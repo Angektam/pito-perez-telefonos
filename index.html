@@ -53,7 +53,7 @@
                         📊 Comparar (0/3)
                     </button>
                     <!-- Toggle Modo Oscuro -->
-                    <button id="theme-toggle" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                    <button id="theme-toggle" class="p-3 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 hover:scale-110 shadow-md" title="Cambiar tema">
                         <span id="theme-icon" class="text-xl">🌙</span>
                     </button>
                 </div>
@@ -83,6 +83,11 @@
             <button data-view="comments" class="mobile-nav-item flex flex-col items-center py-2 px-3 rounded-lg transition-colors">
                 <span class="text-2xl">💬</span>
                 <span class="text-xs mt-1">Chat</span>
+            </button>
+            <!-- Botón de tema en móvil -->
+            <button id="theme-toggle-mobile" class="mobile-nav-item flex flex-col items-center py-2 px-3 rounded-lg transition-colors">
+                <span id="theme-icon-mobile" class="text-2xl">🌙</span>
+                <span class="text-xs mt-1">Tema</span>
             </button>
         </div>
     </div>

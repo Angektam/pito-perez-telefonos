@@ -43,9 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeSecurity();
     secureLogger.info('Aplicación iniciada');
     
-    // Inicializar tema
-    initializeTheme();
-    
     // Inicializar PWA y notificaciones
     initializePWA();
 
@@ -1197,6 +1194,9 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAccountView();
         // renderCommentsView se llamará cuando se acceda a la vista de comentarios
         updateView('dashboard');
+        
+        // Inicializar tema después de que todo esté cargado
+        initializeTheme();
     });
 });
 
@@ -1220,16 +1220,33 @@ let isDarkMode = localStorage.getItem('theme') === 'dark' ||
 function initializeTheme() {
     const themeToggle = document.getElementById('theme-toggle');
     const themeIcon = document.getElementById('theme-icon');
+    const themeToggleMobile = document.getElementById('theme-toggle-mobile');
+    const themeIconMobile = document.getElementById('theme-icon-mobile');
     
-    if (isDarkMode) {
-        document.documentElement.classList.add('dark');
-        themeIcon.textContent = '☀️';
-    } else {
-        document.documentElement.classList.remove('dark');
-        themeIcon.textContent = '🌙';
+    if (!themeToggle || !themeIcon) {
+        console.log('Elementos de tema no encontrados, reintentando...');
+        setTimeout(initializeTheme, 100);
+        return;
     }
     
+    // Aplicar tema inicial
+    if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+        if (themeIcon) themeIcon.textContent = '☀️';
+        if (themeIconMobile) themeIconMobile.textContent = '☀️';
+    } else {
+        document.documentElement.classList.remove('dark');
+        if (themeIcon) themeIcon.textContent = '🌙';
+        if (themeIconMobile) themeIconMobile.textContent = '🌙';
+    }
+    
+    // Agregar event listeners
     themeToggle.addEventListener('click', toggleTheme);
+    if (themeToggleMobile) {
+        themeToggleMobile.addEventListener('click', toggleTheme);
+    }
+    
+    console.log('Tema inicializado correctamente');
 }
 
 function toggleTheme() {
@@ -1237,14 +1254,22 @@ function toggleTheme() {
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
     
     const themeIcon = document.getElementById('theme-icon');
+    const themeIconMobile = document.getElementById('theme-icon-mobile');
     
     if (isDarkMode) {
         document.documentElement.classList.add('dark');
-        themeIcon.textContent = '☀️';
+        if (themeIcon) themeIcon.textContent = '☀️';
+        if (themeIconMobile) themeIconMobile.textContent = '☀️';
+        console.log('Cambiado a modo oscuro');
     } else {
         document.documentElement.classList.remove('dark');
-        themeIcon.textContent = '🌙';
+        if (themeIcon) themeIcon.textContent = '🌙';
+        if (themeIconMobile) themeIconMobile.textContent = '🌙';
+        console.log('Cambiado a modo claro');
     }
+    
+    // Mostrar notificación
+    showToast(isDarkMode ? 'Modo oscuro activado' : 'Modo claro activado', 'info');
 }
 
 // Comparison functions
