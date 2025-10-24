@@ -129,21 +129,26 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const renderAuthSection = () => {
+        const authButtons = document.getElementById('auth-buttons');
         if (state.currentUser) {
-            authSection.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <span class="font-semibold text-slate-700 hidden sm:inline">Hola, ${state.currentUser.name}</span>
-                            <button id="logout-btn" class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600 transition-colors text-sm">Salir</button>
-                        </div>
-                    `;
+            authButtons.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <span class="font-semibold text-slate-700 dark:text-slate-300 hidden sm:inline">Hola, ${state.currentUser.name}</span>
+                    <button id="logout-btn" class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600 transition-colors text-sm">Salir</button>
+                </div>
+            `;
             document.getElementById('logout-btn').addEventListener('click', handleLogout);
         } else {
-            authSection.innerHTML = `
-                        <button id="login-prompt-btn" class="bg-indigo-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-indigo-700 transition-colors text-sm">
-                            Iniciar Sesión
-                        </button>
-                    `;
-            document.getElementById('login-prompt-btn').addEventListener('click', () => showAuthModal());
+            authButtons.innerHTML = `
+                <button id="login-btn" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                    Iniciar Sesión
+                </button>
+                <button id="register-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors text-sm">
+                    Registrarse
+                </button>
+            `;
+            document.getElementById('login-btn').addEventListener('click', () => showAuthModal('login'));
+            document.getElementById('register-btn').addEventListener('click', () => showAuthModal('register'));
         }
     };
 
@@ -1502,4 +1507,80 @@ function scheduleNotifications() {
             'Ahora puedes comparar hasta 3 teléfonos y usar el modo oscuro.'
         );
     }, 30000);
+}
+
+// Modal de autenticación
+function showAuthModal(type = 'login') {
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">
+                    ${type === 'login' ? 'Iniciar Sesión' : 'Registrarse'}
+                </h2>
+                <button onclick="this.closest('.fixed').remove()" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <form id="auth-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Nombre</label>
+                    <input type="text" id="auth-name" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-slate-100" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email</label>
+                    <input type="email" id="auth-email" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-slate-100" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Contraseña</label>
+                    <input type="password" id="auth-password" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-slate-100" required>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors">
+                    ${type === 'login' ? 'Iniciar Sesión' : 'Registrarse'}
+                </button>
+            </form>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Event listener para el formulario
+    document.getElementById('auth-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('auth-name').value;
+        const email = document.getElementById('auth-email').value;
+        const password = document.getElementById('auth-password').value;
+        
+        if (type === 'login') {
+            handleLogin(name, email, password);
+        } else {
+            handleRegister(name, email, password);
+        }
+        
+        modal.remove();
+    });
+}
+
+// Funciones de autenticación
+function handleLogin(name, email, password) {
+    // Simulación de login
+    state.currentUser = { id: 1, name, email };
+    renderAuthSection();
+    showToast('¡Bienvenido!', 'success');
+}
+
+function handleRegister(name, email, password) {
+    // Simulación de registro
+    state.currentUser = { id: 1, name, email };
+    renderAuthSection();
+    showToast('¡Cuenta creada exitosamente!', 'success');
+}
+
+function handleLogout() {
+    state.currentUser = null;
+    renderAuthSection();
+    showToast('Sesión cerrada', 'info');
 }

@@ -1,4 +1,14 @@
-body { font-family: 'Inter', sans-serif; }
+/* Fuentes y estilos base */
+body { 
+    font-family: 'Inter', sans-serif; 
+    font-weight: 400;
+    line-height: 1.6;
+}
+
+/* Asegurar que las fuentes se carguen correctamente */
+* {
+    font-family: 'Inter', sans-serif;
+}
 
 /* Estilos para las estrellas de calificación */
 .rating-star {
@@ -85,9 +95,64 @@ body { font-family: 'Inter', sans-serif; }
         gap: 2rem;
     }
 }
-.chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
-@media (min-width: 768px) { .chart-container { height: 350px; } }
-.hidden { display: none; }
-.nav-item-active { background-color: #4f46e5; color: white; }
-.nav-item { color: #4b5563; }
-.nav-item:hover { background-color: #eef2ff; color: #3730a3; }
+
+/* Estilos para contenedores de gráficos */
+.chart-container { 
+    position: relative; 
+    width: 100%; 
+    max-width: 600px; 
+    margin-left: auto; 
+    margin-right: auto; 
+    height: 300px; 
+    max-height: 400px; 
+}
+
+@media (min-width: 768px) { 
+    .chart-container { 
+        height: 350px; 
+    } 
+}
+
+/* Utilidades */
+.hidden { 
+    display: none; 
+}
+
+/* Navegación */
+.nav-item-active { 
+    background-color: #4f46e5; 
+    color: white; 
+}
+
+.nav-item { 
+    color: #4b5563; 
+}
+
+.nav-item:hover { 
+    background-color: #eef2ff; 
+    color: #3730a3; 
+}
+
+/* Mejorar legibilidad del texto */
+.text-slate-800 {
+    color: #1e293b !important;
+}
+
+.dark .text-slate-100 {
+    color: #f1f5f9 !important;
+}
+
+/* Asegurar que los botones sean visibles */
+button {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+}
+
+/* Mejorar contraste en modo oscuro */
+.dark .text-slate-600 {
+    color: #cbd5e1 !important;
+}
+
+.dark .text-slate-700 {
+    color: #e2e8f0 !important;
+}
