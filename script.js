@@ -446,11 +446,45 @@ document.addEventListener('DOMContentLoaded', () => {
             populatePhoneSelect();
         }, 100);
         
+        // Renderizar mensaje de autenticación
+        renderCommentAuthInfo();
+        
         // Renderizar lista de comentarios
         renderCommentsList();
         
         // Configurar eventos
         setupCommentEvents();
+    };
+
+    const renderCommentAuthInfo = () => {
+        const authInfo = document.getElementById('comment-auth-info');
+        if (authInfo) {
+            if (!state.currentUser) {
+                authInfo.innerHTML = `
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-blue-600">ℹ️</span>
+                            <p class="text-blue-800 text-sm">
+                                <strong>Debes iniciar sesión</strong> para publicar comentarios. 
+                                Solo puedes eliminar tus propios comentarios.
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                authInfo.innerHTML = `
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-600">✅</span>
+                            <p class="text-green-800 text-sm">
+                                Sesión iniciada como <strong>${state.currentUser.name}</strong>. 
+                                Puedes publicar y eliminar tus propios comentarios.
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
     };
 
     const renderCommentsList = () => {
@@ -483,7 +517,9 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="bg-slate-50 p-6 rounded-2xl">
                 <h3 class="text-lg font-bold text-slate-800 mb-4">${phoneName}</h3>
                 <div class="space-y-4">
-                    ${comments.map(comment => `
+                    ${comments.map(comment => {
+                        const canDelete = state.currentUser && comment.author === state.currentUser.name;
+                        return `
                         <div class="bg-white p-4 rounded-xl border border-slate-200">
                             <div class="flex justify-between items-start mb-3">
                                 <div>
@@ -493,13 +529,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <span class="text-sm text-slate-500">${comment.date}</span>
                                     </div>
                                 </div>
-                                <button class="delete-comment-btn text-red-500 hover:text-red-700 text-sm" data-id="${comment.id}">
-                                    🗑️
-                                </button>
+                                ${canDelete ? `
+                                    <button class="delete-comment-btn text-red-500 hover:text-red-700 text-sm" data-id="${comment.id}" title="Eliminar mi comentario">
+                                        🗑️
+                                    </button>
+                                ` : ''}
                             </div>
                             <p class="text-slate-700">${escapeHtml(comment.text)}</p>
                         </div>
-                    `).join('')}
+                    `;
+                    }).join('')}
                 </div>
             </div>
         `).join('');
@@ -559,6 +598,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleCommentSubmit = (e) => {
         e.preventDefault();
         
+        // Verificar si el usuario está logueado
+        if (!state.currentUser) {
+            alert('Debes iniciar sesión para publicar comentarios');
+            showAuthModal();
+            return;
+        }
+        
         const formData = new FormData(e.target);
         const phoneId = parseInt(document.getElementById('comment-phone').value);
         const rating = parseInt(document.querySelector('input[name="rating"]:checked')?.value);
@@ -582,6 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
             rating: rating,
             text: sanitizedText,
             author: sanitizedAuthor,
+            userId: state.currentUser.id, // Agregar ID del usuario para mayor seguridad
             date: new Date().toLocaleDateString('es-ES', { 
                 year: 'numeric', 
                 month: 'short', 
@@ -602,14 +649,36 @@ document.addEventListener('DOMContentLoaded', () => {
             star.classList.remove('text-yellow-400');
         });
         
+        secureLogger.info('Comentario publicado por usuario autenticado');
         alert('¡Comentario publicado exitosamente!');
     };
 
     const deleteComment = (commentId) => {
+        // Verificar si el usuario está logueado
+        if (!state.currentUser) {
+            alert('Debes iniciar sesión para eliminar comentarios');
+            showAuthModal();
+            return;
+        }
+        
+        // Buscar el comentario
+        const comment = state.comments.find(c => c.id === commentId);
+        if (!comment) {
+            alert('Comentario no encontrado');
+            return;
+        }
+        
+        // Verificar que el comentario pertenece al usuario actual
+        if (comment.author !== state.currentUser.name || comment.userId !== state.currentUser.id) {
+            alert('Solo puedes eliminar tus propios comentarios');
+            return;
+        }
+        
         if (confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
             state.comments = state.comments.filter(c => c.id !== commentId);
             saveCommentsToStorage();
             renderCommentsList();
+            secureLogger.info('Comentario eliminado por el autor');
         }
     };
 
