@@ -26,65 +26,6 @@ body { font-family: 'Inter', sans-serif; }
     50% { transform: scale(1.2); filter: drop-shadow(0 0 12px rgba(255, 193, 7, 0.8)); }
     100% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(255, 193, 7, 0.5)); }
 }
-
-/* Responsive improvements */
-@media (max-width: 768px) {
-    .chart-container {
-        height: 250px;
-        max-height: 300px;
-    }
-    
-    .mobile-nav-item {
-        min-width: 60px;
-    }
-    
-    .mobile-nav-item.active {
-        background-color: #4f46e5;
-        color: white;
-    }
-    
-    .mobile-nav-item:hover {
-        background-color: #eef2ff;
-        color: #3730a3;
-    }
-    
-    /* Mejorar espaciado en móvil */
-    .grid {
-        gap: 1rem;
-    }
-    
-    /* Botones más grandes en móvil */
-    button {
-        min-height: 44px;
-    }
-    
-    /* Texto más legible en móvil */
-    .text-sm {
-        font-size: 0.875rem;
-    }
-}
-
-/* Mejoras para tablets */
-@media (min-width: 768px) and (max-width: 1024px) {
-    .chart-container {
-        height: 300px;
-    }
-    
-    .grid {
-        gap: 1.5rem;
-    }
-}
-
-/* Mejoras para pantallas grandes */
-@media (min-width: 1024px) {
-    .chart-container {
-        height: 350px;
-    }
-    
-    .grid {
-        gap: 2rem;
-    }
-}
 .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
 @media (min-width: 768px) { .chart-container { height: 350px; } }
 .hidden { display: none; }

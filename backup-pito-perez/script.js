@@ -42,12 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializar medidas de seguridad
     initializeSecurity();
     secureLogger.info('Aplicación iniciada');
-    
-    // Inicializar tema
-    initializeTheme();
-    
-    // Inicializar PWA y notificaciones
-    initializePWA();
 
     let phoneDatabase = []; 
     
@@ -59,7 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
         filters: { brand: '', storage: '', ram: '', minCamera: '', minBattery: '', os: '', condition: '', minPrice: '', maxPrice: '' },
         easyAnswers: { usage: null, budget: null, priority: null, system: null, size: null },
         comments: [],
-        comparison: []
     };
 
     const views = document.querySelectorAll('.view-container');
@@ -85,14 +78,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             <img src="${imageUrl}" alt="Teléfono ${phone.name}" class="object-cover h-full w-full opacity-90 transition-transform duration-300 hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                             <div class="hidden items-center justify-center h-full w-full text-6xl bg-gradient-to-br from-indigo-100 to-purple-100">📱</div>
                         </div>
-                        <div class="absolute top-3 right-3 flex flex-col space-y-2">
-                            <button class="compare-btn w-10 h-10 bg-green-500 rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform" data-id="${phone.id}" title="Agregar a comparación">
-                                <span class="text-white text-sm font-bold">+</span>
-                            </button>
-                            <button class="favorite-btn w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform" data-id="${phone.id}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="${isFavorite ? '#ef4444' : 'none'}" stroke="${isFavorite ? '#ef4444' : 'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                            </button>
-                        </div>
+                        <button class="favorite-btn absolute top-3 right-3 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform" data-id="${phone.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="${isFavorite ? '#ef4444' : 'none'}" stroke="${isFavorite ? '#ef4444' : 'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                        </button>
                     </div>
                     <div class="flex-grow pt-4">
                         ${badge ? `<div class="text-xs font-bold ${badge.color} text-white px-3 py-1 rounded-full inline-block mb-2">${badge.icon} ${badge.text}</div>` : ''}
@@ -270,21 +258,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div id="search-results-container" class="mt-8"></div>
                 `;
         document.getElementById('search-btn').addEventListener('click', handleSearch);
-        
-        // Búsqueda en tiempo real
-        const searchInputs = [
-            'filter-brand', 'filter-storage', 'filter-ram', 'filter-os', 
-            'filter-condition', 'filter-minCamera', 'filter-minBattery', 
-            'filter-minPrice', 'filter-maxPrice'
-        ];
-        
-        searchInputs.forEach(inputId => {
-            const input = document.getElementById(inputId);
-            if (input) {
-                input.addEventListener('input', debounce(handleSearch, 300));
-            }
-        });
-        
         handleSearch(); 
     };
     
@@ -1169,10 +1142,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (favoriteBtn) {
             handleToggleFavorite(parseInt(favoriteBtn.dataset.id));
         }
-        const compareBtn = e.target.closest('.compare-btn');
-        if (compareBtn) {
-            addToComparison(compareBtn.dataset.id);
-        }
         const deleteHistoryBtn = e.target.closest('.delete-history-btn');
         if (deleteHistoryBtn) {
             state.searchHistory = state.searchHistory.filter(h => h.id !== parseInt(deleteHistoryBtn.dataset.id));
@@ -1194,312 +1163,3 @@ document.addEventListener('DOMContentLoaded', () => {
         updateView('dashboard');
     });
 });
-
-// Debounce function for real-time search
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// Theme management
-let isDarkMode = localStorage.getItem('theme') === 'dark' || 
-                 (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
-
-function initializeTheme() {
-    const themeToggle = document.getElementById('theme-toggle');
-    const themeIcon = document.getElementById('theme-icon');
-    
-    if (isDarkMode) {
-        document.documentElement.classList.add('dark');
-        themeIcon.textContent = '☀️';
-    } else {
-        document.documentElement.classList.remove('dark');
-        themeIcon.textContent = '🌙';
-    }
-    
-    themeToggle.addEventListener('click', toggleTheme);
-}
-
-function toggleTheme() {
-    isDarkMode = !isDarkMode;
-    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-    
-    const themeIcon = document.getElementById('theme-icon');
-    
-    if (isDarkMode) {
-        document.documentElement.classList.add('dark');
-        themeIcon.textContent = '☀️';
-    } else {
-        document.documentElement.classList.remove('dark');
-        themeIcon.textContent = '🌙';
-    }
-}
-
-// Comparison functions
-function addToComparison(phoneId) {
-    if (state.comparison.length >= 3) {
-        showToast('Máximo 3 teléfonos para comparar', 'warning');
-        return;
-    }
-    
-    if (state.comparison.includes(phoneId)) {
-        showToast('Este teléfono ya está en la comparación', 'info');
-        return;
-    }
-    
-    state.comparison.push(phoneId);
-    updateComparisonUI();
-    showToast('Teléfono agregado a la comparación', 'success');
-}
-
-function removeFromComparison(phoneId) {
-    state.comparison = state.comparison.filter(id => id !== phoneId);
-    updateComparisonUI();
-    showToast('Teléfono removido de la comparación', 'info');
-}
-
-function updateComparisonUI() {
-    const comparisonBtn = document.getElementById('comparison-btn');
-    if (comparisonBtn) {
-        comparisonBtn.innerHTML = `📊 Comparar (${state.comparison.length}/3)`;
-        comparisonBtn.disabled = state.comparison.length === 0;
-    }
-}
-
-function showComparison() {
-    if (state.comparison.length === 0) {
-        showToast('Agrega teléfonos para comparar', 'warning');
-        return;
-    }
-    
-    const phones = state.comparison.map(id => phoneDatabase.find(p => p.id === id)).filter(Boolean);
-    renderComparisonModal(phones);
-}
-
-function renderComparisonModal(phones) {
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
-    modal.innerHTML = `
-        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
-            <div class="p-6 border-b border-slate-200 dark:border-slate-700">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Comparación de Teléfonos</h2>
-                    <button onclick="this.closest('.fixed').remove()" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            <div class="p-6">
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="border-b border-slate-200 dark:border-slate-700">
-                                <th class="text-left py-3 px-4 font-semibold text-slate-600 dark:text-slate-300">Especificación</th>
-                                ${phones.map(phone => `
-                                    <th class="text-center py-3 px-4 font-semibold text-slate-600 dark:text-slate-300">
-                                        <div class="flex flex-col items-center">
-                                            <img src="${phone.image}" alt="${phone.name}" class="w-16 h-16 object-cover rounded-lg mb-2" onerror="this.style.display='none'">
-                                            <span class="text-sm">${phone.name}</span>
-                                        </div>
-                                    </th>
-                                `).join('')}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="border-b border-slate-100 dark:border-slate-700">
-                                <td class="py-3 px-4 font-medium text-slate-700 dark:text-slate-300">Precio</td>
-                                ${phones.map(phone => `
-                                    <td class="py-3 px-4 text-center text-lg font-bold text-indigo-600 dark:text-indigo-400">
-                                        $${phone.price.toLocaleString('es-MX')}
-                                    </td>
-                                `).join('')}
-                            </tr>
-                            <tr class="border-b border-slate-100 dark:border-slate-700">
-                                <td class="py-3 px-4 font-medium text-slate-700 dark:text-slate-300">Especificaciones</td>
-                                ${phones.map(phone => `
-                                    <td class="py-3 px-4 text-center text-sm text-slate-600 dark:text-slate-400">
-                                        ${phone.specs}
-                                    </td>
-                                `).join('')}
-                            </tr>
-                            <tr class="border-b border-slate-100 dark:border-slate-700">
-                                <td class="py-3 px-4 font-medium text-slate-700 dark:text-slate-300">Batería</td>
-                                ${phones.map(phone => `
-                                    <td class="py-3 px-4 text-center text-slate-600 dark:text-slate-400">
-                                        ${phone.battery || 'N/A'} mAh
-                                    </td>
-                                `).join('')}
-                            </tr>
-                            <tr class="border-b border-slate-100 dark:border-slate-700">
-                                <td class="py-3 px-4 font-medium text-slate-700 dark:text-slate-300">Almacenamiento</td>
-                                ${phones.map(phone => `
-                                    <td class="py-3 px-4 text-center text-slate-600 dark:text-slate-400">
-                                        ${phone.storage || 'N/A'}
-                                    </td>
-                                `).join('')}
-                            </tr>
-                            <tr class="border-b border-slate-100 dark:border-slate-700">
-                                <td class="py-3 px-4 font-medium text-slate-700 dark:text-slate-300">RAM</td>
-                                ${phones.map(phone => `
-                                    <td class="py-3 px-4 text-center text-slate-600 dark:text-slate-400">
-                                        ${phone.ram || 'N/A'}
-                                    </td>
-                                `).join('')}
-                            </tr>
-                            <tr>
-                                <td class="py-3 px-4 font-medium text-slate-700 dark:text-slate-300">Acciones</td>
-                                ${phones.map(phone => `
-                                    <td class="py-3 px-4 text-center">
-                                        <button onclick="removeFromComparison('${phone.id}'); this.closest('.fixed').remove(); showComparison();" 
-                                                class="bg-red-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-600 transition-colors">
-                                            Quitar
-                                        </button>
-                                    </td>
-                                `).join('')}
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-}
-
-function showToast(message, type = 'info') {
-    const toast = document.createElement('div');
-    const colors = {
-        success: 'bg-green-500',
-        error: 'bg-red-500',
-        warning: 'bg-yellow-500',
-        info: 'bg-blue-500'
-    };
-    
-    toast.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full`;
-    toast.textContent = message;
-    
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.classList.remove('translate-x-full');
-    }, 100);
-    
-    setTimeout(() => {
-        toast.classList.add('translate-x-full');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-// PWA and Notifications
-function initializePWA() {
-    // Registrar Service Worker
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js')
-            .then((registration) => {
-                console.log('SW registrado exitosamente:', registration);
-            })
-            .catch((error) => {
-                console.log('Error al registrar SW:', error);
-            });
-    }
-    
-    // Solicitar permisos de notificación
-    if ('Notification' in window) {
-        if (Notification.permission === 'default') {
-            Notification.requestPermission().then((permission) => {
-                if (permission === 'granted') {
-                    showToast('Notificaciones habilitadas', 'success');
-                }
-            });
-        }
-    }
-    
-    // Detectar si es instalable
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        showInstallButton();
-    });
-    
-    // Detectar si ya está instalado
-    window.addEventListener('appinstalled', () => {
-        showToast('¡App instalada exitosamente!', 'success');
-        hideInstallButton();
-    });
-}
-
-function showInstallButton() {
-    const installBtn = document.createElement('button');
-    installBtn.id = 'install-btn';
-    installBtn.className = 'fixed bottom-20 right-4 bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 hover:bg-indigo-700 transition-colors';
-    installBtn.innerHTML = '📱 Instalar App';
-    installBtn.onclick = installApp;
-    document.body.appendChild(installBtn);
-}
-
-function hideInstallButton() {
-    const installBtn = document.getElementById('install-btn');
-    if (installBtn) {
-        installBtn.remove();
-    }
-}
-
-function installApp() {
-    if (window.deferredPrompt) {
-        window.deferredPrompt.prompt();
-        window.deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('Usuario aceptó la instalación');
-            }
-            window.deferredPrompt = null;
-        });
-    }
-}
-
-function sendNotification(title, body, icon = null) {
-    if ('Notification' in window && Notification.permission === 'granted') {
-        const notification = new Notification(title, {
-            body: body,
-            icon: icon || '/icon-192x192.png',
-            badge: '/badge-72x72.png',
-            vibrate: [100, 50, 100],
-            requireInteraction: true
-        });
-        
-        notification.onclick = () => {
-            window.focus();
-            notification.close();
-        };
-        
-        return notification;
-    }
-}
-
-// Notificaciones automáticas
-function scheduleNotifications() {
-    // Notificación de bienvenida
-    setTimeout(() => {
-        sendNotification(
-            '¡Bienvenido a Pito Pérez!',
-            'Explora nuestro catálogo de teléfonos y encuentra el perfecto para ti.'
-        );
-    }, 5000);
-    
-    // Notificación de nuevas funciones
-    setTimeout(() => {
-        sendNotification(
-            'Nuevas funciones disponibles',
-            'Ahora puedes comparar hasta 3 teléfonos y usar el modo oscuro.'
-        );
-    }, 30000);
-}
