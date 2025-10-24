@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Pito Pérez - Guía Interactiva de Smartphones</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-40 shadow-sm border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center space-x-3">
+                    <span class="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+                        Pito Pérez
+                    </span>
+                </div>
+                <nav class="hidden md:flex items-center space-x-2">
+                    <button data-view="dashboard" class="nav-item nav-item-active px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200 flex items-center gap-2">📊 Panel General</button>
+                    <button data-view="search" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200 flex items-center gap-2">🔍 Búsqueda Avanzada</button>
+                    <button data-view="easy" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200 flex items-center gap-2">🎯 Modo Fácil</button>
+                    <button data-view="account" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200 flex items-center gap-2">👤 Mi Cuenta</button>
+                    <button data-view="comments" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200 flex items-center gap-2">💬 Comentarios</button>
+                </nav>
+                <div id="auth-section" class="flex items-center">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        <div id="loading-indicator" class="text-center py-20">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500 mx-auto"></div>
+            <p class="mt-4 text-xl font-semibold text-slate-700">Cargando catálogo dinámico...</p>
+        </div>
+
+        <div id="dashboard-view" class="view-container hidden">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900">Bienvenido a la Guía de Smartphones</h1>
+                <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">Explora el mercado de teléfonos con nuestros gráficos interactivos o encuentra tu dispositivo ideal con nuestras herramientas de búsqueda. (Datos obtenidos de una API)</p>
+            </div>
+            <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200 mb-8">
+                <h2 class="text-2xl font-bold text-center mb-2">Resumen del Mercado</h2>
+                <p class="text-slate-500 text-center mb-8">Estos gráficos se basan en nuestro catálogo de productos simulados.</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <div>
+                        <h3 class="text-lg font-semibold text-center mb-4">Precio Promedio por Marca (USD)</h3>
+                        <div class="chart-container"><canvas id="priceChart"></canvas></div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-center mb-4">Capacidad de Batería (mAh)</h3>
+                        <div class="chart-container"><canvas id="batteryChart"></canvas></div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-center mb-4">Distribución de Sistema Operativo</h3>
+                        <div class="chart-container"><canvas id="osChart"></canvas></div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-center mb-4">Cámara Principal (MP)</h3>
+                         <div class="chart-container"><canvas id="cameraChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="search-view" class="view-container hidden">
+            <div id="search-results-container" class="mt-8">
+            </div>
+        </div>
+
+        <div id="easy-view" class="view-container hidden">
+             <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200 text-center mb-8">
+                <h1 class="text-4xl font-bold text-slate-800 mb-4">🎯 Modo Fácil</h1>
+                <p class="text-lg text-slate-600 leading-relaxed max-w-3xl mx-auto">
+                    Responde algunas preguntas simples y te ayudaremos a encontrar el teléfono perfecto. ¡No necesitas ser un experto!
+                </p>
+            </div>
+            <div id="easy-mode-questions">
+            </div>
+             <div id="easy-mode-results-container" class="mt-12">
+            </div>
+        </div>
+
+        <div id="account-view" class="view-container hidden">
+        </div>
+
+        <div id="comments-view" class="view-container hidden">
+            <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2 text-center">💬 Comentarios y Opiniones</h2>
+                <p class="text-slate-500 text-center mb-8">Comparte tu experiencia y lee opiniones de otros usuarios sobre los teléfonos.</p>
+                
+                <!-- Formulario para agregar comentario -->
+                <div class="bg-slate-50 p-6 rounded-2xl mb-8">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-4">Agregar Comentario</h3>
+                    <form id="comment-form" class="space-y-4">
+                        <div>
+                            <label for="comment-phone" class="block text-sm font-medium text-slate-700 mb-2">Teléfono</label>
+                            <select id="comment-phone" required class="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="">Selecciona un teléfono</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="comment-rating" class="block text-sm font-medium text-slate-700 mb-2">Calificación</label>
+                            <div class="flex space-x-2">
+                                <input type="radio" id="rating-5" name="rating" value="5" class="sr-only">
+                                <label for="rating-5" class="rating-star text-2xl cursor-pointer hover:text-yellow-400" data-rating="5">⭐</label>
+                                <input type="radio" id="rating-4" name="rating" value="4" class="sr-only">
+                                <label for="rating-4" class="rating-star text-2xl cursor-pointer hover:text-yellow-400" data-rating="4">⭐</label>
+                                <input type="radio" id="rating-3" name="rating" value="3" class="sr-only">
+                                <label for="rating-3" class="rating-star text-2xl cursor-pointer hover:text-yellow-400" data-rating="3">⭐</label>
+                                <input type="radio" id="rating-2" name="rating" value="2" class="sr-only">
+                                <label for="rating-2" class="rating-star text-2xl cursor-pointer hover:text-yellow-400" data-rating="2">⭐</label>
+                                <input type="radio" id="rating-1" name="rating" value="1" class="sr-only">
+                                <label for="rating-1" class="rating-star text-2xl cursor-pointer hover:text-yellow-400" data-rating="1">⭐</label>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="comment-text" class="block text-sm font-medium text-slate-700 mb-2">Comentario</label>
+                            <textarea id="comment-text" required rows="4" placeholder="Escribe tu opinión sobre este teléfono..." class="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                        </div>
+                        <div>
+                            <label for="comment-author" class="block text-sm font-medium text-slate-700 mb-2">Tu nombre</label>
+                            <input type="text" id="comment-author" required placeholder="Tu nombre" class="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors">
+                            Publicar Comentario
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Lista de comentarios -->
+                <div id="comments-list" class="space-y-6">
+                    <!-- Los comentarios se cargarán aquí dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-200 shadow-t-lg z-40 p-2">
+        <div class="flex justify-around">
+            <button data-view="dashboard" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-indigo-600"><span class="text-2xl">📊</span><span>Panel</span></button>
+            <button data-view="search" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-slate-500"><span class="text-2xl">🔍</span><span>Buscar</span></button>
+            <button data-view="easy" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-slate-500"><span class="text-2xl">🎯</span><span>Fácil</span></button>
+            <button data-view="account" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-slate-500"><span class="text-2xl">👤</span><span>Cuenta</span></button>
+            <button data-view="comments" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-slate-500"><span class="text-2xl">💬</span><span>Comentarios</span></button>
+        </div>
+    </footer>
+    <div class="h-20 md:hidden"></div>
+
+    <div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 hidden">
+        <div id="modal-content" class="bg-white rounded-3xl shadow-2xl w-full max-w-md m-4 relative transform transition-all duration-300">
+        </div>
+    </div>
+    
+    <script type="module" src="script.js"></script>
+</body>
+</html>

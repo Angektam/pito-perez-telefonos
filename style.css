@@ -1,0 +1,7 @@
+body { font-family: 'Inter', sans-serif; }
+.chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+@media (min-width: 768px) { .chart-container { height: 350px; } }
+.hidden { display: none; }
+.nav-item-active { background-color: #4f46e5; color: white; }
+.nav-item { color: #4b5563; }
+.nav-item:hover { background-color: #eef2ff; color: #3730a3; }

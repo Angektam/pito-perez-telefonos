@@ -1,0 +1,29 @@
+# Configuración para GitHub Pages
+title: "Pito Pérez - Guía Interactiva de Smartphones"
+description: "Una aplicación web moderna para explorar y comparar smartphones con datos en tiempo real, gráficos interactivos y sistema de comentarios."
+
+# Configuración de GitHub Pages
+plugins:
+  - jekyll-sitemap
+  - jekyll-feed
+
+# Configuración del sitio
+baseurl: "/pito-perez-telefonos"
+url: "https://tu-usuario.github.io"
+
+# Configuración de build
+exclude:
+  - README.md
+  - DEPLOY.md
+  - server.py
+  - start.bat
+  - setup-github.bat
+  - netlify.toml
+
+# Configuración de permalinks
+permalink: /:title/
+
+# Configuración de colecciones
+collections:
+  phones:
+    output: true
