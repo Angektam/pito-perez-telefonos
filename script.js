@@ -562,6 +562,24 @@ document.addEventListener('DOMContentLoaded', () => {
         // Eventos para las estrellas de calificación
         document.querySelectorAll('.rating-star').forEach(star => {
             star.addEventListener('click', handleRatingClick);
+            
+            // Efecto hover
+            star.addEventListener('mouseenter', (e) => {
+                e.target.style.transform = 'scale(1.2)';
+                e.target.style.transition = 'all 0.2s ease-in-out';
+            });
+            
+            star.addEventListener('mouseleave', (e) => {
+                const rating = parseInt(e.target.dataset.rating);
+                const selectedRating = document.querySelector('input[name="rating"]:checked')?.value;
+                
+                if (selectedRating && rating <= parseInt(selectedRating)) {
+                    e.target.style.transform = 'scale(1.1)';
+                } else {
+                    e.target.style.transform = 'scale(1)';
+                }
+                e.target.style.transition = 'all 0.2s ease-in-out';
+            });
         });
         
         // Eventos para eliminar comentarios
@@ -581,13 +599,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleRatingClick = (e) => {
         const rating = parseInt(e.target.dataset.rating);
         
-        // Actualizar visualmente las estrellas
+        // Actualizar visualmente las estrellas con animación
         document.querySelectorAll('.rating-star').forEach((star, index) => {
             const starRating = 5 - index;
             if (starRating <= rating) {
-                star.classList.add('text-yellow-400');
+                star.classList.add('text-yellow-400', 'scale-110');
+                star.style.transform = 'scale(1.1)';
+                star.style.transition = 'all 0.2s ease-in-out';
             } else {
-                star.classList.remove('text-yellow-400');
+                star.classList.remove('text-yellow-400', 'scale-110');
+                star.style.transform = 'scale(1)';
+                star.style.transition = 'all 0.2s ease-in-out';
             }
         });
         
@@ -646,7 +668,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Limpiar formulario
         e.target.reset();
         document.querySelectorAll('.rating-star').forEach(star => {
-            star.classList.remove('text-yellow-400');
+            star.classList.remove('text-yellow-400', 'scale-110');
+            star.style.transform = 'scale(1)';
+            star.style.transition = 'all 0.3s ease-in-out';
         });
         
         secureLogger.info('Comentario publicado por usuario autenticado');

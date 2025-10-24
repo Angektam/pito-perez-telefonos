@@ -1,4 +1,31 @@
 body { font-family: 'Inter', sans-serif; }
+
+/* Estilos para las estrellas de calificación */
+.rating-star {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.rating-star:hover {
+    animation: starPulse 0.6s ease-in-out infinite alternate;
+    filter: drop-shadow(0 4px 8px rgba(255, 193, 7, 0.3));
+}
+
+.rating-star.text-yellow-400 {
+    animation: starGlow 1s ease-in-out;
+    filter: drop-shadow(0 0 8px rgba(255, 193, 7, 0.5));
+}
+
+@keyframes starPulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.15); }
+}
+
+@keyframes starGlow {
+    0% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(255, 193, 7, 0)); }
+    50% { transform: scale(1.2); filter: drop-shadow(0 0 12px rgba(255, 193, 7, 0.8)); }
+    100% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(255, 193, 7, 0.5)); }
+}
 .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
 @media (min-width: 768px) { .chart-container { height: 350px; } }
 .hidden { display: none; }
