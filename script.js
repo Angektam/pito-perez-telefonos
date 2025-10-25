@@ -1213,64 +1213,16 @@ function debounce(func, wait) {
     };
 }
 
-// Theme management
-let isDarkMode = localStorage.getItem('theme') === 'dark' || 
-                 (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+// Theme management - Solo modo oscuro
+let isDarkMode = true;
 
 function initializeTheme() {
-    const themeToggle = document.getElementById('theme-toggle');
-    const themeIcon = document.getElementById('theme-icon');
-    const themeToggleMobile = document.getElementById('theme-toggle-mobile');
-    const themeIconMobile = document.getElementById('theme-icon-mobile');
-    
-    if (!themeToggle || !themeIcon) {
-        console.log('Elementos de tema no encontrados, reintentando...');
-        setTimeout(initializeTheme, 100);
-        return;
-    }
-    
-    // Aplicar tema inicial
-    if (isDarkMode) {
-        document.documentElement.classList.add('dark');
-        if (themeIcon) themeIcon.textContent = '☀️';
-        if (themeIconMobile) themeIconMobile.textContent = '☀️';
-    } else {
-        document.documentElement.classList.remove('dark');
-        if (themeIcon) themeIcon.textContent = '🌙';
-        if (themeIconMobile) themeIconMobile.textContent = '🌙';
-    }
-    
-    // Agregar event listeners
-    themeToggle.addEventListener('click', toggleTheme);
-    if (themeToggleMobile) {
-        themeToggleMobile.addEventListener('click', toggleTheme);
-    }
-    
-    console.log('Tema inicializado correctamente');
+    // Aplicar modo oscuro siempre
+    document.documentElement.classList.add('dark');
+    console.log('Modo oscuro aplicado permanentemente');
 }
 
-function toggleTheme() {
-    isDarkMode = !isDarkMode;
-    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-    
-    const themeIcon = document.getElementById('theme-icon');
-    const themeIconMobile = document.getElementById('theme-icon-mobile');
-    
-    if (isDarkMode) {
-        document.documentElement.classList.add('dark');
-        if (themeIcon) themeIcon.textContent = '☀️';
-        if (themeIconMobile) themeIconMobile.textContent = '☀️';
-        console.log('Cambiado a modo oscuro');
-    } else {
-        document.documentElement.classList.remove('dark');
-        if (themeIcon) themeIcon.textContent = '🌙';
-        if (themeIconMobile) themeIconMobile.textContent = '🌙';
-        console.log('Cambiado a modo claro');
-    }
-    
-    // Mostrar notificación
-    showToast(isDarkMode ? 'Modo oscuro activado' : 'Modo claro activado', 'info');
-}
+// Función eliminada - solo modo oscuro
 
 // Comparison functions
 function addToComparison(phoneId) {

@@ -1,13 +1,41 @@
-/* Fuentes y estilos base */
+/* Fuentes y estilos base - Modo oscuro permanente */
+html {
+    background-color: #0f172a;
+}
+
 body { 
     font-family: 'Inter', sans-serif; 
     font-weight: 400;
     line-height: 1.6;
+    background-color: #0f172a;
+    color: #f1f5f9;
 }
 
 /* Asegurar que las fuentes se carguen correctamente */
 * {
     font-family: 'Inter', sans-serif;
+}
+
+/* Forzar modo oscuro en todos los elementos */
+* {
+    color-scheme: dark;
+}
+
+/* Asegurar que todos los elementos usen colores oscuros */
+.bg-slate-50 {
+    background-color: #0f172a !important;
+}
+
+.text-slate-800 {
+    color: #f1f5f9 !important;
+}
+
+.bg-white {
+    background-color: #1e293b !important;
+}
+
+.border-slate-200 {
+    border-color: #334155 !important;
 }
 
 /* Estilos para las estrellas de calificación */
