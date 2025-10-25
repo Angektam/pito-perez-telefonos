@@ -56,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
         filters: { brand: '', storage: '', ram: '', minCamera: '', minBattery: '', os: '', condition: '', minPrice: '', maxPrice: '' },
         easyAnswers: { usage: null, budget: null, priority: null, system: null, size: null },
         comments: [],
-        comparison: []
     };
 
     const views = document.querySelectorAll('.view-container');
@@ -82,14 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             <img src="${imageUrl}" alt="Teléfono ${phone.name}" class="object-cover h-full w-full opacity-90 transition-transform duration-300 hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                             <div class="hidden items-center justify-center h-full w-full text-6xl bg-gradient-to-br from-indigo-100 to-purple-100">📱</div>
                         </div>
-                        <div class="absolute top-3 right-3 flex flex-col space-y-2">
-                            <button class="compare-btn w-10 h-10 bg-green-500 rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform" data-id="${phone.id}" title="Agregar a comparación">
-                                <span class="text-white text-sm font-bold">+</span>
-                            </button>
-                            <button class="favorite-btn w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform" data-id="${phone.id}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="${isFavorite ? '#ef4444' : 'none'}" stroke="${isFavorite ? '#ef4444' : 'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                            </button>
-                        </div>
+                        <button class="favorite-btn absolute top-3 right-3 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform" data-id="${phone.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="${isFavorite ? '#ef4444' : 'none'}" stroke="${isFavorite ? '#ef4444' : 'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                        </button>
                     </div>
                     <div class="flex-grow pt-4">
                         ${badge ? `<div class="text-xs font-bold ${badge.color} text-white px-3 py-1 rounded-full inline-block mb-2">${badge.icon} ${badge.text}</div>` : ''}
@@ -1171,10 +1165,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (favoriteBtn) {
             handleToggleFavorite(parseInt(favoriteBtn.dataset.id));
         }
-        const compareBtn = e.target.closest('.compare-btn');
-        if (compareBtn) {
-            addToComparison(compareBtn.dataset.id);
-        }
         const deleteHistoryBtn = e.target.closest('.delete-history-btn');
         if (deleteHistoryBtn) {
             state.searchHistory = state.searchHistory.filter(h => h.id !== parseInt(deleteHistoryBtn.dataset.id));
@@ -1222,138 +1212,6 @@ function initializeTheme() {
     console.log('Modo claro aplicado permanentemente');
 }
 
-// Comparison functions
-function addToComparison(phoneId) {
-    if (state.comparison.length >= 3) {
-        showToast('Máximo 3 teléfonos para comparar', 'warning');
-        return;
-    }
-    
-    if (state.comparison.includes(phoneId)) {
-        showToast('Este teléfono ya está en la comparación', 'info');
-        return;
-    }
-    
-    state.comparison.push(phoneId);
-    updateComparisonUI();
-    showToast('Teléfono agregado a la comparación', 'success');
-}
-
-function removeFromComparison(phoneId) {
-    state.comparison = state.comparison.filter(id => id !== phoneId);
-    updateComparisonUI();
-    showToast('Teléfono removido de la comparación', 'info');
-}
-
-function updateComparisonUI() {
-    const comparisonBtn = document.getElementById('comparison-btn');
-    if (comparisonBtn) {
-        comparisonBtn.innerHTML = `📊 Comparar (${state.comparison.length}/3)`;
-        comparisonBtn.disabled = state.comparison.length === 0;
-    }
-}
-
-function showComparison() {
-    if (state.comparison.length === 0) {
-        showToast('Agrega teléfonos para comparar', 'warning');
-        return;
-    }
-    
-    const phones = state.comparison.map(id => phoneDatabase.find(p => p.id === id)).filter(Boolean);
-    renderComparisonModal(phones);
-}
-
-function renderComparisonModal(phones) {
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
-    modal.innerHTML = `
-        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
-            <div class="p-6 border-b border-slate-200 dark:border-slate-700">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Comparación de Teléfonos</h2>
-                    <button onclick="this.closest('.fixed').remove()" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            <div class="p-6">
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="border-b border-slate-200 dark:border-slate-700">
-                                <th class="text-left py-3 px-4 font-semibold text-slate-600 dark:text-slate-300">Especificación</th>
-                                ${phones.map(phone => `
-                                    <th class="text-center py-3 px-4 font-semibold text-slate-600 dark:text-slate-300">
-                                        <div class="flex flex-col items-center">
-                                            <img src="${phone.image}" alt="${phone.name}" class="w-16 h-16 object-cover rounded-lg mb-2" onerror="this.style.display='none'">
-                                            <span class="text-sm">${phone.name}</span>
-                                        </div>
-                                    </th>
-                                `).join('')}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="border-b border-slate-100 dark:border-slate-700">
-                                <td class="py-3 px-4 font-medium text-slate-700 dark:text-slate-300">Precio</td>
-                                ${phones.map(phone => `
-                                    <td class="py-3 px-4 text-center text-lg font-bold text-indigo-600 dark:text-indigo-400">
-                                        $${phone.price.toLocaleString('es-MX')}
-                                    </td>
-                                `).join('')}
-                            </tr>
-                            <tr class="border-b border-slate-100 dark:border-slate-700">
-                                <td class="py-3 px-4 font-medium text-slate-700 dark:text-slate-300">Especificaciones</td>
-                                ${phones.map(phone => `
-                                    <td class="py-3 px-4 text-center text-sm text-slate-600 dark:text-slate-400">
-                                        ${phone.specs}
-                                    </td>
-                                `).join('')}
-                            </tr>
-                            <tr class="border-b border-slate-100 dark:border-slate-700">
-                                <td class="py-3 px-4 font-medium text-slate-700 dark:text-slate-300">Batería</td>
-                                ${phones.map(phone => `
-                                    <td class="py-3 px-4 text-center text-slate-600 dark:text-slate-400">
-                                        ${phone.battery || 'N/A'} mAh
-                                    </td>
-                                `).join('')}
-                            </tr>
-                            <tr class="border-b border-slate-100 dark:border-slate-700">
-                                <td class="py-3 px-4 font-medium text-slate-700 dark:text-slate-300">Almacenamiento</td>
-                                ${phones.map(phone => `
-                                    <td class="py-3 px-4 text-center text-slate-600 dark:text-slate-400">
-                                        ${phone.storage || 'N/A'}
-                                    </td>
-                                `).join('')}
-                            </tr>
-                            <tr class="border-b border-slate-100 dark:border-slate-700">
-                                <td class="py-3 px-4 font-medium text-slate-700 dark:text-slate-300">RAM</td>
-                                ${phones.map(phone => `
-                                    <td class="py-3 px-4 text-center text-slate-600 dark:text-slate-400">
-                                        ${phone.ram || 'N/A'}
-                                    </td>
-                                `).join('')}
-                            </tr>
-                            <tr>
-                                <td class="py-3 px-4 font-medium text-slate-700 dark:text-slate-300">Acciones</td>
-                                ${phones.map(phone => `
-                                    <td class="py-3 px-4 text-center">
-                                        <button onclick="removeFromComparison('${phone.id}'); this.closest('.fixed').remove(); showComparison();" 
-                                                class="bg-red-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-600 transition-colors">
-                                            Quitar
-                                        </button>
-                                    </td>
-                                `).join('')}
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-}
 
 function showToast(message, type = 'info') {
     const toast = document.createElement('div');
