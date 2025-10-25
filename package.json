@@ -1,0 +1,32 @@
+{
+  "name": "pito-perez-telefonos",
+  "version": "1.0.0",
+  "description": "Guía interactiva de smartphones con comparación, búsqueda avanzada y recomendaciones",
+  "main": "index.html",
+  "scripts": {
+    "start": "python server.py",
+    "dev": "python -m http.server 8000",
+    "build": "echo 'No build process needed for static site'",
+    "deploy": "git push origin main"
+  },
+  "keywords": [
+    "smartphones",
+    "telefonos",
+    "comparacion",
+    "busqueda",
+    "recomendaciones",
+    "pwa"
+  ],
+  "author": "Pito Pérez",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Angektam/pito-perez-telefonos.git"
+  },
+  "homepage": "https://Angektam.github.io/pito-perez-telefonos",
+  "devDependencies": {},
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

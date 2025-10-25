@@ -1,13 +1,14 @@
-// Service Worker para PWA
+// Service Worker para PWA - Pito Pérez
 const CACHE_NAME = 'pito-perez-v1.0';
 const urlsToCache = [
     '/',
     '/index.html',
-    '/style.css',
-    '/script.js',
-    '/api.js',
-    '/security.js',
-    '/fallback-db.js',
+    '/manifest.json',
+    '/src/css/style.css',
+    '/src/js/script.js',
+    '/src/js/api.js',
+    '/src/js/security.js',
+    '/src/js/fallback-db.js',
     'https://cdn.tailwindcss.com',
     'https://cdn.jsdelivr.net/npm/chart.js',
     'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'

@@ -1,0 +1,47 @@
+{
+  "project": {
+    "name": "Pito Pérez - Guía de Teléfonos",
+    "version": "1.0.0",
+    "description": "Aplicación web progresiva para comparar y buscar teléfonos",
+    "author": "Pito Pérez",
+    "license": "MIT"
+  },
+  "development": {
+    "server": {
+      "port": 8000,
+      "host": "localhost",
+      "protocol": "http"
+    },
+    "features": {
+      "pwa": true,
+      "darkMode": false,
+      "comparison": false,
+      "realTimeSearch": true,
+      "notifications": true,
+      "security": true
+    }
+  },
+  "api": {
+    "primary": "https://fakestoreapi.com/products?limit=20",
+    "fallback": "local",
+    "exchangeRate": 18.5,
+    "currency": "MXN"
+  },
+  "images": {
+    "source": "unsplash",
+    "fallback": "emoji",
+    "optimization": true
+  },
+  "security": {
+    "xssProtection": true,
+    "rateLimiting": true,
+    "inputValidation": true,
+    "secureHeaders": true
+  },
+  "deployment": {
+    "githubPages": true,
+    "netlify": true,
+    "vercel": true,
+    "customDomain": false
+  }
+}
