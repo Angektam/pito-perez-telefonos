@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
                              <div class="text-7xl mb-4">👤</div>
                             <h2 class="text-2xl font-bold text-slate-800 mb-2">Accede a tu cuenta</h2>
                             <p class="text-slate-500 mb-6">Inicia sesión para ver tus favoritos e historial de búsqueda.</p>
-                            <button class="bg-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors" onclick="showAuthModal()">
+                            <button class="bg-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors" onclick="showAuthModal('login')">
                                 Iniciar Sesión / Registrarse
                             </button>
                         </div>
@@ -646,7 +646,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Verificar si el usuario está logueado
         if (!state.currentUser) {
             alert('Debes iniciar sesión para publicar comentarios');
-            showAuthModal();
+            showAuthModal('login');
             return;
         }
         
@@ -704,7 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Verificar si el usuario está logueado
         if (!state.currentUser) {
             alert('Debes iniciar sesión para eliminar comentarios');
-            showAuthModal();
+            showAuthModal('login');
             return;
         }
         
@@ -777,43 +777,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     
-    window.showAuthModal = () => { 
-        modalContent.innerHTML = `
-                    <div class="p-8">
-                        <h2 class="text-2xl font-bold text-center mb-2" id="auth-title">Iniciar Sesión</h2>
-                        <div id="auth-form-container">
-                             <form id="login-form">
-                                <input type="email" placeholder="Correo electrónico" required class="w-full mt-4 p-3 border border-slate-300 rounded-lg">
-                                <input type="password" placeholder="Contraseña" required class="w-full mt-4 p-3 border border-slate-300 rounded-lg">
-                                <button type="submit" class="w-full mt-6 bg-indigo-600 text-white font-bold py-3 rounded-lg">Ingresar</button>
-                            </form>
-                        </div>
-                         <p class="text-center mt-4 text-sm">¿No tienes cuenta? <button id="toggle-auth-mode" class="text-indigo-600 font-semibold">Regístrate</button></p>
-                    </div>
-                `;
-        modalBackdrop.classList.remove('hidden');
-        document.getElementById('login-form').addEventListener('submit', handleLogin);
-        document.getElementById('toggle-auth-mode').addEventListener('click', toggleAuthMode);
-    }
-    
-    const toggleAuthMode = () => {
-        const isLogin = document.getElementById('login-form') !== null;
-        if (isLogin) {
-            document.getElementById('auth-title').innerText = "Crear Cuenta";
-            document.getElementById('auth-form-container').innerHTML = `
-                        <form id="register-form">
-                            <input type="text" placeholder="Nombre" required class="w-full mt-4 p-3 border border-slate-300 rounded-lg">
-                            <input type="email" placeholder="Correo electrónico" required class="w-full mt-4 p-3 border border-slate-300 rounded-lg">
-                            <input type="password" placeholder="Contraseña" required class="w-full mt-4 p-3 border border-slate-300 rounded-lg">
-                            <button type="submit" class="w-full mt-6 bg-indigo-600 text-white font-bold py-3 rounded-lg">Registrarse</button>
-                        </form>
-                    `;
-             document.querySelector('#toggle-auth-mode').innerText = "Inicia Sesión";
-            document.getElementById('register-form').addEventListener('submit', handleRegister);
-        } else {
-             showAuthModal(); 
-        }
-    };
 
     const showProductModal = (phone) => {
         const imageUrl = phone.image;
