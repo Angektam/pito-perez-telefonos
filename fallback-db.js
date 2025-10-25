@@ -55,7 +55,7 @@ export const fallbackPhoneDatabase = [
         screen: 'large',
         os: 'ios',
         condition: 'new',
-        price: 22150,
+        price: 24999,
         specs: '8gb RAM • 256gb • 48mp Camera • 4422 mAh Batería.',
         image: createPhoneImageSVG('apple', 'iPhone 15 Pro'),
         fullSpecs: {
@@ -83,7 +83,7 @@ export const fallbackPhoneDatabase = [
         screen: 'medium',
         os: 'ios',
         condition: 'new',
-        price: 18500,
+        price: 19999,
         specs: '8gb RAM • 128gb • 48mp Camera • 3877 mAh Batería.',
         image: createPhoneImageSVG('apple', 'iPhone 15'),
         fullSpecs: {
@@ -112,7 +112,7 @@ export const fallbackPhoneDatabase = [
         screen: 'large',
         os: 'android',
         condition: 'new',
-        price: 21000,
+        price: 22999,
         specs: '12gb RAM • 512gb • 64mp Camera • 5200 mAh Batería.',
         image: createPhoneImageSVG('samsung', 'Galaxy S24'),
         fullSpecs: {
@@ -140,7 +140,7 @@ export const fallbackPhoneDatabase = [
         screen: 'medium',
         os: 'android',
         condition: 'new',
-        price: 15700,
+        price: 17999,
         specs: '8gb RAM • 256gb • 50mp Camera • 4800 mAh Batería.',
         image: createPhoneImageSVG('samsung', 'Galaxy S23'),
         fullSpecs: {
@@ -169,7 +169,7 @@ export const fallbackPhoneDatabase = [
         screen: 'large',
         os: 'android',
         condition: 'new',
-        price: 19800,
+        price: 21999,
         specs: '12gb RAM • 256gb • 50mp Camera • 5050 mAh Batería.',
         image: createPhoneImageSVG('google', 'Pixel 8 Pro'),
         fullSpecs: {
@@ -197,7 +197,7 @@ export const fallbackPhoneDatabase = [
         screen: 'medium',
         os: 'android',
         condition: 'new',
-        price: 14250,
+        price: 15999,
         specs: '8gb RAM • 128gb • 50mp Camera • 4575 mAh Batería.',
         image: createPhoneImageSVG('google', 'Pixel 8'),
         fullSpecs: {
@@ -226,7 +226,7 @@ export const fallbackPhoneDatabase = [
         screen: 'large',
         os: 'android',
         condition: 'new',
-        price: 17500,
+        price: 18999,
         specs: '16gb RAM • 512gb • 64mp Camera • 5500 mAh Batería.',
         image: createPhoneImageSVG('xiaomi', 'Xiaomi 14'),
         fullSpecs: {
@@ -254,7 +254,7 @@ export const fallbackPhoneDatabase = [
         screen: 'medium',
         os: 'android',
         condition: 'new',
-        price: 11100,
+        price: 12999,
         specs: '8gb RAM • 256gb • 48mp Camera • 5000 mAh Batería.',
         image: createPhoneImageSVG('xiaomi', 'Xiaomi 13'),
         fullSpecs: {
@@ -283,7 +283,7 @@ export const fallbackPhoneDatabase = [
         screen: 'large',
         os: 'android',
         condition: 'new',
-        price: 18900,
+        price: 20999,
         specs: '16gb RAM • 512gb • 50mp Camera • 5400 mAh Batería.',
         image: createPhoneImageSVG('oneplus', 'OnePlus 12'),
         fullSpecs: {
@@ -311,7 +311,7 @@ export const fallbackPhoneDatabase = [
         screen: 'medium',
         os: 'android',
         condition: 'new',
-        price: 13500,
+        price: 14999,
         specs: '12gb RAM • 256gb • 48mp Camera • 4800 mAh Batería.',
         image: createPhoneImageSVG('oneplus', 'OnePlus 11'),
         fullSpecs: {
@@ -340,7 +340,7 @@ export const fallbackPhoneDatabase = [
         screen: 'large',
         os: 'ios',
         condition: 'refurbished',
-        price: 19800,
+        price: 21999,
         specs: '8gb RAM • 512gb • 48mp Camera • 4422 mAh Batería.',
         image: createPhoneImageSVG('apple', 'iPhone 14 Pro'),
         fullSpecs: {
@@ -368,7 +368,7 @@ export const fallbackPhoneDatabase = [
         screen: 'medium',
         os: 'android',
         condition: 'new',
-        price: 12400,
+        price: 13999,
         specs: '8gb RAM • 256gb • 50mp Camera • 5000 mAh Batería.',
         image: createPhoneImageSVG('samsung', 'Galaxy A54'),
         fullSpecs: {
@@ -396,7 +396,7 @@ export const fallbackPhoneDatabase = [
         screen: 'small',
         os: 'android',
         condition: 'new',
-        price: 11900,
+        price: 13499,
         specs: '8gb RAM • 128gb • 48mp Camera • 4385 mAh Batería.',
         image: createPhoneImageSVG('google', 'Pixel 7 Pro'),
         fullSpecs: {
@@ -424,7 +424,7 @@ export const fallbackPhoneDatabase = [
         screen: 'large',
         os: 'android',
         condition: 'new',
-        price: 9800,
+        price: 8999,
         specs: '12gb RAM • 256gb • 64mp Camera • 5200 mAh Batería.',
         image: createPhoneImageSVG('xiaomi', 'Redmi Note 13'),
         fullSpecs: {
@@ -452,7 +452,7 @@ export const fallbackPhoneDatabase = [
         screen: 'medium',
         os: 'android',
         condition: 'new',
-        price: 11500,
+        price: 12999,
         specs: '8gb RAM • 256gb • 50mp Camera • 5000 mAh Batería.',
         image: createPhoneImageSVG('oneplus', 'OnePlus 10T'),
         fullSpecs: {
@@ -480,7 +480,7 @@ export const fallbackPhoneDatabase = [
         screen: 'small',
         os: 'ios',
         condition: 'refurbished',
-        price: 16700,
+        price: 18999,
         specs: '8gb RAM • 128gb • 48mp Camera • 3279 mAh Batería.',
         image: createPhoneImageSVG('apple', 'iPhone 14'),
         fullSpecs: {
@@ -508,7 +508,7 @@ export const fallbackPhoneDatabase = [
         screen: 'small',
         os: 'android',
         condition: 'refurbished',
-        price: 10200,
+        price: 11999,
         specs: '8gb RAM • 128gb • 50mp Camera • 4500 mAh Batería.',
         image: createPhoneImageSVG('samsung', 'Galaxy A34'),
         fullSpecs: {
@@ -536,7 +536,7 @@ export const fallbackPhoneDatabase = [
         screen: 'medium',
         os: 'android',
         condition: 'new',
-        price: 12800,
+        price: 14499,
         specs: '8gb RAM • 256gb • 50mp Camera • 4614 mAh Batería.',
         image: createPhoneImageSVG('google', 'Pixel 7'),
         fullSpecs: {
@@ -564,7 +564,7 @@ export const fallbackPhoneDatabase = [
         screen: 'medium',
         os: 'android',
         condition: 'new',
-        price: 7400,
+        price: 6999,
         specs: '8gb RAM • 128gb • 50mp Camera • 5000 mAh Batería.',
         image: createPhoneImageSVG('xiaomi', 'Redmi 12'),
         fullSpecs: {
@@ -592,7 +592,7 @@ export const fallbackPhoneDatabase = [
         screen: 'medium',
         os: 'android',
         condition: 'refurbished',
-        price: 9500,
+        price: 10999,
         specs: '8gb RAM • 128gb • 50mp Camera • 4500 mAh Batería.',
         image: createPhoneImageSVG('oneplus', 'OnePlus Nord'),
         fullSpecs: {
