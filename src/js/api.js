@@ -1,6 +1,7 @@
 import { fallbackPhoneDatabase } from './fallback-db.js';
 
-export const FAKE_STORE_API_URL = 'https://fakestoreapi.com/products?limit=20';
+const FAKE_STORE_API_URL = 'https://fakestoreapi.com/products?limit=20';
+window.FAKE_STORE_API_URL = FAKE_STORE_API_URL;
 
 // Imágenes reales verificadas de teléfonos específicos de Unsplash
 const realPhoneImages = {
@@ -43,7 +44,7 @@ function getPhoneImageUrl(brand, productId) {
     return brandImages[imageIndex];
 }
 
-export function mapToPhoneSpecs(products) {
+function mapToPhoneSpecs(products) {
     const brands = ['apple', 'samsung', 'google', 'xiaomi', 'oneplus'];
     const osOptions = { apple: 'ios', default: 'android' };
     const storageOptions = ['128gb', '256gb', '512gb'];
@@ -101,7 +102,7 @@ export function mapToPhoneSpecs(products) {
     });
 }
 
-export async function fetchAndInitializeApp(loadingIndicator, renderAuthSection, renderCharts, renderSearchView, renderEasyModeView, renderAccountView, updateView, FAKE_STORE_API_URL, mapToPhoneSpecs) {
+async function fetchAndInitializeApp(loadingIndicator, renderAuthSection, renderCharts, renderSearchView, renderEasyModeView, renderAccountView, updateView, FAKE_STORE_API_URL, mapToPhoneSpecs) {
     loadingIndicator.classList.remove('hidden');
     
     try {
@@ -134,3 +135,7 @@ export async function fetchAndInitializeApp(loadingIndicator, renderAuthSection,
         loadingIndicator.classList.add('hidden');
     }
 }
+
+// Hacer las funciones disponibles globalmente
+window.mapToPhoneSpecs = mapToPhoneSpecs;
+window.fetchAndInitializeApp = fetchAndInitializeApp;

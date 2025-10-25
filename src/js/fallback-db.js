@@ -42,7 +42,7 @@ function createPhoneImageSVG(brand, model) {
 }
 
 // Base de datos de respaldo para cuando la API falle
-export const fallbackPhoneDatabase = [
+const fallbackPhoneDatabase = [
     // Apple iPhones
     {
         id: 1,
@@ -610,4 +610,7 @@ export const fallbackPhoneDatabase = [
         ]
     }
 ];
+
+// Hacer la base de datos disponible globalmente
+window.fallbackPhoneDatabase = fallbackPhoneDatabase;
 

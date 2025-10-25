@@ -1,7 +1,7 @@
 // Módulo de seguridad para la aplicación
 
 // 1. Sanitización de datos de entrada
-export function sanitizeInput(input) {
+function sanitizeInput(input) {
     if (typeof input !== 'string') return '';
     
     // Eliminar caracteres peligrosos y scripts
@@ -284,4 +284,25 @@ export function validateOrigin(origin) {
     
     return allowedOrigins.some(allowed => origin.startsWith(allowed));
 }
+
+// Hacer todas las funciones disponibles globalmente
+window.sanitizeInput = sanitizeInput;
+window.isValidUrl = isValidUrl;
+window.escapeHtml = escapeHtml;
+window.validateNumber = validateNumber;
+window.sanitizeDatabaseInput = sanitizeDatabaseInput;
+window.validateEmail = validateEmail;
+window.apiRateLimiter = apiRateLimiter;
+window.searchRateLimiter = searchRateLimiter;
+window.preventClickjacking = preventClickjacking;
+window.CSP_HEADERS = CSP_HEADERS;
+window.validateFormData = validateFormData;
+window.secureLocalStorage = secureLocalStorage;
+window.verifyDataIntegrity = verifyDataIntegrity;
+window.secureLogger = secureLogger;
+window.fetchWithTimeout = fetchWithTimeout;
+window.initializeSecurity = initializeSecurity;
+window.validateSearchInput = validateSearchInput;
+window.generateCSRFToken = generateCSRFToken;
+window.validateOrigin = validateOrigin;
 

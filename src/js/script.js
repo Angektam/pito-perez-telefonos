@@ -1,18 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-import { FAKE_STORE_API_URL, mapToPhoneSpecs, fetchAndInitializeApp } from './api.js';
-import { 
-    sanitizeInput, 
-    escapeHtml, 
-    validateEmail, 
-    validateNumber,
-    initializeSecurity,
-    secureLogger,
-    searchRateLimiter,
-    secureLocalStorage,
-    validateSearchInput
-} from './security.js';
+// Las funciones ya están disponibles globalmente desde los scripts cargados anteriormente
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 let firebaseConfig = null;
 try { firebaseConfig = JSON.parse(__firebase_config); } catch (e) {}
