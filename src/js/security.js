@@ -14,7 +14,7 @@ function sanitizeInput(input) {
 }
 
 // 2. Validación de URLs
-export function isValidUrl(url) {
+function isValidUrl(url) {
     try {
         const urlObj = new URL(url);
         // Solo permitir https y http
@@ -25,7 +25,7 @@ export function isValidUrl(url) {
 }
 
 // 3. Sanitización de HTML para prevenir XSS
-export function escapeHtml(text) {
+function escapeHtml(text) {
     const map = {
         '&': '&amp;',
         '<': '&lt;',
@@ -38,7 +38,7 @@ export function escapeHtml(text) {
 }
 
 // 4. Validación de números (precios, cantidades)
-export function validateNumber(value, min = 0, max = Infinity) {
+function validateNumber(value, min = 0, max = Infinity) {
     const num = parseFloat(value);
     if (isNaN(num)) return null;
     if (num < min || num > max) return null;
@@ -46,7 +46,7 @@ export function validateNumber(value, min = 0, max = Infinity) {
 }
 
 // 5. Protección contra inyección SQL (aunque no usamos SQL directamente)
-export function sanitizeDatabaseInput(input) {
+function sanitizeDatabaseInput(input) {
     if (typeof input !== 'string') return '';
     
     // Eliminar caracteres SQL peligrosos
@@ -59,7 +59,7 @@ export function sanitizeDatabaseInput(input) {
 }
 
 // 6. Validación de email
-export function validateEmail(email) {
+function validateEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email) && email.length <= 254;
 }
@@ -90,11 +90,11 @@ class RateLimiter {
     }
 }
 
-export const apiRateLimiter = new RateLimiter(50, 60000); // 50 requests por minuto
-export const searchRateLimiter = new RateLimiter(30, 60000); // 30 búsquedas por minuto
+const apiRateLimiter = new RateLimiter(50, 60000); // 50 requests por minuto
+const searchRateLimiter = new RateLimiter(30, 60000); // 30 búsquedas por minuto
 
 // 8. Prevención de clickjacking
-export function preventClickjacking() {
+function preventClickjacking() {
     if (window.top !== window.self) {
         // Si estamos en un iframe, redirigir al padre
         window.top.location = window.self.location;
@@ -102,7 +102,7 @@ export function preventClickjacking() {
 }
 
 // 9. Content Security Policy headers (para configurar en el servidor)
-export const CSP_HEADERS = {
+const CSP_HEADERS = {
     "Content-Security-Policy": 
         "default-src 'self'; " +
         "script-src 'self' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://www.gstatic.com 'unsafe-inline'; " +
@@ -114,7 +114,7 @@ export const CSP_HEADERS = {
 };
 
 // 10. Validación de datos del formulario
-export function validateFormData(formData) {
+function validateFormData(formData) {
     const errors = [];
     
     if (formData.email && !validateEmail(formData.email)) {
@@ -139,7 +139,7 @@ export function validateFormData(formData) {
 }
 
 // 11. Protección de datos sensibles en localStorage
-export function secureLocalStorage() {
+function secureLocalStorage() {
     return {
         setItem: (key, value) => {
             try {
@@ -172,7 +172,7 @@ export function secureLocalStorage() {
 }
 
 // 12. Verificación de integridad de datos
-export function verifyDataIntegrity(data) {
+function verifyDataIntegrity(data) {
     if (!data || typeof data !== 'object') return false;
     
     // Verificar que tenga las propiedades esperadas
@@ -181,7 +181,7 @@ export function verifyDataIntegrity(data) {
 }
 
 // 13. Logger seguro (no expone información sensible)
-export const secureLogger = {
+const secureLogger = {
     info: (message) => {
         console.log(`[INFO] ${new Date().toISOString()}: ${message}`);
     },
@@ -198,7 +198,7 @@ export const secureLogger = {
 };
 
 // 14. Timeout para requests HTTP
-export async function fetchWithTimeout(url, options = {}, timeout = 5000) {
+async function fetchWithTimeout(url, options = {}, timeout = 5000) {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
     
@@ -219,7 +219,7 @@ export async function fetchWithTimeout(url, options = {}, timeout = 5000) {
 }
 
 // 15. Inicializar medidas de seguridad
-export function initializeSecurity() {
+function initializeSecurity() {
     // Prevenir clickjacking
     preventClickjacking();
     
@@ -249,7 +249,7 @@ export function initializeSecurity() {
 }
 
 // 16. Validación de entrada de búsqueda
-export function validateSearchInput(searchTerm) {
+function validateSearchInput(searchTerm) {
     if (!searchTerm || typeof searchTerm !== 'string') {
         return { valid: false, error: 'Término de búsqueda inválido' };
     }
@@ -268,14 +268,14 @@ export function validateSearchInput(searchTerm) {
 }
 
 // 17. Protección contra CSRF (Cross-Site Request Forgery)
-export function generateCSRFToken() {
+function generateCSRFToken() {
     return Array.from(crypto.getRandomValues(new Uint8Array(32)))
         .map(b => b.toString(16).padStart(2, '0'))
         .join('');
 }
 
 // 18. Validar origen de requests
-export function validateOrigin(origin) {
+function validateOrigin(origin) {
     const allowedOrigins = [
         window.location.origin,
         'http://localhost',

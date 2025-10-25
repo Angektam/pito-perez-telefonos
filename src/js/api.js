@@ -1,5 +1,3 @@
-import { fallbackPhoneDatabase } from './fallback-db.js';
-
 const FAKE_STORE_API_URL = 'https://fakestoreapi.com/products?limit=20';
 window.FAKE_STORE_API_URL = FAKE_STORE_API_URL;
 
@@ -129,7 +127,7 @@ async function fetchAndInitializeApp(loadingIndicator, renderAuthSection, render
         await new Promise(resolve => setTimeout(resolve, 1000));
         
         console.log('✅ Datos cargados desde base de datos de respaldo');
-        return fallbackPhoneDatabase;
+        return window.fallbackPhoneDatabase;
         
     } finally {
         loadingIndicator.classList.add('hidden');
