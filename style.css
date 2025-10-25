@@ -1,14 +1,14 @@
-/* Fuentes y estilos base - Modo oscuro permanente */
+/* Fuentes y estilos base - Modo claro permanente */
 html {
-    background-color: #0f172a;
+    background-color: #f8fafc;
 }
 
 body { 
     font-family: 'Inter', sans-serif; 
     font-weight: 400;
     line-height: 1.6;
-    background-color: #0f172a;
-    color: #f1f5f9;
+    background-color: #f8fafc;
+    color: #1e293b;
 }
 
 /* Asegurar que las fuentes se carguen correctamente */
@@ -16,26 +16,26 @@ body {
     font-family: 'Inter', sans-serif;
 }
 
-/* Forzar modo oscuro en todos los elementos */
+/* Forzar modo claro en todos los elementos */
 * {
-    color-scheme: dark;
+    color-scheme: light;
 }
 
-/* Asegurar que todos los elementos usen colores oscuros */
+/* Asegurar que todos los elementos usen colores claros */
 .bg-slate-50 {
-    background-color: #0f172a !important;
+    background-color: #f8fafc !important;
 }
 
 .text-slate-800 {
-    color: #f1f5f9 !important;
+    color: #1e293b !important;
 }
 
 .bg-white {
-    background-color: #1e293b !important;
+    background-color: #ffffff !important;
 }
 
 .border-slate-200 {
-    border-color: #334155 !important;
+    border-color: #e2e8f0 !important;
 }
 
 /* Estilos para las estrellas de calificación */

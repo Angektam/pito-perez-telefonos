@@ -1213,16 +1213,14 @@ function debounce(func, wait) {
     };
 }
 
-// Theme management - Solo modo oscuro
-let isDarkMode = true;
+// Theme management - Solo modo claro
+let isDarkMode = false;
 
 function initializeTheme() {
-    // Aplicar modo oscuro siempre
-    document.documentElement.classList.add('dark');
-    console.log('Modo oscuro aplicado permanentemente');
+    // Aplicar modo claro siempre
+    document.documentElement.classList.remove('dark');
+    console.log('Modo claro aplicado permanentemente');
 }
-
-// Función eliminada - solo modo oscuro
 
 // Comparison functions
 function addToComparison(phoneId) {
