@@ -41,6 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mejorar experiencia táctil
     enhanceTouchExperience();
 
+    // Inicializar variables globales para autenticación
+    globalState = null;
+    globalRenderAuthSection = null;
+    globalShowToast = null;
+
     let phoneDatabase = []; 
     
     let state = {
@@ -1727,6 +1732,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     fetchAndInitializeApp(loadingIndicator, renderAuthSection, renderCharts, renderSearchView, renderEasyModeView, renderAccountView, updateView, FAKE_STORE_API_URL, mapToPhoneSpecs).then(newPhoneDatabase => {
         phoneDatabase = newPhoneDatabase;
+        
+        // Asignar variables globales para autenticación
+        globalState = state;
+        globalRenderAuthSection = renderAuthSection;
+        globalShowToast = showToast;
+        
         renderAuthSection();
         renderCharts();
         renderSearchView();
@@ -2070,6 +2081,11 @@ function scheduleNotifications() {
     }, 45000);
 }
 
+// Variables globales para autenticación
+let globalState = null;
+let globalRenderAuthSection = null;
+let globalShowToast = null;
+
 // Modal de autenticación
 function showAuthModal(type = 'login') {
     const modal = document.createElement('div');
@@ -2127,23 +2143,26 @@ function showAuthModal(type = 'login') {
 
 // Funciones de autenticación
 function handleLogin(name, email, password) {
+    if (!globalState) return;
     // Simulación de login
-    state.currentUser = { id: 1, name, email };
-    renderAuthSection();
-    showToast('¡Bienvenido!', 'success');
+    globalState.currentUser = { id: 1, name, email };
+    if (globalRenderAuthSection) globalRenderAuthSection();
+    if (globalShowToast) globalShowToast('¡Bienvenido!', 'success');
 }
 
 function handleRegister(name, email, password) {
+    if (!globalState) return;
     // Simulación de registro
-    state.currentUser = { id: 1, name, email };
-    renderAuthSection();
-    showToast('¡Cuenta creada exitosamente!', 'success');
+    globalState.currentUser = { id: 1, name, email };
+    if (globalRenderAuthSection) globalRenderAuthSection();
+    if (globalShowToast) globalShowToast('¡Cuenta creada exitosamente!', 'success');
 }
 
 function handleLogout() {
-    state.currentUser = null;
-    renderAuthSection();
-    showToast('Sesión cerrada', 'info');
+    if (!globalState) return;
+    globalState.currentUser = null;
+    if (globalRenderAuthSection) globalRenderAuthSection();
+    if (globalShowToast) globalShowToast('Sesión cerrada', 'info');
 }
 
 // Hacer funciones disponibles globalmente
