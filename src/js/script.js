@@ -1,26 +1,24 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+// Firebase configuration - usando CDN en lugar de módulos ES6
 // Las funciones ya están disponibles globalmente desde los scripts cargados anteriormente
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 let firebaseConfig = null;
 try { firebaseConfig = JSON.parse(__firebase_config); } catch (e) {}
 
-if (firebaseConfig) {
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    setLogLevel('debug');
+// Inicializar Firebase si está disponible
+if (typeof firebase !== 'undefined' && firebaseConfig) {
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    onAuthStateChanged(auth, (user) => {});
+    auth.onAuthStateChanged((user) => {});
 
     if (typeof __initial_auth_token !== 'undefined') {
-        signInWithCustomToken(auth, __initial_auth_token)
+        auth.signInWithCustomToken(__initial_auth_token)
             .catch(error => {
-                signInAnonymously(auth);
+                auth.signInAnonymously();
             });
     } else {
-        signInAnonymously(auth);
+        auth.signInAnonymously();
     }
     window.firebaseApp = app;
     window.firebaseAuth = auth;
@@ -1475,7 +1473,9 @@ document.addEventListener('DOMContentLoaded', () => {
         updateView('dashboard');
         
         // Inicializar tema después de que todo esté cargado
-        initializeTheme();
+        setTimeout(() => {
+            initializeTheme();
+        }, 100);
     });
 });
 
@@ -1496,9 +1496,14 @@ function debounce(func, wait) {
 let isDarkMode = false;
 
 function initializeTheme() {
+    console.log('Inicializando tema...');
+    
     // Cargar preferencia guardada o usar preferencia del sistema
     const savedTheme = localStorage.getItem('theme');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    console.log('Tema guardado:', savedTheme);
+    console.log('Sistema prefiere oscuro:', systemPrefersDark);
     
     if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
         enableDarkMode();
@@ -1508,8 +1513,13 @@ function initializeTheme() {
     
     // Configurar event listener para el botón de toggle
     const themeToggle = document.getElementById('theme-toggle');
+    console.log('Botón de tema encontrado:', themeToggle);
+    
     if (themeToggle) {
         themeToggle.addEventListener('click', toggleTheme);
+        console.log('Event listener agregado al botón de tema');
+    } else {
+        console.error('No se encontró el botón de tema con ID: theme-toggle');
     }
     
     // Escuchar cambios en la preferencia del sistema
@@ -1525,6 +1535,7 @@ function initializeTheme() {
 }
 
 function toggleTheme() {
+    console.log('Toggle tema clickeado. Modo actual:', isDarkMode);
     if (isDarkMode) {
         enableLightMode();
     } else {
