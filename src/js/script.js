@@ -1475,9 +1475,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateView('dashboard');
         
         // Inicializar tema después de que todo esté cargado
-        setTimeout(() => {
-            initializeTheme();
-        }, 100);
+        initializeTheme();
     });
 });
 
@@ -1494,51 +1492,24 @@ function debounce(func, wait) {
     };
 }
 
-// Theme management - Modo oscuro por defecto
-let isDarkMode = true;
+// Theme management - Modo claro y oscuro
+let isDarkMode = false;
 
 function initializeTheme() {
-    // Activar modo oscuro por defecto
-    enableDarkMode();
+    // Cargar preferencia guardada o usar preferencia del sistema
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
-    // Asegurar que los botones tengan la clase correcta desde el inicio
-    setTimeout(() => {
-        updateThemeButtons();
-    }, 100);
+    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+        enableDarkMode();
+    } else {
+        enableLightMode();
+    }
     
-    // Configurar event listener para el botón de toggle con retry
-    const setupThemeButtons = () => {
-        const themeSwitcherGrid = document.getElementById('theme-switcher-grid');
-        const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
-        
-        console.log('Botón de tema animado encontrado:', themeSwitcherGrid);
-        console.log('Botón móvil de tema encontrado:', mobileThemeToggle);
-        
-        if (themeSwitcherGrid) {
-            // Remover listener existente si existe
-            themeSwitcherGrid.removeEventListener('click', handleThemeToggle);
-            themeSwitcherGrid.addEventListener('click', handleThemeToggle);
-            console.log('Event listener agregado al botón de tema animado');
-        } else {
-            console.error('No se encontró el botón de tema con ID: theme-switcher-grid');
-        }
-        
-        if (mobileThemeToggle) {
-            // Remover listener existente si existe
-            mobileThemeToggle.removeEventListener('click', toggleTheme);
-            mobileThemeToggle.addEventListener('click', toggleTheme);
-            console.log('Event listener agregado al botón móvil de tema');
-        } else {
-            console.error('No se encontró el botón móvil de tema con ID: mobile-theme-toggle');
-        }
-    };
-    
-    // Intentar configurar inmediatamente
-    setupThemeButtons();
-    
-    // Si no se encontraron los botones, intentar de nuevo después de un breve delay
-    if (!document.getElementById('theme-switcher-grid')) {
-        setTimeout(setupThemeButtons, 500);
+    // Configurar event listener para el botón de toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
     }
     
     // Escuchar cambios en la preferencia del sistema
@@ -1551,41 +1522,12 @@ function initializeTheme() {
             }
         }
     });
-    
-    // Delegación de eventos como respaldo
-    document.addEventListener('click', (e) => {
-        if (e.target.id === 'theme-switcher-grid' || e.target.closest('#theme-switcher-grid')) {
-            console.log('Botón de tema animado clickeado (delegación)');
-            handleThemeToggle(e);
-        }
-        if (e.target.id === 'mobile-theme-toggle' || e.target.closest('#mobile-theme-toggle')) {
-            console.log('Botón móvil de tema clickeado (delegación)');
-            toggleTheme();
-        }
-    });
-}
-
-function handleThemeToggle(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('handleThemeToggle llamado, isDarkMode actual:', isDarkMode);
-    
-    if (isDarkMode) {
-        console.log('Cambiando a modo claro');
-        enableLightMode();
-    } else {
-        console.log('Cambiando a modo oscuro');
-        enableDarkMode();
-    }
 }
 
 function toggleTheme() {
-    console.log('toggleTheme llamado, isDarkMode actual:', isDarkMode);
     if (isDarkMode) {
-        console.log('Cambiando a modo claro');
         enableLightMode();
     } else {
-        console.log('Cambiando a modo oscuro');
         enableDarkMode();
     }
 }
@@ -1595,7 +1537,6 @@ function enableDarkMode() {
     document.documentElement.classList.add('dark');
     localStorage.setItem('theme', 'dark');
     updateThemeIcons();
-    updateThemeButtons();
     console.log('Modo oscuro activado');
 }
 
@@ -1604,50 +1545,19 @@ function enableLightMode() {
     document.documentElement.classList.remove('dark');
     localStorage.setItem('theme', 'light');
     updateThemeIcons();
-    updateThemeButtons();
     console.log('Modo claro activado');
 }
 
 function updateThemeIcons() {
     const sunIcon = document.getElementById('sun-icon');
     const moonIcon = document.getElementById('moon-icon');
-    const mobileMoonIcon = document.getElementById('mobile-moon-icon');
     
     if (isDarkMode) {
-        if (sunIcon) sunIcon.classList.add('hidden');
-        if (moonIcon) moonIcon.classList.remove('hidden');
-        if (mobileMoonIcon) mobileMoonIcon.textContent = '🌙';
+        sunIcon.classList.add('hidden');
+        moonIcon.classList.remove('hidden');
     } else {
-        if (sunIcon) sunIcon.classList.remove('hidden');
-        if (moonIcon) moonIcon.classList.add('hidden');
-        if (mobileMoonIcon) mobileMoonIcon.textContent = '☀️';
-    }
-}
-
-function updateThemeButtons() {
-    const themeSwitcherGrid = document.getElementById('theme-switcher-grid');
-    const mobileThemeSwitcher = document.getElementById('theme-switcher-grid-mobile');
-    
-    console.log('Actualizando botones de tema, isDarkMode:', isDarkMode);
-    
-    if (isDarkMode) {
-        if (themeSwitcherGrid) {
-            themeSwitcherGrid.classList.add('night-theme');
-            console.log('Agregada clase night-theme al botón desktop');
-        }
-        if (mobileThemeSwitcher) {
-            mobileThemeSwitcher.classList.add('night-theme');
-            console.log('Agregada clase night-theme al botón móvil');
-        }
-    } else {
-        if (themeSwitcherGrid) {
-            themeSwitcherGrid.classList.remove('night-theme');
-            console.log('Removida clase night-theme del botón desktop');
-        }
-        if (mobileThemeSwitcher) {
-            mobileThemeSwitcher.classList.remove('night-theme');
-            console.log('Removida clase night-theme del botón móvil');
-        }
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
     }
 }
 
