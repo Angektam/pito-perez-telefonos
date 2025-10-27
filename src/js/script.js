@@ -1475,7 +1475,9 @@ document.addEventListener('DOMContentLoaded', () => {
         updateView('dashboard');
         
         // Inicializar tema después de que todo esté cargado
-        initializeTheme();
+        setTimeout(() => {
+            initializeTheme();
+        }, 100);
     });
 });
 
@@ -1499,25 +1501,39 @@ function initializeTheme() {
     // Activar modo oscuro por defecto
     enableDarkMode();
     
-    // Configurar event listener para el botón de toggle
-    const themeToggle = document.getElementById('theme-toggle');
-    const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+    // Configurar event listener para el botón de toggle con retry
+    const setupThemeButtons = () => {
+        const themeToggle = document.getElementById('theme-toggle');
+        const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+        
+        console.log('Botón de tema encontrado:', themeToggle);
+        console.log('Botón móvil de tema encontrado:', mobileThemeToggle);
+        
+        if (themeToggle) {
+            // Remover listener existente si existe
+            themeToggle.removeEventListener('click', toggleTheme);
+            themeToggle.addEventListener('click', toggleTheme);
+            console.log('Event listener agregado al botón de tema');
+        } else {
+            console.error('No se encontró el botón de tema con ID: theme-toggle');
+        }
+        
+        if (mobileThemeToggle) {
+            // Remover listener existente si existe
+            mobileThemeToggle.removeEventListener('click', toggleTheme);
+            mobileThemeToggle.addEventListener('click', toggleTheme);
+            console.log('Event listener agregado al botón móvil de tema');
+        } else {
+            console.error('No se encontró el botón móvil de tema con ID: mobile-theme-toggle');
+        }
+    };
     
-    console.log('Botón de tema encontrado:', themeToggle);
-    console.log('Botón móvil de tema encontrado:', mobileThemeToggle);
+    // Intentar configurar inmediatamente
+    setupThemeButtons();
     
-    if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
-        console.log('Event listener agregado al botón de tema');
-    } else {
-        console.error('No se encontró el botón de tema con ID: theme-toggle');
-    }
-    
-    if (mobileThemeToggle) {
-        mobileThemeToggle.addEventListener('click', toggleTheme);
-        console.log('Event listener agregado al botón móvil de tema');
-    } else {
-        console.error('No se encontró el botón móvil de tema con ID: mobile-theme-toggle');
+    // Si no se encontraron los botones, intentar de nuevo después de un breve delay
+    if (!document.getElementById('theme-toggle')) {
+        setTimeout(setupThemeButtons, 500);
     }
     
     // Escuchar cambios en la preferencia del sistema
@@ -1530,12 +1546,27 @@ function initializeTheme() {
             }
         }
     });
+    
+    // Delegación de eventos como respaldo
+    document.addEventListener('click', (e) => {
+        if (e.target.id === 'theme-toggle' || e.target.closest('#theme-toggle')) {
+            console.log('Botón de tema clickeado (delegación)');
+            toggleTheme();
+        }
+        if (e.target.id === 'mobile-theme-toggle' || e.target.closest('#mobile-theme-toggle')) {
+            console.log('Botón móvil de tema clickeado (delegación)');
+            toggleTheme();
+        }
+    });
 }
 
 function toggleTheme() {
+    console.log('toggleTheme llamado, isDarkMode actual:', isDarkMode);
     if (isDarkMode) {
+        console.log('Cambiando a modo claro');
         enableLightMode();
     } else {
+        console.log('Cambiando a modo oscuro');
         enableDarkMode();
     }
 }
