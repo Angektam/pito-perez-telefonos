@@ -2140,3 +2140,9 @@ function handleLogout() {
     renderAuthSection();
     showToast('Sesión cerrada', 'info');
 }
+
+// Hacer funciones disponibles globalmente
+window.showAuthModal = showAuthModal;
+window.handleLogin = handleLogin;
+window.handleRegister = handleRegister;
+window.handleLogout = handleLogout;
