@@ -331,66 +331,142 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const renderEasyModeView = () => {
         const questions = [
-            { id: 'usage', icon: '📱', title: '¿Para qué usarás tu teléfono?', options: [
-                { value: 'basic', emoji: '💬', label: 'Básico (Llamadas, mensajes)' }, 
-                { value: 'social', emoji: '📸', label: 'Redes Sociales' }, 
-                { value: 'gaming', emoji: '🎮', label: 'Juegos' }, 
-                { value: 'professional', emoji: '💼', label: 'Trabajo' },
-                { value: 'creative', emoji: '🎨', label: 'Creativo (Fotos, videos)' },
-                { value: 'student', emoji: '📚', label: 'Estudios' },
-                { value: 'travel', emoji: '✈️', label: 'Viajes' },
-                { value: 'mixed', emoji: '🔄', label: 'Uso mixto' }
-            ]},
-            { id: 'budget', icon: '💰', title: '¿Cuál es tu presupuesto?', options: [
-                { value: 'very-low', emoji: '💵', label: '< $5,500' }, 
-                { value: 'low', emoji: '💴', label: '$5,500 - $9,250' }, 
-                { value: 'medium', emoji: '💶', label: '$9,250 - $14,800' }, 
-                { value: 'high', emoji: '💷', label: '$14,800 - $22,200' }, 
-                { value: 'premium', emoji: '💎', label: '> $22,200' },
-                { value: 'flexible', emoji: '🤝', label: 'Flexible' }
-            ]},
-            { id: 'priority', icon: '⭐', title: '¿Qué es más importante para ti?', options: [
-                { value: 'battery', emoji: '🔋', label: 'Batería duradera' }, 
-                { value: 'camera', emoji: '📷', label: 'Cámara excelente' }, 
-                { value: 'storage', emoji: '💾', label: 'Mucho espacio' }, 
-                { value: 'brand', emoji: '🏆', label: 'Marca reconocida' },
-                { value: 'performance', emoji: '⚡', label: 'Rendimiento' },
-                { value: 'design', emoji: '✨', label: 'Diseño atractivo' },
-                { value: 'durability', emoji: '🛡️', label: 'Resistencia' },
-                { value: 'value', emoji: '💯', label: 'Mejor relación calidad-precio' }
-            ]},
-            { id: 'system', icon: '🏷️', title: '¿Tienes preferencia de sistema operativo?', options: [
-                { value: 'ios', emoji: '🍎', label: 'iOS (iPhone)' }, 
-                { value: 'android', emoji: '🤖', label: 'Android' }, 
-                { value: 'any', emoji: '🤷', label: 'No me importa' },
-                { value: 'prefer-ios', emoji: '🍎', label: 'Prefiero iOS' },
-                { value: 'prefer-android', emoji: '🤖', label: 'Prefiero Android' }
-            ]},
-            { id: 'size', icon: '📏', title: '¿Qué tamaño de pantalla prefieres?', options: [
-                { value: 'small', emoji: '📱', label: 'Pequeña (fácil de manejar)' }, 
-                { value: 'medium', emoji: '📱', label: 'Mediana (equilibrada)' }, 
-                { value: 'large', emoji: '📱', label: 'Grande (mejor para multimedia)' }, 
-                { value: 'any', emoji: '🤷', label: 'No me importa' }
-            ]}
+            { 
+                id: 'usage', 
+                icon: '📱', 
+                title: '¿Para qué usarás principalmente tu teléfono?', 
+                description: 'Esto nos ayuda a entender tus necesidades específicas',
+                options: [
+                    { value: 'basic', emoji: '💬', label: 'Básico', sublabel: 'Llamadas y mensajes', color: 'blue' }, 
+                    { value: 'social', emoji: '📸', label: 'Redes Sociales', sublabel: 'Instagram, TikTok, etc.', color: 'pink' }, 
+                    { value: 'gaming', emoji: '🎮', label: 'Juegos', sublabel: 'Gaming móvil', color: 'purple' }, 
+                    { value: 'professional', emoji: '💼', label: 'Trabajo', sublabel: 'Productividad', color: 'indigo' },
+                    { value: 'creative', emoji: '🎨', label: 'Creativo', sublabel: 'Fotos y videos', color: 'orange' },
+                    { value: 'student', emoji: '📚', label: 'Estudios', sublabel: 'Aplicaciones educativas', color: 'green' },
+                    { value: 'travel', emoji: '✈️', label: 'Viajes', sublabel: 'GPS y fotos', color: 'cyan' },
+                    { value: 'mixed', emoji: '🔄', label: 'Uso Mixto', sublabel: 'Un poco de todo', color: 'gray' }
+                ]
+            },
+            { 
+                id: 'budget', 
+                icon: '💰', 
+                title: '¿Cuál es tu presupuesto aproximado?', 
+                description: 'Los precios están en pesos mexicanos',
+                options: [
+                    { value: 'very-low', emoji: '💵', label: 'Económico', sublabel: 'Menos de $5,500', color: 'green' }, 
+                    { value: 'low', emoji: '💴', label: 'Accesible', sublabel: '$5,500 - $9,250', color: 'blue' }, 
+                    { value: 'medium', emoji: '💶', label: 'Intermedio', sublabel: '$9,250 - $14,800', color: 'yellow' }, 
+                    { value: 'high', emoji: '💷', label: 'Alto', sublabel: '$14,800 - $22,200', color: 'orange' }, 
+                    { value: 'premium', emoji: '💎', label: 'Premium', sublabel: 'Más de $22,200', color: 'purple' },
+                    { value: 'flexible', emoji: '🤝', label: 'Flexible', sublabel: 'Depende del valor', color: 'gray' }
+                ]
+            },
+            { 
+                id: 'priority', 
+                icon: '⭐', 
+                title: '¿Qué característica es más importante para ti?', 
+                description: 'Selecciona la que más te importe',
+                options: [
+                    { value: 'battery', emoji: '🔋', label: 'Batería', sublabel: 'Duración todo el día', color: 'green' }, 
+                    { value: 'camera', emoji: '📷', label: 'Cámara', sublabel: 'Fotos profesionales', color: 'blue' }, 
+                    { value: 'storage', emoji: '💾', label: 'Almacenamiento', sublabel: 'Mucho espacio', color: 'purple' }, 
+                    { value: 'brand', emoji: '🏆', label: 'Marca', sublabel: 'Reconocida y confiable', color: 'yellow' },
+                    { value: 'performance', emoji: '⚡', label: 'Rendimiento', sublabel: 'Velocidad y fluidez', color: 'red' },
+                    { value: 'design', emoji: '✨', label: 'Diseño', sublabel: 'Atractivo y moderno', color: 'pink' },
+                    { value: 'durability', emoji: '🛡️', label: 'Resistencia', sublabel: 'Que dure mucho', color: 'gray' },
+                    { value: 'value', emoji: '💯', label: 'Valor', sublabel: 'Mejor relación precio-calidad', color: 'indigo' }
+                ]
+            },
+            { 
+                id: 'system', 
+                icon: '🏷️', 
+                title: '¿Tienes preferencia de sistema operativo?', 
+                description: 'Esto afecta las aplicaciones disponibles',
+                options: [
+                    { value: 'ios', emoji: '🍎', label: 'iOS', sublabel: 'Solo iPhone', color: 'gray' }, 
+                    { value: 'android', emoji: '🤖', label: 'Android', sublabel: 'Samsung, Xiaomi, etc.', color: 'green' }, 
+                    { value: 'any', emoji: '🤷', label: 'Cualquiera', sublabel: 'No me importa', color: 'blue' },
+                    { value: 'prefer-ios', emoji: '🍎', label: 'Prefiero iOS', sublabel: 'Pero considero Android', color: 'gray' },
+                    { value: 'prefer-android', emoji: '🤖', label: 'Prefiero Android', sublabel: 'Pero considero iOS', color: 'green' }
+                ]
+            },
+            { 
+                id: 'size', 
+                icon: '📏', 
+                title: '¿Qué tamaño de pantalla prefieres?', 
+                description: 'Esto afecta la comodidad de uso',
+                options: [
+                    { value: 'small', emoji: '📱', label: 'Pequeña', sublabel: 'Fácil de manejar', color: 'blue' }, 
+                    { value: 'medium', emoji: '📱', label: 'Mediana', sublabel: 'Equilibrada', color: 'green' }, 
+                    { value: 'large', emoji: '📱', label: 'Grande', sublabel: 'Mejor para multimedia', color: 'purple' }, 
+                    { value: 'any', emoji: '🤷', label: 'Cualquiera', sublabel: 'No me importa', color: 'gray' }
+                ]
+            }
         ];
         
-        easyQuestionsContainer.innerHTML = questions.map(q => `
-                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 mb-6">
-                        <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-3"><span class="text-3xl">${q.icon}</span>${q.title}</h3>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 easy-options" data-question-id="${q.id}">
-                            ${q.options.map(opt => `<button data-value="${opt.value}" class="p-4 rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-indigo-500 hover:bg-indigo-50 transition-all text-center font-semibold">
-                                <span class="text-4xl block mb-2">${opt.emoji}</span>
-                                ${opt.label}
-                            </button>`).join('')}
+        // Estado para el progreso
+        state.easyModeAnswers = {};
+        state.currentQuestionIndex = 0;
+        
+        easyQuestionsContainer.innerHTML = `
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold text-white">🎯 Modo Fácil</h2>
+                    <div class="text-white/80 text-sm">
+                        <span id="current-question">1</span> de ${questions.length}
+                    </div>
+                </div>
+                <div class="w-full bg-white/20 rounded-full h-2 mb-2">
+                    <div id="progress-bar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-500" style="width: ${100/questions.length}%"></div>
+                </div>
+                <p class="text-white/70 text-sm">Responde las preguntas para encontrar tu teléfono ideal</p>
+            </div>
+            
+            <div id="questions-container">
+                ${questions.map((q, index) => `
+                    <div class="question-card ${index === 0 ? 'active' : 'hidden'} transition-all duration-300" data-question-index="${index}">
+                        <div class="glass p-8 rounded-3xl shadow-2xl border border-white/20 mb-6">
+                            <div class="text-center mb-6">
+                                <div class="text-6xl mb-4">${q.icon}</div>
+                                <h3 class="text-2xl font-bold text-white mb-2">${q.title}</h3>
+                                <p class="text-white/80">${q.description}</p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 easy-options" data-question-id="${q.id}">
+                                ${q.options.map(opt => `
+                                    <button data-value="${opt.value}" class="easy-option p-6 rounded-2xl border-2 border-white/20 bg-white/10 hover:border-white/40 hover:bg-white/20 transition-all duration-300 text-center group hover:scale-105 hover:shadow-lg">
+                                        <div class="text-5xl mb-3 group-hover:scale-110 transition-transform duration-300">${opt.emoji}</div>
+                                        <div class="font-bold text-white text-lg mb-1">${opt.label}</div>
+                                        <div class="text-white/70 text-sm">${opt.sublabel}</div>
+                                        <div class="mt-3 w-8 h-1 bg-gradient-to-r from-${opt.color}-400 to-${opt.color}-600 rounded-full mx-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    </button>
+                                `).join('')}
+                            </div>
                         </div>
                     </div>
-                `).join('') + `
-                <div class="text-center mt-8">
-                     <button id="get-recommendations-btn" class="bg-indigo-600 text-white font-bold py-4 px-10 rounded-xl text-lg hover:bg-indigo-700 transition-colors disabled:bg-slate-300" disabled>✨ Ver Recomendaciones</button>
-                </div>`;
+                `).join('')}
+            </div>
+            
+            <div class="flex justify-between items-center mt-8">
+                <button id="prev-question-btn" class="bg-white/20 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    ← Anterior
+                </button>
+                <button id="next-question-btn" class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-8 py-3 rounded-xl font-bold hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    Siguiente →
+                </button>
+                <button id="get-recommendations-btn" class="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-8 py-3 rounded-xl font-bold hover:from-green-600 hover:to-emerald-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hidden">
+                    ✨ Ver Recomendaciones
+                </button>
+            </div>
+        `;
 
+        // Event listeners
+        document.getElementById('next-question-btn').addEventListener('click', handleNextQuestion);
+        document.getElementById('prev-question-btn').addEventListener('click', handlePrevQuestion);
         document.getElementById('get-recommendations-btn').addEventListener('click', handleGetRecommendations);
         easyQuestionsContainer.addEventListener('click', handleEasyAnswer);
+        
+        // Inicializar primera pregunta
+        updateQuestionDisplay();
     };
 
     const renderAccountView = () => {
@@ -1110,114 +1186,294 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const handleEasyAnswer = (e) => {
-        const button = e.target.closest('button');
-        if (!button) return;
+        if (e.target.matches('.easy-option')) {
+            const questionId = e.target.closest('.easy-options').dataset.questionId;
+            const value = e.target.dataset.value;
+            
+            // Remover selección anterior en esta pregunta
+            e.target.closest('.easy-options').querySelectorAll('.easy-option').forEach(btn => {
+                btn.classList.remove('border-indigo-500', 'bg-indigo-500/20', 'ring-2', 'ring-indigo-500/50');
+                btn.classList.add('border-white/20', 'bg-white/10');
+            });
+            
+            // Marcar selección actual
+            e.target.classList.remove('border-white/20', 'bg-white/10');
+            e.target.classList.add('border-indigo-500', 'bg-indigo-500/20', 'ring-2', 'ring-indigo-500/50');
+            
+            // Guardar respuesta
+            state.easyModeAnswers[questionId] = value;
+            
+            // Actualizar display de preguntas
+            updateQuestionDisplay();
+            
+            // Efecto de selección
+            e.target.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                e.target.style.transform = '';
+            }, 150);
+        }
+    };
+
+    const handleNextQuestion = () => {
+        if (state.currentQuestionIndex < 4) {
+            state.currentQuestionIndex++;
+            updateQuestionDisplay();
+        }
+    };
+
+    const handlePrevQuestion = () => {
+        if (state.currentQuestionIndex > 0) {
+            state.currentQuestionIndex--;
+            updateQuestionDisplay();
+        }
+    };
+
+    const updateQuestionDisplay = () => {
+        const questions = document.querySelectorAll('.question-card');
+        const currentQuestion = document.getElementById('current-question');
+        const progressBar = document.getElementById('progress-bar');
+        const nextBtn = document.getElementById('next-question-btn');
+        const prevBtn = document.getElementById('prev-question-btn');
+        const recommendationsBtn = document.getElementById('get-recommendations-btn');
         
-        const questionId = button.parentElement.dataset.questionId;
-        const value = button.dataset.value;
-        state.easyAnswers[questionId] = value;
-        
-        button.parentElement.querySelectorAll('button').forEach(btn => {
-            btn.classList.remove('bg-indigo-500', 'text-white', 'border-indigo-500');
-            btn.classList.add('bg-slate-50', 'border-slate-200');
+        // Ocultar todas las preguntas
+        questions.forEach((q, index) => {
+            if (index === state.currentQuestionIndex) {
+                q.classList.remove('hidden');
+                q.classList.add('active');
+            } else {
+                q.classList.add('hidden');
+                q.classList.remove('active');
+            }
         });
-        button.classList.add('bg-indigo-500', 'text-white', 'border-indigo-500');
         
-        const allAnswered = Object.values(state.easyAnswers).every(v => v !== null);
-        document.getElementById('get-recommendations-btn').disabled = !allAnswered;
+        // Actualizar contador y barra de progreso
+        if (currentQuestion) {
+            currentQuestion.textContent = state.currentQuestionIndex + 1;
+        }
+        
+        if (progressBar) {
+            const progress = ((state.currentQuestionIndex + 1) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+        
+        // Actualizar botones
+        if (prevBtn) {
+            prevBtn.disabled = state.currentQuestionIndex === 0;
+        }
+        
+        if (nextBtn) {
+            const currentQuestionId = questions[state.currentQuestionIndex]?.querySelector('.easy-options')?.dataset.questionId;
+            const hasAnswer = currentQuestionId && state.easyModeAnswers[currentQuestionId];
+            nextBtn.disabled = !hasAnswer || state.currentQuestionIndex === questions.length - 1;
+        }
+        
+        if (recommendationsBtn) {
+            const totalQuestions = questions.length;
+            const answeredQuestions = Object.keys(state.easyModeAnswers).length;
+            const shouldShow = answeredQuestions === totalQuestions;
+            
+            if (shouldShow) {
+                recommendationsBtn.classList.remove('hidden');
+                nextBtn.classList.add('hidden');
+            } else {
+                recommendationsBtn.classList.add('hidden');
+                nextBtn.classList.remove('hidden');
+            }
+        }
     };
 
     const handleGetRecommendations = () => {
         const budgetRanges = { 
-            'very-low': [0, 5500], // < $300 USD ≈ < $5,500 MXN
-            'low': [5500, 9250], // $300-500 USD ≈ $5,500-9,250 MXN
-            'medium': [9250, 14800], // $500-800 USD ≈ $9,250-14,800 MXN
-            'high': [14800, 22200], // $800-1200 USD ≈ $14,800-22,200 MXN
-            'premium': [22200, Infinity], // > $1200 USD ≈ > $22,200 MXN
+            'very-low': [0, 5500],
+            'low': [5500, 9250],
+            'medium': [9250, 14800],
+            'high': [14800, 22200],
+            'premium': [22200, Infinity],
             'flexible': [0, Infinity]
         };
         
-        let phones = phoneDatabase;
+        let phones = [...phoneDatabase];
         
-        // Filtrar por presupuesto si no es flexible
-        if (state.easyAnswers.budget && state.easyAnswers.budget !== 'flexible') {
-            const [min, max] = budgetRanges[state.easyAnswers.budget];
-            phones = phones.filter(p => p.price >= min && p.price <= max);
-        }
-        
-        // Filtrar por sistema operativo
-        if (state.easyAnswers.system && state.easyAnswers.system !== 'any') {
-            if (state.easyAnswers.system === 'prefer-ios') {
-                phones = phones.filter(p => p.os === 'ios');
-            } else if (state.easyAnswers.system === 'prefer-android') {
-                phones = phones.filter(p => p.os === 'android');
-            } else if (state.easyAnswers.system === 'ios' || state.easyAnswers.system === 'android') {
-                phones = phones.filter(p => p.os === state.easyAnswers.system);
-            }
-        }
-        
-        // Filtrar por tamaño de pantalla si se especificó
-        if (state.easyAnswers.size && state.easyAnswers.size !== 'any') {
-            phones = phones.filter(p => p.screen === state.easyAnswers.size);
-        }
-
-        // Ordenar por prioridad
-        const sortFunctions = {
-            battery: (a, b) => b.battery - a.battery,
-            camera: (a, b) => parseInt(b.camera) - parseInt(a.camera),
-            storage: (a, b) => parseInt(b.storage) - parseInt(a.storage),
-            brand: (a, b) => a.brand.localeCompare(b.brand),
-            performance: (a, b) => {
-                const aScore = parseInt(a.ram) + parseInt(a.storage) + a.battery/100;
-                const bScore = parseInt(b.ram) + parseInt(b.storage) + b.battery/100;
-                return bScore - aScore;
-            },
-            design: (a, b) => a.price - b.price, // Asumimos que más caro = mejor diseño
-            durability: (a, b) => b.battery - a.battery, // Asumimos que más batería = más durabilidad
-            value: (a, b) => {
-                const aValue = (parseInt(a.ram) + parseInt(a.storage) + a.battery/100) / a.price;
-                const bValue = (parseInt(b.ram) + parseInt(b.storage) + b.battery/100) / b.price;
-                return bValue - aValue;
-            }
-        };
-        
-        if (state.easyAnswers.priority && sortFunctions[state.easyAnswers.priority]) {
-            phones.sort(sortFunctions[state.easyAnswers.priority]);
-        } else {
-            // Si no hay prioridad específica, ordenar por mejor relación calidad-precio
-            phones.sort((a, b) => {
-                const aValue = (parseInt(a.ram) + parseInt(a.storage) + a.battery/100) / a.price;
-                const bValue = (parseInt(b.ram) + parseInt(b.storage) + b.battery/100) / b.price;
-                return bValue - aValue;
-            });
-        }
-
-        // Mostrar hasta 6 resultados para dar más opciones
-        const results = phones.slice(0, 6);
-        const badges = {};
-        
-        results.forEach(phone => {
-            // Badges basados en prioridad
-            if (state.easyAnswers.priority === 'battery' && phone.battery >= 5000) {
-                badges[phone.id] = { icon: '🔋', text: 'Gran Batería', color: 'bg-green-500' };
-            }
-            if (state.easyAnswers.priority === 'camera' && parseInt(phone.camera) >= 50) {
-                badges[phone.id] = { icon: '📷', text: 'Cámara Pro', color: 'bg-purple-500' };
-            }
-            if (state.easyAnswers.priority === 'value') {
-                badges[phone.id] = { icon: '💯', text: 'Excelente Valor', color: 'bg-blue-500' };
+        // Algoritmo de puntuación mejorado
+        const calculateScore = (phone) => {
+            let score = 0;
+            const answers = state.easyModeAnswers;
+            
+            // Puntuación por presupuesto (0-30 puntos)
+            if (answers.budget && answers.budget !== 'flexible') {
+                const [min, max] = budgetRanges[answers.budget];
+                if (phone.price >= min && phone.price <= max) {
+                    score += 30;
+                } else if (phone.price < min) {
+                    score += 20; // Cerca del rango
+                } else if (phone.price > max) {
+                    score += 10; // Por encima pero no mucho
+                }
+            } else {
+                score += 15; // Puntuación neutral para flexible
             }
             
-            // Badges adicionales
-            if (phone.price <= 9250 && phone.battery >= 4000) { // $500 USD ≈ $9,250 MXN
-                badges[phone.id] = { icon: '💵', text: 'Económico', color: 'bg-green-600' };
+            // Puntuación por sistema operativo (0-25 puntos)
+            if (answers.system) {
+                if (answers.system === 'ios' && phone.os === 'ios') score += 25;
+                else if (answers.system === 'android' && phone.os === 'android') score += 25;
+                else if (answers.system === 'prefer-ios' && phone.os === 'ios') score += 20;
+                else if (answers.system === 'prefer-android' && phone.os === 'android') score += 20;
+                else if (answers.system === 'any') score += 15;
+                else score += 5; // Penalización por no coincidir
             }
-            if (parseInt(phone.storage) >= 256) {
-                badges[phone.id] = { icon: '💾', text: 'Alto Almacenamiento', color: 'bg-indigo-500' };
+            
+            // Puntuación por tamaño de pantalla (0-15 puntos)
+            if (answers.size && answers.size !== 'any') {
+                const sizeRanges = {
+                    'small': [0, 5.5],
+                    'medium': [5.5, 6.2],
+                    'large': [6.2, Infinity]
+                };
+                const [min, max] = sizeRanges[answers.size];
+                if (phone.screenSize >= min && phone.screenSize <= max) {
+                    score += 15;
+                } else {
+                    score += 8; // Puntuación parcial
+                }
             }
+            
+            // Puntuación por prioridad (0-30 puntos)
+            if (answers.priority) {
+                const priority = answers.priority;
+                const maxValues = {
+                    battery: Math.max(...phones.map(p => p.battery)),
+                    camera: Math.max(...phones.map(p => parseInt(p.camera))),
+                    storage: Math.max(...phones.map(p => parseInt(p.storage))),
+                    performance: Math.max(...phones.map(p => parseInt(p.ram)))
+                };
+                
+                switch (priority) {
+                    case 'battery':
+                        score += (phone.battery / maxValues.battery) * 30;
+                        break;
+                    case 'camera':
+                        score += (parseInt(phone.camera) / maxValues.camera) * 30;
+                        break;
+                    case 'storage':
+                        score += (parseInt(phone.storage) / maxValues.storage) * 30;
+                        break;
+                    case 'performance':
+                        score += (parseInt(phone.ram) / maxValues.performance) * 30;
+                        break;
+                    case 'brand':
+                        const knownBrands = ['Apple', 'Samsung', 'Google', 'OnePlus', 'Xiaomi', 'Huawei'];
+                        score += knownBrands.includes(phone.brand) ? 30 : 15;
+                        break;
+                    case 'design':
+                        // Puntuación basada en características de diseño
+                        score += (phone.screenSize > 6 ? 20 : 15) + (phone.weight < 200 ? 10 : 5);
+                        break;
+                    case 'durability':
+                        // Puntuación basada en características de durabilidad
+                        score += (phone.battery > 4000 ? 15 : 10) + (parseInt(phone.storage) > 128 ? 15 : 10);
+                        break;
+                    case 'value':
+                        const valueScore = (phone.battery + parseInt(phone.camera) + parseInt(phone.storage) + parseInt(phone.ram)) / phone.price * 1000;
+                        score += Math.min(valueScore, 30);
+                        break;
+                }
+            }
+            
+            // Puntuación por uso (0-20 puntos)
+            if (answers.usage) {
+                switch (answers.usage) {
+                    case 'basic':
+                        score += 20; // Cualquier teléfono sirve
+                        break;
+                    case 'social':
+                        score += (parseInt(phone.camera) > 12 ? 20 : 15) + (parseInt(phone.storage) > 64 ? 5 : 0);
+                        break;
+                    case 'gaming':
+                        score += (parseInt(phone.ram) > 6 ? 20 : 15) + (phone.battery > 4000 ? 5 : 0);
+                        break;
+                    case 'professional':
+                        score += (parseInt(phone.storage) > 128 ? 15 : 10) + (parseInt(phone.ram) > 6 ? 10 : 5);
+                        break;
+                    case 'creative':
+                        score += (parseInt(phone.camera) > 20 ? 20 : 15) + (parseInt(phone.storage) > 128 ? 5 : 0);
+                        break;
+                    case 'student':
+                        score += (phone.battery > 3500 ? 15 : 10) + (parseInt(phone.storage) > 64 ? 10 : 5);
+                        break;
+                    case 'travel':
+                        score += (phone.battery > 4000 ? 15 : 10) + (parseInt(phone.camera) > 12 ? 10 : 5);
+                        break;
+                    case 'mixed':
+                        score += 15; // Puntuación equilibrada
+                        break;
+                }
+            }
+            
+            return Math.round(score);
+        };
+        
+        // Calcular puntuaciones y ordenar
+        phones.forEach(phone => {
+            phone.recommendationScore = calculateScore(phone);
         });
         
-        renderProductGrid(easyResultsContainer, results, badges);
+        phones.sort((a, b) => b.recommendationScore - a.recommendationScore);
+        
+        // Mostrar resultados mejorados
+        const resultsContainer = document.getElementById('easy-mode-results-container');
+        if (phones.length === 0) {
+            resultsContainer.innerHTML = `
+                <div class="text-center py-12">
+                    <div class="text-6xl mb-4">😔</div>
+                    <h3 class="text-2xl font-bold text-white mb-2">No encontramos teléfonos</h3>
+                    <p class="text-white/80 mb-6">Intenta ajustar tus criterios de búsqueda</p>
+                    <button onclick="renderEasyModeView()" class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors">
+                        Volver a intentar
+                    </button>
+                </div>
+            `;
+        } else {
+            const topPhones = phones.slice(0, 6);
+            const totalMatches = phones.filter(p => p.recommendationScore > 50).length;
+            
+            resultsContainer.innerHTML = `
+                <div class="glass p-8 rounded-3xl shadow-2xl border border-white/20 mb-8">
+                    <div class="text-center mb-6">
+                        <div class="text-6xl mb-4">🎉</div>
+                        <h3 class="text-3xl font-bold text-white mb-2">¡Recomendaciones Perfectas!</h3>
+                        <p class="text-white/80 text-lg">Encontramos ${totalMatches} teléfonos que coinciden perfectamente con tus preferencias</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${topPhones.map((phone, index) => `
+                            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-2xl">${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '⭐'}</span>
+                                        <span class="text-sm font-semibold text-white/80">Recomendación #${index + 1}</span>
+                                    </div>
+                                    <div class="bg-gradient-to-r from-green-400 to-emerald-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                                        ${phone.recommendationScore}%
+                                    </div>
+                                </div>
+                                ${renderProductCard(phone, state.favorites.includes(phone.id), 'Recomendado')}
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="text-center mt-8">
+                        <button onclick="renderEasyModeView()" class="bg-white/20 text-white px-8 py-3 rounded-xl font-semibold hover:bg-white/30 transition-all duration-300 mr-4">
+                            🔄 Volver a intentar
+                        </button>
+                        <button onclick="updateView('search')" class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-8 py-3 rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-600 transition-all duration-300">
+                            🔍 Búsqueda Avanzada
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
     };
 
     function handleLogin(e) {
