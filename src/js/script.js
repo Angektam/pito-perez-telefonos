@@ -1738,6 +1738,9 @@ document.addEventListener('DOMContentLoaded', () => {
         globalRenderAuthSection = renderAuthSection;
         globalShowToast = showToast;
         
+        // Hacer renderAccountView disponible globalmente
+        window.renderAccountView = renderAccountView;
+        
         renderAuthSection();
         renderCharts();
         renderSearchView();
@@ -2148,6 +2151,14 @@ function handleLogin(name, email, password) {
     globalState.currentUser = { id: 1, name, email };
     if (globalRenderAuthSection) globalRenderAuthSection();
     if (globalShowToast) globalShowToast('¡Bienvenido!', 'success');
+    
+    // Actualizar vista de cuenta si está activa
+    if (globalState.currentView === 'account') {
+        // Buscar la función renderAccountView en el scope global
+        if (window.renderAccountView) {
+            window.renderAccountView();
+        }
+    }
 }
 
 function handleRegister(name, email, password) {
@@ -2156,6 +2167,14 @@ function handleRegister(name, email, password) {
     globalState.currentUser = { id: 1, name, email };
     if (globalRenderAuthSection) globalRenderAuthSection();
     if (globalShowToast) globalShowToast('¡Cuenta creada exitosamente!', 'success');
+    
+    // Actualizar vista de cuenta si está activa
+    if (globalState.currentView === 'account') {
+        // Buscar la función renderAccountView en el scope global
+        if (window.renderAccountView) {
+            window.renderAccountView();
+        }
+    }
 }
 
 function handleLogout() {
@@ -2163,6 +2182,14 @@ function handleLogout() {
     globalState.currentUser = null;
     if (globalRenderAuthSection) globalRenderAuthSection();
     if (globalShowToast) globalShowToast('Sesión cerrada', 'info');
+    
+    // Actualizar vista de cuenta si está activa
+    if (globalState.currentView === 'account') {
+        // Buscar la función renderAccountView en el scope global
+        if (window.renderAccountView) {
+            window.renderAccountView();
+        }
+    }
 }
 
 // Hacer funciones disponibles globalmente
