@@ -1,77 +1,45 @@
-// Firebase configuration - usando CDN en lugar de módulos ES6
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 // Las funciones ya están disponibles globalmente desde los scripts cargados anteriormente
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 let firebaseConfig = null;
 try { firebaseConfig = JSON.parse(__firebase_config); } catch (e) {}
 
-// Inicializar Firebase si está disponible (modo seguro)
-if (typeof firebase !== 'undefined' && firebaseConfig) {
-    try {
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+if (firebaseConfig) {
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    setLogLevel('debug');
 
-        auth.onAuthStateChanged((user) => {});
+    onAuthStateChanged(auth, (user) => {});
 
-        if (typeof __initial_auth_token !== 'undefined') {
-            auth.signInWithCustomToken(__initial_auth_token)
-                .catch(error => {
-                    auth.signInAnonymously();
-                });
-        } else {
-            auth.signInAnonymously();
-        }
-        window.firebaseApp = app;
-        window.firebaseAuth = auth;
-        window.firestoreDb = db;
-    } catch (error) {
-        console.log('Firebase no disponible, continuando sin autenticación');
+    if (typeof __initial_auth_token !== 'undefined') {
+        signInWithCustomToken(auth, __initial_auth_token)
+            .catch(error => {
+                signInAnonymously(auth);
+            });
+    } else {
+        signInAnonymously(auth);
     }
-} else {
-    console.log('Firebase no disponible, continuando sin autenticación');
+    window.firebaseApp = app;
+    window.firebaseAuth = auth;
+    window.firestoreDb = db;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM cargado, iniciando aplicación...');
+    // Inicializar medidas de seguridad
+    initializeSecurity();
+    secureLogger.info('Aplicación iniciada');
     
-    // Inicializar medidas de seguridad de forma segura
-    try {
-        if (typeof initializeSecurity === 'function') {
-            initializeSecurity();
-        }
-        if (typeof secureLogger !== 'undefined' && secureLogger.info) {
-            secureLogger.info('Aplicación iniciada');
-        }
-    } catch (error) {
-        console.log('Security no disponible, continuando...');
-    }
+    // Inicializar PWA y notificaciones
+    initializePWA();
     
-    // Inicializar PWA y notificaciones de forma segura
-    try {
-        if (typeof initializePWA === 'function') {
-            initializePWA();
-        }
-    } catch (error) {
-        console.log('PWA no disponible, continuando...');
-    }
+    // Inicializar gestos móviles
+    initializeMobileGestures();
     
-    // Inicializar gestos móviles de forma segura
-    try {
-        if (typeof initializeMobileGestures === 'function') {
-            initializeMobileGestures();
-        }
-    } catch (error) {
-        console.log('Gestos móviles no disponibles, continuando...');
-    }
-    
-    // Mejorar experiencia táctil de forma segura
-    try {
-        if (typeof enhanceTouchExperience === 'function') {
-            enhanceTouchExperience();
-        }
-    } catch (error) {
-        console.log('Touch experience no disponible, continuando...');
-    }
+    // Mejorar experiencia táctil
+    enhanceTouchExperience();
 
     let phoneDatabase = []; 
     
@@ -1507,9 +1475,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateView('dashboard');
         
         // Inicializar tema después de que todo esté cargado
-        setTimeout(() => {
-            initializeTheme();
-        }, 100);
+        initializeTheme();
     });
 });
 
@@ -1530,14 +1496,9 @@ function debounce(func, wait) {
 let isDarkMode = false;
 
 function initializeTheme() {
-    console.log('Inicializando tema...');
-    
     // Cargar preferencia guardada o usar preferencia del sistema
     const savedTheme = localStorage.getItem('theme');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    console.log('Tema guardado:', savedTheme);
-    console.log('Sistema prefiere oscuro:', systemPrefersDark);
     
     if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
         enableDarkMode();
@@ -1547,13 +1508,8 @@ function initializeTheme() {
     
     // Configurar event listener para el botón de toggle
     const themeToggle = document.getElementById('theme-toggle');
-    console.log('Botón de tema encontrado:', themeToggle);
-    
     if (themeToggle) {
         themeToggle.addEventListener('click', toggleTheme);
-        console.log('Event listener agregado al botón de tema');
-    } else {
-        console.error('No se encontró el botón de tema con ID: theme-toggle');
     }
     
     // Escuchar cambios en la preferencia del sistema
@@ -1569,7 +1525,6 @@ function initializeTheme() {
 }
 
 function toggleTheme() {
-    console.log('Toggle tema clickeado. Modo actual:', isDarkMode);
     if (isDarkMode) {
         enableLightMode();
     } else {

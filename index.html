@@ -9,10 +9,6 @@
     <title>Pito Pérez - Guía Interactiva de Smartphones</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Firebase CDN -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -240,8 +236,8 @@
     <!-- Scripts organizados en orden correcto -->
     <script src="src/js/security.js"></script>
     <script src="src/js/fallback-db.js"></script>
-    <script src="src/js/api.js"></script>
-    <script src="src/js/script.js"></script>
+    <script type="module" src="src/js/api.js"></script>
+    <script type="module" src="src/js/script.js"></script>
     <script>
         // Registrar Service Worker
         if ('serviceWorker' in navigator) {
