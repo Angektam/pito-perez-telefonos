@@ -1503,19 +1503,19 @@ function initializeTheme() {
     
     // Configurar event listener para el botón de toggle con retry
     const setupThemeButtons = () => {
-        const themeToggle = document.getElementById('theme-toggle');
+        const themeSwitcherGrid = document.getElementById('theme-switcher-grid');
         const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
         
-        console.log('Botón de tema encontrado:', themeToggle);
+        console.log('Botón de tema animado encontrado:', themeSwitcherGrid);
         console.log('Botón móvil de tema encontrado:', mobileThemeToggle);
         
-        if (themeToggle) {
+        if (themeSwitcherGrid) {
             // Remover listener existente si existe
-            themeToggle.removeEventListener('click', toggleTheme);
-            themeToggle.addEventListener('click', toggleTheme);
-            console.log('Event listener agregado al botón de tema');
+            themeSwitcherGrid.removeEventListener('click', toggleTheme);
+            themeSwitcherGrid.addEventListener('click', toggleTheme);
+            console.log('Event listener agregado al botón de tema animado');
         } else {
-            console.error('No se encontró el botón de tema con ID: theme-toggle');
+            console.error('No se encontró el botón de tema con ID: theme-switcher-grid');
         }
         
         if (mobileThemeToggle) {
@@ -1532,7 +1532,7 @@ function initializeTheme() {
     setupThemeButtons();
     
     // Si no se encontraron los botones, intentar de nuevo después de un breve delay
-    if (!document.getElementById('theme-toggle')) {
+    if (!document.getElementById('theme-switcher-grid')) {
         setTimeout(setupThemeButtons, 500);
     }
     
@@ -1549,8 +1549,8 @@ function initializeTheme() {
     
     // Delegación de eventos como respaldo
     document.addEventListener('click', (e) => {
-        if (e.target.id === 'theme-toggle' || e.target.closest('#theme-toggle')) {
-            console.log('Botón de tema clickeado (delegación)');
+        if (e.target.id === 'theme-switcher-grid' || e.target.closest('#theme-switcher-grid')) {
+            console.log('Botón de tema animado clickeado (delegación)');
             toggleTheme();
         }
         if (e.target.id === 'mobile-theme-toggle' || e.target.closest('#mobile-theme-toggle')) {
@@ -1576,6 +1576,7 @@ function enableDarkMode() {
     document.documentElement.classList.add('dark');
     localStorage.setItem('theme', 'dark');
     updateThemeIcons();
+    updateThemeButtons();
     console.log('Modo oscuro activado');
 }
 
@@ -1584,6 +1585,7 @@ function enableLightMode() {
     document.documentElement.classList.remove('dark');
     localStorage.setItem('theme', 'light');
     updateThemeIcons();
+    updateThemeButtons();
     console.log('Modo claro activado');
 }
 
@@ -1600,6 +1602,19 @@ function updateThemeIcons() {
         if (sunIcon) sunIcon.classList.remove('hidden');
         if (moonIcon) moonIcon.classList.add('hidden');
         if (mobileMoonIcon) mobileMoonIcon.textContent = '☀️';
+    }
+}
+
+function updateThemeButtons() {
+    const themeSwitcherGrid = document.getElementById('theme-switcher-grid');
+    const mobileThemeSwitcher = document.getElementById('theme-switcher-grid-mobile');
+    
+    if (isDarkMode) {
+        if (themeSwitcherGrid) themeSwitcherGrid.classList.add('night-theme');
+        if (mobileThemeSwitcher) mobileThemeSwitcher.classList.add('night-theme');
+    } else {
+        if (themeSwitcherGrid) themeSwitcherGrid.classList.remove('night-theme');
+        if (mobileThemeSwitcher) mobileThemeSwitcher.classList.remove('night-theme');
     }
 }
 
