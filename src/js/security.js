@@ -231,12 +231,8 @@ function initializeSecurity() {
         document.head.appendChild(meta);
     }
     
-    if (!document.querySelector('meta[http-equiv="X-Frame-Options"]')) {
-        const meta = document.createElement('meta');
-        meta.httpEquiv = 'X-Frame-Options';
-        meta.content = 'DENY';
-        document.head.appendChild(meta);
-    }
+    // X-Frame-Options debe configurarse en el servidor, no como meta tag
+    // Esto previene el error de consola en GitHub Pages
     
     if (!document.querySelector('meta[http-equiv="X-XSS-Protection"]')) {
         const meta = document.createElement('meta');

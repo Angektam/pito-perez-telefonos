@@ -1946,12 +1946,13 @@ function showToast(message, type = 'info', duration = 3000) {
 function initializePWA() {
     // Registrar Service Worker
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js')
+        const swPath = 'src/js/sw.js';
+        navigator.serviceWorker.register(swPath)
             .then((registration) => {
-                console.log('SW registrado exitosamente:', registration);
+                console.log('✅ SW registrado exitosamente:', registration);
             })
             .catch((error) => {
-                console.log('Error al registrar SW:', error);
+                console.warn('⚠️ Service Worker no disponible (esto es normal en desarrollo):', error.message);
             });
     }
     

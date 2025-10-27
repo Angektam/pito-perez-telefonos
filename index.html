@@ -241,7 +241,14 @@
     <script>
         // Registrar Service Worker
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('src/js/sw.js');
+            const swPath = 'src/js/sw.js';
+            navigator.serviceWorker.register(swPath)
+                .then((registration) => {
+                    console.log('✅ SW registrado exitosamente:', registration);
+                })
+                .catch((error) => {
+                    console.warn('⚠️ Service Worker no disponible (normal en desarrollo):', error.message);
+                });
         }
     </script>
 </body>
