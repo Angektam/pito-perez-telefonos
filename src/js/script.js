@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Inicializar PWA y notificaciones
     initializePWA();
-    
+
     // Inicializar gestos móviles
     initializeMobileGestures();
     
@@ -88,8 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <div class="absolute top-3 right-3 flex flex-col gap-2">
                             <button class="favorite-btn w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform" data-id="${phone.id}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="${isFavorite ? '#ef4444' : 'none'}" stroke="${isFavorite ? '#ef4444' : 'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                            </button>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="${isFavorite ? '#ef4444' : 'none'}" stroke="${isFavorite ? '#ef4444' : 'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                        </button>
                             <button class="compare-btn w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform ${isInComparison ? 'bg-indigo-500 text-white' : 'text-slate-500'}" data-id="${phone.id}" title="${isInComparison ? 'Quitar de comparación' : 'Agregar a comparación'}">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
                             </button>
@@ -106,8 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <div class="flex gap-2">
                             <button class="details-btn flex-1 bg-indigo-600 text-white font-semibold py-3 px-4 rounded-xl hover:bg-indigo-700 transition-colors modern-btn" data-id="${phone.id}">
-                                Ver Detalles
-                            </button>
+                            Ver Detalles
+                        </button>
                         </div>
                     </div>
                 </div>
@@ -265,18 +265,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${selectHTML('filter-storage', 'Almacenamiento', filterOptions.storage)}
                         ${selectHTML('filter-ram', 'RAM', filterOptions.ram)}
                         ${selectHTML('filter-screen', 'Tamaño de Pantalla', filterOptions.screen)}
-                     </div>
+                        </div>
                      
                      <!-- Filtros numéricos -->
                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         ${inputHTML('filter-minCamera', 'Cámara Mínima (MP)', 'Ej: 48')}
                         ${inputHTML('filter-minBattery', 'Batería Mínima (mAh)', 'Ej: 4500')}
-                        <div class="flex-1 min-w-[150px]">
+                         <div class="flex-1 min-w-[150px]">
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Precio (MXN)</label>
-                            <div class="flex gap-2 mt-1">
+                             <div class="flex gap-2 mt-1">
                                 <input type="number" id="filter-minPrice" placeholder="Mínimo" class="block w-full text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md p-2 dark:bg-slate-700 dark:text-slate-100">
                                 <input type="number" id="filter-maxPrice" placeholder="Máximo" class="block w-full text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md p-2 dark:bg-slate-700 dark:text-slate-100">
-                            </div>
+                             </div>
                         </div>
                     </div>
                     
@@ -414,8 +414,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h2 class="text-2xl font-bold text-white">🎯 Modo Fácil</h2>
                     <div class="text-white/80 text-sm">
                         <span id="current-question">1</span> de ${questions.length}
+                        </div>
                     </div>
-                </div>
                 <div class="w-full bg-white/20 rounded-full h-2 mb-2">
                     <div id="progress-bar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-500" style="width: ${100/questions.length}%"></div>
                 </div>
@@ -476,11 +476,16 @@ document.addEventListener('DOMContentLoaded', () => {
                              <div class="text-7xl mb-4">👤</div>
                             <h2 class="text-2xl font-bold text-slate-800 mb-2">Accede a tu cuenta</h2>
                             <p class="text-slate-500 mb-6">Inicia sesión para ver tus favoritos e historial de búsqueda.</p>
-                            <button class="bg-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors" onclick="showAuthModal('login')">
+                            <button id="account-login-btn" class="bg-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors">
                                 Iniciar Sesión / Registrarse
                             </button>
                         </div>
                     `;
+        
+        // Agregar event listener al botón
+        document.getElementById('account-login-btn').addEventListener('click', () => {
+            showAuthModal('login');
+        });
             return;
         }
         
@@ -1310,7 +1315,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (phone.price > max) {
                     score += 10; // Por encima pero no mucho
                 }
-            } else {
+        } else {
                 score += 15; // Puntuación neutral para flexible
             }
             
