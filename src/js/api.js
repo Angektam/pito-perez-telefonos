@@ -103,31 +103,95 @@ function mapToPhoneSpecs(products) {
 async function fetchAndInitializeApp(loadingIndicator, renderAuthSection, renderCharts, renderSearchView, renderEasyModeView, renderAccountView, updateView, FAKE_STORE_API_URL, mapToPhoneSpecs) {
     loadingIndicator.classList.remove('hidden');
     
+    // Configurar timeout para la API
+    const API_TIMEOUT = 5000; // 5 segundos
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+    
     try {
-        const response = await fetch(FAKE_STORE_API_URL);
+        console.log('🌐 Intentando conectar con la API...');
+        const response = await fetch(FAKE_STORE_API_URL, {
+            signal: controller.signal,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        clearTimeout(timeoutId);
+        
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
         const rawProducts = await response.json();
         
+        if (!rawProducts || !Array.isArray(rawProducts) || rawProducts.length === 0) {
+            throw new Error('API returned empty or invalid data');
+        }
+        
         const newPhoneDatabase = mapToPhoneSpecs(rawProducts);
-        console.log('✅ Datos cargados desde la API');
+        console.log('✅ Datos cargados desde la API:', newPhoneDatabase.length, 'productos');
+        
+        // Guardar en localStorage para uso offline
+        try {
+            localStorage.setItem('phoneDatabase_cache', JSON.stringify({
+                data: newPhoneDatabase,
+                timestamp: Date.now(),
+                source: 'api'
+            }));
+        } catch (e) {
+            console.warn('No se pudo guardar en localStorage:', e);
+        }
+        
         return newPhoneDatabase;
         
     } catch (error) {
-        console.warn('⚠️ Error al cargar la API, usando base de datos de respaldo:', error);
+        clearTimeout(timeoutId);
+        console.warn('⚠️ Error al cargar la API, activando modo offline:', error.message);
         
-        // Usar la base de datos de respaldo en caso de error
+        // Mostrar mensaje informativo al usuario
         loadingIndicator.innerHTML = `
             <div class="text-7xl mb-4">📱</div>
-            <p class="mt-4 text-xl font-semibold text-indigo-600">Cargando catálogo desde base de datos local...</p>
+            <p class="mt-4 text-xl font-semibold text-orange-600">Modo Offline Activado</p>
+            <p class="mt-2 text-lg text-slate-600">Cargando catálogo desde base de datos local...</p>
+            <div class="mt-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                <p class="text-sm text-orange-800">
+                    <strong>ℹ️ Información:</strong> La API no está disponible. 
+                    Estás viendo datos almacenados localmente. 
+                    Algunas funciones pueden estar limitadas.
+                </p>
+            </div>
         `;
         
         // Simular un pequeño retraso para mostrar el mensaje
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 1500));
         
-        console.log('✅ Datos cargados desde base de datos de respaldo');
-        return window.fallbackPhoneDatabase;
+        // Intentar cargar desde localStorage primero
+        let fallbackData = null;
+        try {
+            const cached = localStorage.getItem('phoneDatabase_cache');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                const cacheAge = Date.now() - parsed.timestamp;
+                const maxAge = 24 * 60 * 60 * 1000; // 24 horas
+                
+                if (cacheAge < maxAge) {
+                    fallbackData = parsed.data;
+                    console.log('✅ Datos cargados desde caché local:', fallbackData.length, 'productos');
+                }
+            }
+        } catch (e) {
+            console.warn('Error al cargar caché:', e);
+        }
+        
+        // Si no hay caché o está muy viejo, usar base de datos de respaldo
+        if (!fallbackData) {
+            fallbackData = window.getFallbackPhoneData ? window.getFallbackPhoneData() : window.fallbackPhoneDatabase;
+            console.log('✅ Datos cargados desde base de datos de respaldo:', fallbackData.length, 'productos');
+        }
+        
+        return fallbackData;
         
     } finally {
         loadingIndicator.classList.add('hidden');

@@ -1741,6 +1741,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Hacer renderAccountView disponible globalmente
         window.renderAccountView = renderAccountView;
         
+        // Detectar si se está usando base de datos de respaldo
+        const isUsingFallback = newPhoneDatabase.some(phone => phone.source === 'fallback-database');
+        if (isUsingFallback) {
+            showOfflineIndicator();
+        }
+        
         renderAuthSection();
         renderCharts();
         renderSearchView();
@@ -1751,6 +1757,22 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Inicializar tema después de que todo esté cargado
         initializeTheme();
+        
+        // Configurar listeners de conexión
+        window.addEventListener('online', () => {
+            showToast('Conexión restaurada', 'success');
+            const offlineIndicator = document.getElementById('offline-indicator');
+            if (offlineIndicator) {
+                offlineIndicator.remove();
+            }
+        });
+        
+        window.addEventListener('offline', () => {
+            checkConnectionStatus();
+        });
+        
+        // Verificar estado inicial
+        checkConnectionStatus();
     });
 });
 
@@ -2192,8 +2214,46 @@ function handleLogout() {
     }
 }
 
+// Función para mostrar indicador offline
+function showOfflineIndicator() {
+    // Crear indicador offline
+    const offlineIndicator = document.createElement('div');
+    offlineIndicator.id = 'offline-indicator';
+    offlineIndicator.className = 'fixed top-20 right-4 z-50 bg-orange-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 animate-pulse';
+    offlineIndicator.innerHTML = `
+        <span class="text-lg">📱</span>
+        <div>
+            <div class="font-semibold text-sm">Modo Offline</div>
+            <div class="text-xs opacity-90">Usando datos locales</div>
+        </div>
+        <button onclick="this.parentElement.remove()" class="ml-2 text-white hover:text-orange-200">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+    `;
+    
+    document.body.appendChild(offlineIndicator);
+    
+    // Auto-ocultar después de 10 segundos
+    setTimeout(() => {
+        if (offlineIndicator.parentElement) {
+            offlineIndicator.remove();
+        }
+    }, 10000);
+}
+
+// Función para verificar estado de conexión
+function checkConnectionStatus() {
+    if (!navigator.onLine) {
+        showOfflineIndicator();
+        showToast('Sin conexión a internet. Usando datos locales.', 'warning', 5000);
+    }
+}
+
 // Hacer funciones disponibles globalmente
 window.showAuthModal = showAuthModal;
 window.handleLogin = handleLogin;
 window.handleRegister = handleRegister;
 window.handleLogout = handleLogout;
+window.showOfflineIndicator = showOfflineIndicator;

@@ -608,9 +608,223 @@ const fallbackPhoneDatabase = [
             { store: 'Tienda Oficial', url: 'https://www.oneplus.com', logo: '🛒' },
             { store: 'Amazon MX', url: 'https://www.amazon.com.mx', logo: '📦' }
         ]
+    },
+    // Teléfonos adicionales para mayor variedad
+    {
+        id: 21,
+        name: 'Huawei P60 Pro',
+        brand: 'huawei',
+        storage: '512gb',
+        ram: '12gb',
+        camera: '48mp',
+        battery: 4815,
+        screen: 'large',
+        os: 'android',
+        condition: 'new',
+        price: 17999,
+        specs: '12gb RAM • 512gb • 48mp Camera • 4815 mAh Batería.',
+        image: createPhoneImageSVG('xiaomi', 'Huawei P60'),
+        fullSpecs: {
+            Processor: 'Snapdragon 8+ Gen 1',
+            Display: 'OLED 6.67" LTPO Display',
+            'Main Camera': '48mp Leica Camera',
+            'Front Camera': '12MP',
+            'Battery Life': '4815 mAh',
+            Weight: '200g',
+            Materials: 'Aluminio con vidrio Gorilla Glass'
+        },
+        purchaseLinks: [
+            { store: 'Tienda Oficial', url: 'https://consumer.huawei.com/mx', logo: '🛒' },
+            { store: 'Amazon MX', url: 'https://www.amazon.com.mx', logo: '📦' }
+        ]
+    },
+    {
+        id: 22,
+        name: 'Motorola Edge 40',
+        brand: 'motorola',
+        storage: '256gb',
+        ram: '8gb',
+        camera: '50mp',
+        battery: 4400,
+        screen: 'medium',
+        os: 'android',
+        condition: 'new',
+        price: 9999,
+        specs: '8gb RAM • 256gb • 50mp Camera • 4400 mAh Batería.',
+        image: createPhoneImageSVG('xiaomi', 'Motorola Edge'),
+        fullSpecs: {
+            Processor: 'MediaTek Dimensity 8020',
+            Display: 'OLED 6.55" Display 144Hz',
+            'Main Camera': '50mp Dual Camera',
+            'Front Camera': '12MP',
+            'Battery Life': '4400 mAh',
+            Weight: '171g',
+            Materials: 'Aluminio con vidrio'
+        },
+        purchaseLinks: [
+            { store: 'Tienda Oficial', url: 'https://www.motorola.com.mx', logo: '🛒' },
+            { store: 'Amazon MX', url: 'https://www.amazon.com.mx', logo: '📦' }
+        ]
+    },
+    {
+        id: 23,
+        name: 'Nothing Phone 2',
+        brand: 'nothing',
+        storage: '256gb',
+        ram: '12gb',
+        camera: '50mp',
+        battery: 4700,
+        screen: 'large',
+        os: 'android',
+        condition: 'new',
+        price: 15999,
+        specs: '12gb RAM • 256gb • 50mp Camera • 4700 mAh Batería.',
+        image: createPhoneImageSVG('xiaomi', 'Nothing Phone'),
+        fullSpecs: {
+            Processor: 'Snapdragon 8+ Gen 1',
+            Display: 'OLED 6.7" Display 120Hz',
+            'Main Camera': '50mp Dual Camera',
+            'Front Camera': '12MP',
+            'Battery Life': '4700 mAh',
+            Weight: '193g',
+            Materials: 'Aluminio con vidrio transparente'
+        },
+        purchaseLinks: [
+            { store: 'Tienda Oficial', url: 'https://www.nothing.tech', logo: '🛒' },
+            { store: 'Amazon MX', url: 'https://www.amazon.com.mx', logo: '📦' }
+        ]
+    },
+    {
+        id: 24,
+        name: 'Realme GT 5',
+        brand: 'realme',
+        storage: '512gb',
+        ram: '16gb',
+        camera: '50mp',
+        battery: 5240,
+        screen: 'large',
+        os: 'android',
+        condition: 'new',
+        price: 11999,
+        specs: '16gb RAM • 512gb • 50mp Camera • 5240 mAh Batería.',
+        image: createPhoneImageSVG('xiaomi', 'Realme GT'),
+        fullSpecs: {
+            Processor: 'Snapdragon 8 Gen 2',
+            Display: 'AMOLED 6.74" Display 144Hz',
+            'Main Camera': '50mp Triple Camera',
+            'Front Camera': '12MP',
+            'Battery Life': '5240 mAh',
+            Weight: '205g',
+            Materials: 'Aluminio con vidrio'
+        },
+        purchaseLinks: [
+            { store: 'Tienda Oficial', url: 'https://www.realme.com/mx', logo: '🛒' },
+            { store: 'Amazon MX', url: 'https://www.amazon.com.mx', logo: '📦' }
+        ]
+    },
+    {
+        id: 25,
+        name: 'Vivo X100 Pro',
+        brand: 'vivo',
+        storage: '512gb',
+        ram: '16gb',
+        camera: '64mp',
+        battery: 5400,
+        screen: 'large',
+        os: 'android',
+        condition: 'new',
+        price: 19999,
+        specs: '16gb RAM • 512gb • 64mp Camera • 5400 mAh Batería.',
+        image: createPhoneImageSVG('xiaomi', 'Vivo X100'),
+        fullSpecs: {
+            Processor: 'MediaTek Dimensity 9300',
+            Display: 'AMOLED 6.78" LTPO Display',
+            'Main Camera': '64mp Zeiss Camera',
+            'Front Camera': '12MP',
+            'Battery Life': '5400 mAh',
+            Weight: '221g',
+            Materials: 'Aluminio con vidrio Gorilla Glass'
+        },
+        purchaseLinks: [
+            { store: 'Tienda Oficial', url: 'https://www.vivo.com/mx', logo: '🛒' },
+            { store: 'Amazon MX', url: 'https://www.amazon.com.mx', logo: '📦' }
+        ]
     }
 ];
 
-// Hacer la base de datos disponible globalmente
+// Función para obtener datos de respaldo con información adicional
+function getFallbackPhoneData() {
+    return fallbackPhoneDatabase.map(phone => ({
+        ...phone,
+        // Agregar campos adicionales para compatibilidad
+        screenSize: phone.screen === 'small' ? 5.8 : phone.screen === 'medium' ? 6.1 : 6.7,
+        weight: phone.fullSpecs?.Weight ? parseInt(phone.fullSpecs.Weight) : 180,
+        // Agregar timestamp para cache
+        lastUpdated: new Date().toISOString(),
+        // Agregar fuente
+        source: 'fallback-database'
+    }));
+}
+
+// Función para buscar en la base de datos de respaldo
+function searchFallbackDatabase(query, filters = {}) {
+    let results = getFallbackPhoneData();
+    
+    // Aplicar filtros
+    if (filters.brand) {
+        results = results.filter(phone => 
+            phone.brand.toLowerCase().includes(filters.brand.toLowerCase())
+        );
+    }
+    
+    if (filters.priceRange) {
+        const [min, max] = filters.priceRange;
+        results = results.filter(phone => phone.price >= min && phone.price <= max);
+    }
+    
+    if (filters.os) {
+        results = results.filter(phone => phone.os === filters.os);
+    }
+    
+    if (filters.screen) {
+        results = results.filter(phone => phone.screen === filters.screen);
+    }
+    
+    // Aplicar búsqueda por texto
+    if (query) {
+        const searchTerm = query.toLowerCase();
+        results = results.filter(phone => 
+            phone.name.toLowerCase().includes(searchTerm) ||
+            phone.brand.toLowerCase().includes(searchTerm) ||
+            phone.specs.toLowerCase().includes(searchTerm)
+        );
+    }
+    
+    return results;
+}
+
+// Función para obtener estadísticas de la base de datos
+function getFallbackDatabaseStats() {
+    const data = getFallbackPhoneData();
+    const brands = [...new Set(data.map(phone => phone.brand))];
+    const priceRanges = {
+        low: data.filter(p => p.price < 10000).length,
+        medium: data.filter(p => p.price >= 10000 && p.price < 20000).length,
+        high: data.filter(p => p.price >= 20000).length
+    };
+    
+    return {
+        totalPhones: data.length,
+        brands: brands.length,
+        averagePrice: Math.round(data.reduce((sum, phone) => sum + phone.price, 0) / data.length),
+        priceRanges,
+        lastUpdated: new Date().toISOString()
+    };
+}
+
+// Hacer la base de datos y funciones disponibles globalmente
 window.fallbackPhoneDatabase = fallbackPhoneDatabase;
+window.getFallbackPhoneData = getFallbackPhoneData;
+window.searchFallbackDatabase = searchFallbackDatabase;
+window.getFallbackDatabaseStats = getFallbackDatabaseStats;
 
