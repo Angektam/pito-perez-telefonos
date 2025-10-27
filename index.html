@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,22 +28,32 @@
 </head>
 <body class="bg-slate-50 text-slate-800">
 
-    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-40 shadow-sm border-b border-slate-200">
+    <header class="glass sticky top-0 z-40 shadow-lg border-b border-white/20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <div class="flex items-center space-x-3">
-                    <span class="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+                    <span class="text-3xl font-extrabold gradient-text animate-pulse">
                         Pito Pérez
                     </span>
                 </div>
                 <nav class="hidden md:flex items-center space-x-2">
-                    <button data-view="dashboard" class="nav-item nav-item-active px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200 flex items-center gap-2">📊 Panel General</button>
-                    <button data-view="search" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200 flex items-center gap-2">🔍 Búsqueda Avanzada</button>
-                    <button data-view="easy" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200 flex items-center gap-2">🎯 Modo Fácil</button>
-                    <button data-view="account" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200 flex items-center gap-2">👤 Mi Cuenta</button>
-                    <button data-view="comments" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200 flex items-center gap-2">💬 Comentarios</button>
+                    <button data-view="dashboard" class="nav-item nav-item-active px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105">📊 Panel General</button>
+                    <button data-view="search" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105">🔍 Búsqueda Avanzada</button>
+                    <button data-view="easy" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105">🎯 Modo Fácil</button>
+                    <button data-view="comparison" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105">📊 Comparar</button>
+                    <button data-view="account" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105">👤 Mi Cuenta</button>
+                    <button data-view="comments" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105">💬 Comentarios</button>
                 </nav>
                 <div id="auth-section" class="flex items-center space-x-4">
+                    <!-- Botón de modo oscuro -->
+                    <button id="theme-toggle" class="p-3 rounded-full bg-white/30 hover:bg-white/40 transition-all duration-300 shadow-lg border border-white/20" title="Cambiar tema">
+                        <svg id="sun-icon" class="w-6 h-6 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <svg id="moon-icon" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
                     <!-- Botones de autenticación (se llenan dinámicamente) -->
                     <div id="auth-buttons" class="flex items-center space-x-2">
                         <!-- Se llenan con JavaScript -->
@@ -54,7 +64,7 @@
     </header>
 
     <!-- Mobile Navigation -->
-    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50">
+    <div class="md:hidden fixed bottom-0 left-0 right-0 glass border-t border-white/20 z-50">
         <div class="flex justify-around py-2">
             <button data-view="dashboard" class="mobile-nav-item flex flex-col items-center py-2 px-3 rounded-lg transition-colors">
                 <span class="text-2xl">📊</span>
@@ -68,13 +78,13 @@
                 <span class="text-2xl">🎯</span>
                 <span class="text-xs mt-1">Fácil</span>
             </button>
-            <button data-view="account" class="mobile-nav-item flex flex-col items-center py-2 px-3 rounded-lg transition-colors">
-                <span class="text-2xl">👤</span>
-                <span class="text-xs mt-1">Cuenta</span>
+            <button data-view="comparison" class="mobile-nav-item flex flex-col items-center py-2 px-3 rounded-lg transition-colors">
+                <span class="text-2xl">📊</span>
+                <span class="text-xs mt-1">Comparar</span>
             </button>
-            <button data-view="comments" class="mobile-nav-item flex flex-col items-center py-2 px-3 rounded-lg transition-colors">
-                <span class="text-2xl">💬</span>
-                <span class="text-xs mt-1">Chat</span>
+            <button id="mobile-theme-toggle" class="mobile-nav-item flex flex-col items-center py-2 px-3 rounded-lg transition-colors">
+                <span id="mobile-moon-icon" class="text-2xl">🌙</span>
+                <span class="text-xs mt-1">Tema</span>
             </button>
         </div>
     </div>
@@ -86,11 +96,11 @@
         </div>
 
         <div id="dashboard-view" class="view-container hidden">
-            <div class="text-center mb-12">
-                <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900">Bienvenido a la Guía de Smartphones</h1>
-                <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">Explora el mercado de teléfonos con nuestros gráficos interactivos o encuentra tu dispositivo ideal con nuestras herramientas de búsqueda. (Datos obtenidos de una API)</p>
+            <div class="text-center mb-12 stagger-animation">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4">Bienvenido a la Guía de Smartphones</h1>
+                <p class="mt-4 text-lg text-white/90 max-w-2xl mx-auto">Explora el mercado de teléfonos con nuestros gráficos interactivos o encuentra tu dispositivo ideal con nuestras herramientas de búsqueda. (Datos obtenidos de una API)</p>
             </div>
-            <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200 mb-8">
+            <div class="glass p-8 rounded-3xl shadow-2xl border border-white/20 mb-8">
                 <h2 class="text-2xl font-bold text-center mb-2">Resumen del Mercado</h2>
                 <p class="text-slate-500 text-center mb-8">Estos gráficos se basan en nuestro catálogo de productos simulados.</p>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -135,10 +145,16 @@
         <div id="account-view" class="view-container hidden">
         </div>
 
+        <div id="comparison-view" class="view-container hidden">
+            <div id="comparison-content">
+                <!-- Contenido de comparación se renderiza aquí -->
+            </div>
+        </div>
+
         <div id="comments-view" class="view-container hidden">
-            <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200">
-                <h2 class="text-3xl font-bold text-slate-800 mb-2 text-center">💬 Comentarios y Opiniones</h2>
-                <p class="text-slate-500 text-center mb-8">Comparte tu experiencia y lee opiniones de otros usuarios sobre los teléfonos.</p>
+            <div class="glass p-8 rounded-3xl shadow-2xl border border-white/20">
+                <h2 class="text-3xl font-bold text-white mb-2 text-center">💬 Comentarios y Opiniones</h2>
+                <p class="text-white/90 text-center mb-8">Comparte tu experiencia y lee opiniones de otros usuarios sobre los teléfonos.</p>
                 
                 <!-- Formulario para agregar comentario -->
                 <div class="bg-slate-50 p-6 rounded-2xl mb-8">
@@ -190,16 +206,27 @@
         </div>
     </main>
 
-    <footer class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-200 shadow-t-lg z-40 p-2">
+    <footer class="md:hidden fixed bottom-0 left-0 right-0 glass border-t border-white/20 shadow-t-lg z-40 p-2">
         <div class="flex justify-around">
             <button data-view="dashboard" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-indigo-600"><span class="text-2xl">📊</span><span>Panel</span></button>
             <button data-view="search" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-slate-500"><span class="text-2xl">🔍</span><span>Buscar</span></button>
             <button data-view="easy" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-slate-500"><span class="text-2xl">🎯</span><span>Fácil</span></button>
+            <button data-view="comparison" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-slate-500"><span class="text-2xl">📊</span><span>Comparar</span></button>
             <button data-view="account" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-slate-500"><span class="text-2xl">👤</span><span>Cuenta</span></button>
-            <button data-view="comments" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-slate-500"><span class="text-2xl">💬</span><span>Comentarios</span></button>
         </div>
     </footer>
     <div class="h-20 md:hidden"></div>
+
+    <!-- Botón flotante de comparación -->
+    <div id="comparison-fab" class="fixed bottom-20 right-4 z-50 hidden">
+        <button class="bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition-all duration-300 hover:scale-110 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+            </svg>
+            <span class="hidden sm:inline font-semibold">Comparar</span>
+            <span id="comparison-count" class="bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">0</span>
+        </button>
+    </div>
 
     <div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 hidden">
         <div id="modal-content" class="bg-white rounded-3xl shadow-2xl w-full max-w-md m-4 relative transform transition-all duration-300">

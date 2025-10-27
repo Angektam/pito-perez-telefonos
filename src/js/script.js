@@ -34,6 +34,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Inicializar PWA y notificaciones
     initializePWA();
+    
+    // Inicializar gestos móviles
+    initializeMobileGestures();
+    
+    // Mejorar experiencia táctil
+    enhanceTouchExperience();
 
     let phoneDatabase = []; 
     
@@ -45,6 +51,15 @@ document.addEventListener('DOMContentLoaded', () => {
         filters: { brand: '', storage: '', ram: '', minCamera: '', minBattery: '', os: '', condition: '', minPrice: '', maxPrice: '' },
         easyAnswers: { usage: null, budget: null, priority: null, system: null, size: null },
         comments: [],
+        comparisonPhones: [],
+    };
+
+    // Sistema de caché para mejorar rendimiento
+    const cache = {
+        searchResults: new Map(),
+        filterOptions: null,
+        lastSearchTime: 0,
+        CACHE_DURATION: 30000 // 30 segundos
     };
 
     const views = document.querySelectorAll('.view-container');
@@ -62,17 +77,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderProductCard = (phone, isFavorite, badge = null) => {
         const imageUrl = phone.image;
+        const isInComparison = state.comparisonPhones.some(p => p.id === phone.id);
         
         return `
-                <div class="bg-white rounded-3xl p-6 shadow-lg border border-slate-200 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col">
+                <div class="product-card bg-white rounded-3xl p-6 shadow-lg border border-slate-200 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col">
                     <div class="relative">
                         <div class="h-40 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center text-6xl overflow-hidden">
-                            <img src="${imageUrl}" alt="Teléfono ${phone.name}" class="object-cover h-full w-full opacity-90 transition-transform duration-300 hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <img src="${imageUrl}" alt="Teléfono ${phone.name}" class="object-cover h-full w-full opacity-90 transition-transform duration-300 hover:scale-105" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                             <div class="hidden items-center justify-center h-full w-full text-6xl bg-gradient-to-br from-indigo-100 to-purple-100">📱</div>
                         </div>
-                        <button class="favorite-btn absolute top-3 right-3 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform" data-id="${phone.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="${isFavorite ? '#ef4444' : 'none'}" stroke="${isFavorite ? '#ef4444' : 'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                        </button>
+                        <div class="absolute top-3 right-3 flex flex-col gap-2">
+                            <button class="favorite-btn w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform" data-id="${phone.id}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="${isFavorite ? '#ef4444' : 'none'}" stroke="${isFavorite ? '#ef4444' : 'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                            </button>
+                            <button class="compare-btn w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform ${isInComparison ? 'bg-indigo-500 text-white' : 'text-slate-500'}" data-id="${phone.id}" title="${isInComparison ? 'Quitar de comparación' : 'Agregar a comparación'}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+                            </button>
+                        </div>
                     </div>
                     <div class="flex-grow pt-4">
                         ${badge ? `<div class="text-xs font-bold ${badge.color} text-white px-3 py-1 rounded-full inline-block mb-2">${badge.icon} ${badge.text}</div>` : ''}
@@ -83,9 +104,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 mb-3">
                             $${phone.price.toLocaleString('es-MX')}
                         </div>
-                        <button class="details-btn w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-xl hover:bg-indigo-700 transition-colors" data-id="${phone.id}">
-                            Ver Detalles
-                        </button>
+                        <div class="flex gap-2">
+                            <button class="details-btn flex-1 bg-indigo-600 text-white font-semibold py-3 px-4 rounded-xl hover:bg-indigo-700 transition-colors modern-btn" data-id="${phone.id}">
+                                Ver Detalles
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -207,66 +230,99 @@ document.addEventListener('DOMContentLoaded', () => {
             ram: [...new Set(phoneDatabase.map(p => p.ram))].sort(),
             os: [...new Set(phoneDatabase.map(p => p.os))],
             condition: [...new Set(phoneDatabase.map(p => p.condition))],
+            screen: [...new Set(phoneDatabase.map(p => p.screen))],
         };
         
         const selectHTML = (id, label, options) => `
             <div class="flex-1 min-w-[150px]">
-                <label for="${id}" class="block text-sm font-medium text-slate-700">${label}</label>
-                <select id="${id}" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                <label for="${id}" class="block text-sm font-medium text-slate-700 dark:text-slate-300">${label}</label>
+                <select id="${id}" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-slate-700 dark:text-slate-100">
                     <option value="">Todos</option>
                     ${options.map(o => `<option value="${o}">${o.charAt(0).toUpperCase() + o.slice(1)}</option>`).join('')}
                 </select>
             </div>`;
 
+        const inputHTML = (id, label, placeholder, type = 'number') => `
+            <div class="flex-1 min-w-[150px]">
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">${label}</label>
+                <input type="${type}" id="${id}" placeholder="${placeholder}" class="block w-full text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md p-2 mt-1 dark:bg-slate-700 dark:text-slate-100">
+            </div>`;
+
         searchViewContainer.innerHTML = `
-                <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200">
-                     <h2 class="text-3xl font-bold text-slate-800 mb-2 text-center">Búsqueda Avanzada</h2>
-                     <p class="text-slate-500 text-center mb-6">Usa los filtros para encontrar exactamente lo que necesitas. Puedes dejar los campos vacíos.</p>
+                <div class="glass p-8 rounded-3xl shadow-2xl border border-white/20">
+                     <h2 class="text-3xl font-bold text-white mb-2 text-center">Búsqueda Avanzada</h2>
+                     <p class="text-white/90 text-center mb-6">Usa los filtros para encontrar exactamente lo que necesitas. Puedes dejar los campos vacíos.</p>
                      
-                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                     <!-- Filtros principales -->
+                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         ${selectHTML('filter-brand', 'Marca', filterOptions.brand)}
                         ${selectHTML('filter-os', 'Sistema Operativo', filterOptions.os)}
                         ${selectHTML('filter-condition', 'Condición', filterOptions.condition)}
-                        <div class="flex-1 min-w-[150px]">
-                            <label class="block text-sm font-medium text-slate-700">Batería Mínima (mAh)</label>
-                            <input type="number" id="filter-minBattery" placeholder="Ej: 4500" class="block w-full text-base border-slate-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md p-2 mt-1">
-                        </div>
                      </div>
                      
-                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                     <!-- Filtros de especificaciones -->
+                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         ${selectHTML('filter-storage', 'Almacenamiento', filterOptions.storage)}
                         ${selectHTML('filter-ram', 'RAM', filterOptions.ram)}
+                        ${selectHTML('filter-screen', 'Tamaño de Pantalla', filterOptions.screen)}
+                     </div>
+                     
+                     <!-- Filtros numéricos -->
+                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        ${inputHTML('filter-minCamera', 'Cámara Mínima (MP)', 'Ej: 48')}
+                        ${inputHTML('filter-minBattery', 'Batería Mínima (mAh)', 'Ej: 4500')}
                         <div class="flex-1 min-w-[150px]">
-                            <label class="block text-sm font-medium text-slate-700">Cámara Mínima (MP)</label>
-                            <input type="number" id="filter-minCamera" placeholder="Ej: 48" class="block w-full text-base border-slate-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md p-2 mt-1">
-                        </div>
-                         <div class="flex-1 min-w-[150px]">
-                             <label class="block text-sm font-medium text-slate-700">Precio (MXN)</label>
-                             <div class="flex gap-2 mt-1">
-                                 <input type="number" id="filter-minPrice" placeholder="Mínimo" class="block w-full text-base border-slate-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md p-2">
-                                 <input type="number" id="filter-maxPrice" placeholder="Máximo" class="block w-full text-base border-slate-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md p-2">
-                             </div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Precio (MXN)</label>
+                            <div class="flex gap-2 mt-1">
+                                <input type="number" id="filter-minPrice" placeholder="Mínimo" class="block w-full text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md p-2 dark:bg-slate-700 dark:text-slate-100">
+                                <input type="number" id="filter-maxPrice" placeholder="Máximo" class="block w-full text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md p-2 dark:bg-slate-700 dark:text-slate-100">
+                            </div>
                         </div>
                     </div>
-                    <div class="flex justify-center">
-                        <button id="search-btn" class="bg-indigo-600 text-white font-semibold py-3 px-10 rounded-xl hover:bg-indigo-700 transition-colors">Aplicar Filtros</button>
+                    
+                    <!-- Filtros adicionales -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="flex-1 min-w-[150px]">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Buscar por nombre</label>
+                            <input type="text" id="filter-name" placeholder="Ej: iPhone, Samsung Galaxy..." class="block w-full text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md p-2 mt-1 dark:bg-slate-700 dark:text-slate-100">
+                        </div>
+                        <div class="flex-1 min-w-[150px]">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Ordenar por</label>
+                            <select id="filter-sort" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-slate-700 dark:text-slate-100">
+                                <option value="name">Nombre (A-Z)</option>
+                                <option value="price-asc">Precio (Menor a Mayor)</option>
+                                <option value="price-desc">Precio (Mayor a Menor)</option>
+                                <option value="battery-desc">Batería (Mayor a Menor)</option>
+                                <option value="camera-desc">Cámara (Mayor a Menor)</option>
+                                <option value="storage-desc">Almacenamiento (Mayor a Menor)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-center gap-4">
+                        <button id="search-btn" class="bg-indigo-600 text-white font-semibold py-3 px-10 rounded-xl hover:bg-indigo-700 transition-colors modern-btn">Aplicar Filtros</button>
+                        <button id="clear-filters-btn" class="bg-slate-500 text-white font-semibold py-3 px-10 rounded-xl hover:bg-slate-600 transition-colors modern-btn">Limpiar Filtros</button>
                     </div>
                 </div>
                 <div id="search-results-container" class="mt-8"></div>
                 `;
+        
+        // Event listeners
         document.getElementById('search-btn').addEventListener('click', handleSearch);
+        document.getElementById('clear-filters-btn').addEventListener('click', clearFilters);
         
         // Búsqueda en tiempo real
         const searchInputs = [
             'filter-brand', 'filter-storage', 'filter-ram', 'filter-os', 
             'filter-condition', 'filter-minCamera', 'filter-minBattery', 
-            'filter-minPrice', 'filter-maxPrice'
+            'filter-minPrice', 'filter-maxPrice', 'filter-name', 'filter-sort', 'filter-screen'
         ];
         
         searchInputs.forEach(inputId => {
             const input = document.getElementById(inputId);
             if (input) {
                 input.addEventListener('input', debounce(handleSearch, 300));
+                input.addEventListener('change', debounce(handleSearch, 300));
             }
         });
         
@@ -845,6 +901,8 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 populatePhoneSelect();
             }, 200);
+        } else if (viewId === 'comparison') {
+            renderComparisonViewContent();
         }
     };
 
@@ -870,10 +928,13 @@ document.addEventListener('DOMContentLoaded', () => {
             ram: document.getElementById('filter-ram')?.value || '',
             os: document.getElementById('filter-os')?.value || '',
             condition: document.getElementById('filter-condition')?.value || '',
+            screen: document.getElementById('filter-screen')?.value || '',
             minCamera: document.getElementById('filter-minCamera')?.value || '',
             minBattery: document.getElementById('filter-minBattery')?.value || '',
             minPrice: document.getElementById('filter-minPrice')?.value || '',
             maxPrice: document.getElementById('filter-maxPrice')?.value || '',
+            name: document.getElementById('filter-name')?.value || '',
+            sort: document.getElementById('filter-sort')?.value || 'name',
         };
         
         // Validar números
@@ -883,34 +944,169 @@ document.addEventListener('DOMContentLoaded', () => {
             ram: sanitizeInput(rawFilters.ram),
             os: sanitizeInput(rawFilters.os),
             condition: sanitizeInput(rawFilters.condition),
+            screen: sanitizeInput(rawFilters.screen),
             minCamera: rawFilters.minCamera ? validateNumber(rawFilters.minCamera, 0, 500) : '',
             minBattery: rawFilters.minBattery ? validateNumber(rawFilters.minBattery, 0, 10000) : '',
             minPrice: rawFilters.minPrice ? validateNumber(rawFilters.minPrice, 0, 1000000) : '',
             maxPrice: rawFilters.maxPrice ? validateNumber(rawFilters.maxPrice, 0, 1000000) : '',
+            name: sanitizeInput(rawFilters.name),
+            sort: rawFilters.sort,
         };
+
+        // Crear clave de caché
+        const cacheKey = JSON.stringify(filters);
+        const now = Date.now();
+        
+        // Verificar caché
+        if (cache.searchResults.has(cacheKey) && (now - cache.lastSearchTime) < cache.CACHE_DURATION) {
+            const cachedResults = cache.searchResults.get(cacheKey);
+            renderProductGrid(document.getElementById('search-results-container'), cachedResults);
+            return;
+        }
         
         if (state.currentUser && Object.values(filters).some(v => v !== '')) {
              state.searchHistory.push({
                 id: Date.now(),
                 date: new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
-                filters: Object.fromEntries(Object.entries(filters).filter(([k, v]) => v !== '')),
+                filters: Object.fromEntries(Object.entries(filters).filter(([k, v]) => v !== '' && k !== 'sort')),
             });
             state.searchHistory = state.searchHistory.slice(-5); 
         }
 
-        const results = phoneDatabase.filter(phone => 
+        let results = phoneDatabase.filter(phone => 
             (!filters.brand || phone.brand === filters.brand) &&
             (!filters.storage || phone.storage === filters.storage) &&
             (!filters.ram || phone.ram === filters.ram) &&
             (!filters.os || phone.os === filters.os) &&
             (!filters.condition || phone.condition === filters.condition) &&
+            (!filters.screen || phone.screen === filters.screen) &&
             (!filters.minCamera || parseInt(phone.camera) >= parseInt(filters.minCamera)) &&
             (!filters.minBattery || phone.battery >= parseInt(filters.minBattery)) &&
             (!filters.minPrice || phone.price >= parseInt(filters.minPrice)) &&
-            (!filters.maxPrice || phone.price <= parseInt(filters.maxPrice))
+            (!filters.maxPrice || phone.price <= parseInt(filters.maxPrice)) &&
+            (!filters.name || phone.name.toLowerCase().includes(filters.name.toLowerCase()))
         );
 
+        // Aplicar ordenamiento
+        results = sortResults(results, filters.sort);
+
+        // Guardar en caché
+        cache.searchResults.set(cacheKey, results);
+        cache.lastSearchTime = now;
+
         renderProductGrid(document.getElementById('search-results-container'), results);
+    };
+
+    const sortResults = (results, sortBy) => {
+        switch (sortBy) {
+            case 'name':
+                return results.sort((a, b) => a.name.localeCompare(b.name));
+            case 'price-asc':
+                return results.sort((a, b) => a.price - b.price);
+            case 'price-desc':
+                return results.sort((a, b) => b.price - a.price);
+            case 'battery-desc':
+                return results.sort((a, b) => b.battery - a.battery);
+            case 'camera-desc':
+                return results.sort((a, b) => parseInt(b.camera) - parseInt(a.camera));
+            case 'storage-desc':
+                return results.sort((a, b) => parseInt(b.storage) - parseInt(a.storage));
+            default:
+                return results;
+        }
+    };
+
+    const clearFilters = () => {
+        const filterInputs = [
+            'filter-brand', 'filter-storage', 'filter-ram', 'filter-os', 
+            'filter-condition', 'filter-minCamera', 'filter-minBattery', 
+            'filter-minPrice', 'filter-maxPrice', 'filter-name', 'filter-screen'
+        ];
+        
+        filterInputs.forEach(inputId => {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.value = '';
+            }
+        });
+        
+        // Reset sort to default
+        const sortSelect = document.getElementById('filter-sort');
+        if (sortSelect) {
+            sortSelect.value = 'name';
+        }
+        
+        handleSearch();
+        showToast('Filtros limpiados', 'info');
+    };
+
+    const exportComparison = () => {
+        if (state.comparisonPhones.length === 0) {
+            showToast('No hay teléfonos para exportar', 'warning');
+            return;
+        }
+
+        const exportData = {
+            title: 'Comparación de Teléfonos - Pito Pérez',
+            date: new Date().toLocaleDateString('es-ES'),
+            phones: state.comparisonPhones.map(phone => ({
+                nombre: phone.name,
+                marca: phone.brand.charAt(0).toUpperCase() + phone.brand.slice(1),
+                precio: `$${phone.price.toLocaleString('es-MX')}`,
+                ram: phone.ram,
+                almacenamiento: phone.storage,
+                camara: phone.camera,
+                bateria: `${phone.battery} mAh`,
+                sistema: phone.os.toUpperCase(),
+                condicion: phone.condition.charAt(0).toUpperCase() + phone.condition.slice(1),
+                pantalla: phone.screen.charAt(0).toUpperCase() + phone.screen.slice(1)
+            }))
+        };
+
+        // Crear CSV
+        const csvContent = createCSV(exportData.phones);
+        downloadFile(csvContent, 'comparacion-telefonos.csv', 'text/csv');
+
+        // Crear JSON
+        const jsonContent = JSON.stringify(exportData, null, 2);
+        downloadFile(jsonContent, 'comparacion-telefonos.json', 'application/json');
+
+        showToast('Comparación exportada exitosamente', 'success');
+    };
+
+    const createCSV = (phones) => {
+        const headers = ['Nombre', 'Marca', 'Precio', 'RAM', 'Almacenamiento', 'Cámara', 'Batería', 'Sistema', 'Condición', 'Pantalla'];
+        const csvRows = [headers.join(',')];
+        
+        phones.forEach(phone => {
+            const row = [
+                `"${phone.nombre}"`,
+                `"${phone.marca}"`,
+                `"${phone.precio}"`,
+                `"${phone.ram}"`,
+                `"${phone.almacenamiento}"`,
+                `"${phone.camara}"`,
+                `"${phone.bateria}"`,
+                `"${phone.sistema}"`,
+                `"${phone.condicion}"`,
+                `"${phone.pantalla}"`
+            ];
+            csvRows.push(row.join(','));
+        });
+        
+        return csvRows.join('\n');
+    };
+
+    const downloadFile = (content, filename, mimeType) => {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     };
 
     const handleEasyAnswer = (e) => {
@@ -1098,12 +1294,131 @@ document.addEventListener('DOMContentLoaded', () => {
         updateAll(); 
     };
 
+    const handleToggleComparison = (phoneId) => {
+        const phone = phoneDatabase.find(p => p.id === phoneId);
+        const isInComparison = state.comparisonPhones.some(p => p.id === phoneId);
+        
+        if (isInComparison) {
+            state.comparisonPhones = state.comparisonPhones.filter(p => p.id !== phoneId);
+            showToast('Teléfono removido de la comparación', 'info');
+        } else {
+            if (state.comparisonPhones.length >= 3) {
+                showToast('Máximo 3 teléfonos para comparar', 'warning');
+                return;
+            }
+            state.comparisonPhones.push(phone);
+            showToast('Teléfono agregado a la comparación', 'success');
+        }
+        updateAll();
+    };
+
+    const renderComparisonView = () => {
+        if (state.comparisonPhones.length === 0) {
+            return `
+                <div class="text-center py-16">
+                    <div class="text-7xl mb-4">📊</div>
+                    <h3 class="text-xl font-bold text-slate-700 mb-2">No hay teléfonos para comparar</h3>
+                    <p class="text-slate-500">Agrega hasta 3 teléfonos para comparar sus especificaciones.</p>
+                </div>
+            `;
+        }
+
+        const comparisonHTML = state.comparisonPhones.map(phone => `
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-200">
+                <div class="text-center mb-4">
+                    <div class="h-32 bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl flex items-center justify-center text-4xl overflow-hidden mb-4">
+                        <img src="${phone.image}" alt="${phone.name}" class="object-cover h-full w-full" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                        <div class="hidden items-center justify-center h-full w-full text-4xl bg-gradient-to-br from-indigo-100 to-purple-100">📱</div>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">${phone.name}</h3>
+                    <div class="text-2xl font-bold gradient-text mb-4">$${phone.price.toLocaleString('es-MX')}</div>
+                </div>
+                
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                        <span class="text-sm text-slate-600">Marca</span>
+                        <span class="font-semibold">${phone.brand.charAt(0).toUpperCase() + phone.brand.slice(1)}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                        <span class="text-sm text-slate-600">RAM</span>
+                        <span class="font-semibold">${phone.ram}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                        <span class="text-sm text-slate-600">Almacenamiento</span>
+                        <span class="font-semibold">${phone.storage}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                        <span class="text-sm text-slate-600">Cámara</span>
+                        <span class="font-semibold">${phone.camera}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                        <span class="text-sm text-slate-600">Batería</span>
+                        <span class="font-semibold">${phone.battery} mAh</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                        <span class="text-sm text-slate-600">Sistema</span>
+                        <span class="font-semibold">${phone.os.toUpperCase()}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2">
+                        <span class="text-sm text-slate-600">Condición</span>
+                        <span class="font-semibold">${phone.condition.charAt(0).toUpperCase() + phone.condition.slice(1)}</span>
+                    </div>
+                </div>
+                
+                <button class="remove-comparison-btn w-full mt-4 bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600 transition-colors" data-id="${phone.id}">
+                    Quitar de Comparación
+                </button>
+            </div>
+        `).join('');
+
+        return `
+            <div class="glass p-8 rounded-3xl shadow-2xl border border-white/20 mb-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-white">Comparación de Teléfonos</h2>
+                    <div class="flex gap-2">
+                        <button id="export-comparison-btn" class="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-600 transition-colors modern-btn">
+                            📊 Exportar
+                        </button>
+                        <button id="clear-comparison-btn" class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600 transition-colors modern-btn">
+                            Limpiar Todo
+                        </button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${comparisonHTML}
+                </div>
+            </div>
+        `;
+    };
+
     const updateAll = () => {
         renderAuthSection();
+        updateComparisonFab();
         if(state.currentView === 'search') {
             handleSearch();
         } else if (state.currentView === 'account') {
             renderAccountView();
+        } else if (state.currentView === 'comparison') {
+            renderComparisonViewContent();
+        }
+    };
+
+    const updateComparisonFab = () => {
+        const fab = document.getElementById('comparison-fab');
+        const count = document.getElementById('comparison-count');
+        
+        if (state.comparisonPhones.length > 0) {
+            fab.classList.remove('hidden');
+            count.textContent = state.comparisonPhones.length;
+        } else {
+            fab.classList.add('hidden');
+        }
+    };
+
+    const renderComparisonViewContent = () => {
+        const container = document.getElementById('comparison-content');
+        if (container) {
+            container.innerHTML = renderComparisonView();
         }
     };
     
@@ -1116,6 +1431,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const favoriteBtn = e.target.closest('.favorite-btn');
         if (favoriteBtn) {
             handleToggleFavorite(parseInt(favoriteBtn.dataset.id));
+        }
+        const compareBtn = e.target.closest('.compare-btn');
+        if (compareBtn) {
+            handleToggleComparison(parseInt(compareBtn.dataset.id));
+        }
+        const removeComparisonBtn = e.target.closest('.remove-comparison-btn');
+        if (removeComparisonBtn) {
+            handleToggleComparison(parseInt(removeComparisonBtn.dataset.id));
+        }
+        const clearComparisonBtn = e.target.closest('#clear-comparison-btn');
+        if (clearComparisonBtn) {
+            state.comparisonPhones = [];
+            updateAll();
+            showToast('Comparación limpiada', 'info');
+        }
+        const exportComparisonBtn = e.target.closest('#export-comparison-btn');
+        if (exportComparisonBtn) {
+            exportComparison();
+        }
+        const comparisonFab = e.target.closest('#comparison-fab button');
+        if (comparisonFab) {
+            updateView('comparison');
         }
         const deleteHistoryBtn = e.target.closest('.delete-history-btn');
         if (deleteHistoryBtn) {
@@ -1155,17 +1492,160 @@ function debounce(func, wait) {
     };
 }
 
-// Theme management - Solo modo claro
-let isDarkMode = false;
+// Theme management - Modo oscuro por defecto
+let isDarkMode = true;
 
 function initializeTheme() {
-    // Aplicar modo claro siempre
+    // Activar modo oscuro por defecto
+    enableDarkMode();
+    
+    // Configurar event listener para el botón de toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+    
+    console.log('Botón de tema encontrado:', themeToggle);
+    console.log('Botón móvil de tema encontrado:', mobileThemeToggle);
+    
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+        console.log('Event listener agregado al botón de tema');
+    } else {
+        console.error('No se encontró el botón de tema con ID: theme-toggle');
+    }
+    
+    if (mobileThemeToggle) {
+        mobileThemeToggle.addEventListener('click', toggleTheme);
+        console.log('Event listener agregado al botón móvil de tema');
+    } else {
+        console.error('No se encontró el botón móvil de tema con ID: mobile-theme-toggle');
+    }
+    
+    // Escuchar cambios en la preferencia del sistema
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+            if (e.matches) {
+                enableDarkMode();
+            } else {
+                enableLightMode();
+            }
+        }
+    });
+}
+
+function toggleTheme() {
+    if (isDarkMode) {
+        enableLightMode();
+    } else {
+        enableDarkMode();
+    }
+}
+
+function enableDarkMode() {
+    isDarkMode = true;
+    document.documentElement.classList.add('dark');
+    localStorage.setItem('theme', 'dark');
+    updateThemeIcons();
+    console.log('Modo oscuro activado');
+}
+
+function enableLightMode() {
+    isDarkMode = false;
     document.documentElement.classList.remove('dark');
-    console.log('Modo claro aplicado permanentemente');
+    localStorage.setItem('theme', 'light');
+    updateThemeIcons();
+    console.log('Modo claro activado');
+}
+
+function updateThemeIcons() {
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+    const mobileMoonIcon = document.getElementById('mobile-moon-icon');
+    
+    if (isDarkMode) {
+        if (sunIcon) sunIcon.classList.add('hidden');
+        if (moonIcon) moonIcon.classList.remove('hidden');
+        if (mobileMoonIcon) mobileMoonIcon.textContent = '🌙';
+    } else {
+        if (sunIcon) sunIcon.classList.remove('hidden');
+        if (moonIcon) moonIcon.classList.add('hidden');
+        if (mobileMoonIcon) mobileMoonIcon.textContent = '☀️';
+    }
+}
+
+// Gestos móviles
+function initializeMobileGestures() {
+    if (!('ontouchstart' in window)) return;
+    
+    let startX = 0;
+    let startY = 0;
+    let endX = 0;
+    let endY = 0;
+    
+    document.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+    }, { passive: true });
+    
+    document.addEventListener('touchend', (e) => {
+        endX = e.changedTouches[0].clientX;
+        endY = e.changedTouches[0].clientY;
+        
+        handleSwipeGesture(startX, startY, endX, endY);
+    }, { passive: true });
+    
+    // Agregar clases móviles al body
+    document.body.classList.add('mobile-device');
+}
+
+function handleSwipeGesture(startX, startY, endX, endY) {
+    const deltaX = endX - startX;
+    const deltaY = endY - startY;
+    const minSwipeDistance = 50;
+    
+    // Verificar si es un swipe horizontal
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+        const views = ['dashboard', 'search', 'easy', 'comparison', 'account', 'comments'];
+        const currentIndex = views.indexOf(state.currentView);
+        
+        if (deltaX > 0 && currentIndex > 0) {
+            // Swipe derecha - vista anterior
+            updateView(views[currentIndex - 1]);
+            showToast('← Vista anterior', 'info');
+        } else if (deltaX < 0 && currentIndex < views.length - 1) {
+            // Swipe izquierda - vista siguiente
+            updateView(views[currentIndex + 1]);
+            showToast('Vista siguiente →', 'info');
+        }
+    }
+}
+
+// Mejorar la experiencia táctil
+function enhanceTouchExperience() {
+    // Agregar feedback háptico si está disponible
+    if ('vibrate' in navigator) {
+        document.addEventListener('touchstart', (e) => {
+            if (e.target.matches('button, .product-card, .mobile-nav-item')) {
+                navigator.vibrate(10);
+            }
+        }, { passive: true });
+    }
+    
+    // Mejorar scroll en móvil
+    document.body.style.webkitOverflowScrolling = 'touch';
+    
+    // Prevenir zoom en inputs
+    const inputs = document.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('focus', () => {
+            if (window.innerWidth < 768) {
+                input.style.fontSize = '16px';
+            }
+        });
+    });
 }
 
 
-function showToast(message, type = 'info') {
+function showToast(message, type = 'info', duration = 3000) {
     const toast = document.createElement('div');
     const colors = {
         success: 'bg-green-500',
@@ -1174,19 +1654,47 @@ function showToast(message, type = 'info') {
         info: 'bg-blue-500'
     };
     
-    toast.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full`;
-    toast.textContent = message;
+    const icons = {
+        success: '✅',
+        error: '❌',
+        warning: '⚠️',
+        info: 'ℹ️'
+    };
+    
+    toast.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full flex items-center gap-2`;
+    toast.innerHTML = `
+        <span class="text-lg">${icons[type]}</span>
+        <span>${message}</span>
+        <button class="ml-2 text-white hover:text-gray-200" onclick="this.parentElement.remove()">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+    `;
     
     document.body.appendChild(toast);
     
+    // Animación de entrada
     setTimeout(() => {
         toast.classList.remove('translate-x-full');
     }, 100);
     
+    // Auto-remove
     setTimeout(() => {
         toast.classList.add('translate-x-full');
         setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    }, duration);
+    
+    // Feedback háptico
+    if ('vibrate' in navigator) {
+        const vibrationPattern = {
+            success: [100],
+            error: [200, 100, 200],
+            warning: [150],
+            info: [50]
+        };
+        navigator.vibrate(vibrationPattern[type] || [50]);
+    }
 }
 
 // PWA and Notifications
@@ -1275,23 +1783,40 @@ function sendNotification(title, body, icon = null) {
     }
 }
 
-// Notificaciones automáticas
+// Notificaciones automáticas mejoradas
 function scheduleNotifications() {
     // Notificación de bienvenida
     setTimeout(() => {
         sendNotification(
             '¡Bienvenido a Pito Pérez!',
-            'Explora nuestro catálogo de teléfonos y encuentra el perfecto para ti.'
+            'Explora nuestro catálogo de teléfonos y encuentra el perfecto para ti.',
+            '/icon-192x192.png'
         );
-    }, 5000);
+        showToast('¡Bienvenido! Explora nuestro catálogo de teléfonos', 'success', 5000);
+    }, 2000);
     
     // Notificación de nuevas funciones
     setTimeout(() => {
         sendNotification(
             'Nuevas funciones disponibles',
-            'Ahora puedes comparar hasta 3 teléfonos y usar el modo oscuro.'
+            'Ahora puedes comparar hasta 3 teléfonos, usar el modo oscuro y exportar comparaciones.',
+            '/icon-192x192.png'
         );
-    }, 30000);
+        showToast('Nuevas funciones: Comparación, modo oscuro y exportación', 'info', 5000);
+    }, 15000);
+    
+    // Notificación de consejos
+    setTimeout(() => {
+        const tips = [
+            '💡 Tip: Usa gestos de deslizar en móvil para navegar entre vistas',
+            '💡 Tip: Puedes comparar hasta 3 teléfonos simultáneamente',
+            '💡 Tip: Usa el modo oscuro para una mejor experiencia nocturna',
+            '💡 Tip: Exporta tus comparaciones en CSV o JSON',
+            '💡 Tip: Los filtros se actualizan en tiempo real'
+        ];
+        const randomTip = tips[Math.floor(Math.random() * tips.length)];
+        showToast(randomTip, 'info', 6000);
+    }, 45000);
 }
 
 // Modal de autenticación

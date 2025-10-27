@@ -1,13 +1,26 @@
-/* Fuentes y estilos base - Modo claro permanente */
+/* Fuentes y estilos base - Modo oscuro por defecto */
 html {
-    background-color: #f8fafc;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    min-height: 100vh;
+    transition: all 0.3s ease;
+}
+
+html:not(.dark) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 body { 
     font-family: 'Inter', sans-serif; 
     font-weight: 400;
     line-height: 1.6;
-    background-color: #f8fafc;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #e2e8f0;
+    min-height: 100vh;
+    transition: all 0.3s ease;
+}
+
+body:not(.dark) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: #1e293b;
 }
 
@@ -16,25 +29,41 @@ body {
     font-family: 'Inter', sans-serif;
 }
 
-/* Forzar modo claro en todos los elementos */
+/* Configuración de color scheme */
 * {
-    color-scheme: light;
+    color-scheme: light dark;
 }
 
-/* Asegurar que todos los elementos usen colores claros */
+/* Asegurar que todos los elementos usen colores oscuros por defecto */
 .bg-slate-50 {
+    background-color: #1e293b !important;
+}
+
+:not(.dark) .bg-slate-50 {
     background-color: #f8fafc !important;
 }
 
 .text-slate-800 {
+    color: #e2e8f0 !important;
+}
+
+:not(.dark) .text-slate-800 {
     color: #1e293b !important;
 }
 
 .bg-white {
+    background-color: #334155 !important;
+}
+
+:not(.dark) .bg-white {
     background-color: #ffffff !important;
 }
 
 .border-slate-200 {
+    border-color: #475569 !important;
+}
+
+:not(.dark) .border-slate-200 {
     border-color: #e2e8f0 !important;
 }
 
@@ -65,6 +94,146 @@ body {
     100% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(255, 193, 7, 0.5)); }
 }
 
+/* Nuevas animaciones y efectos modernos */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes bounce {
+    0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
+    40%, 43% { transform: translate3d(0, -8px, 0); }
+    70% { transform: translate3d(0, -4px, 0); }
+    90% { transform: translate3d(0, -2px, 0); }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200px 0; }
+    100% { background-position: calc(200px + 100%) 0; }
+}
+
+/* Efectos de hover mejorados */
+.product-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: fadeInUp 0.6s ease-out;
+    will-change: transform, box-shadow;
+}
+
+.product-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Optimizaciones de rendimiento */
+.product-card img {
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+/* Reducir animaciones en dispositivos con preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    .product-card,
+    .modern-btn,
+    .rating-star {
+        animation: none;
+        transition: none;
+    }
+    
+    .product-card:hover {
+        transform: none;
+    }
+}
+
+/* Botones con efectos modernos */
+.modern-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.modern-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.modern-btn:hover::before {
+    left: 100%;
+}
+
+/* Efectos de carga mejorados */
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* Gradientes modernos */
+.gradient-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Efectos de glassmorphism - Modo oscuro por defecto */
+.glass {
+    background: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+:not(.dark) .glass {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Animaciones de entrada escalonadas */
+.stagger-animation > * {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.stagger-animation > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-animation > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-animation > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-animation > *:nth-child(4) { animation-delay: 0.4s; }
+.stagger-animation > *:nth-child(5) { animation-delay: 0.5s; }
+.stagger-animation > *:nth-child(6) { animation-delay: 0.6s; }
+
 /* Responsive improvements */
 @media (max-width: 768px) {
     .chart-container {
@@ -74,6 +243,7 @@ body {
     
     .mobile-nav-item {
         min-width: 60px;
+        touch-action: manipulation;
     }
     
     .mobile-nav-item.active {
@@ -94,11 +264,47 @@ body {
     /* Botones más grandes en móvil */
     button {
         min-height: 44px;
+        touch-action: manipulation;
     }
     
     /* Texto más legible en móvil */
     .text-sm {
         font-size: 0.875rem;
+    }
+    
+    /* Mejoras para gestos táctiles */
+    .product-card {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .product-card:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+    }
+    
+    /* Swipe gestures para navegación */
+    .swipe-container {
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .swipe-item {
+        scroll-snap-align: start;
+        flex-shrink: 0;
+    }
+    
+    /* Mejorar scroll en móvil */
+    .mobile-scroll {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+    
+    /* Animaciones optimizadas para móvil */
+    .mobile-animation {
+        will-change: transform;
+        transform: translateZ(0);
     }
 }
 
@@ -176,11 +382,127 @@ button {
     font-weight: 500;
 }
 
-/* Mejorar contraste en modo oscuro */
-.dark .text-slate-600 {
+/* Mejorar contraste - Modo oscuro por defecto */
+.text-slate-600 {
     color: #cbd5e1 !important;
 }
 
-.dark .text-slate-700 {
+:not(.dark) .text-slate-600 {
+    color: #64748b !important;
+}
+
+.text-slate-700 {
     color: #e2e8f0 !important;
+}
+
+:not(.dark) .text-slate-700 {
+    color: #334155 !important;
+}
+
+.text-slate-500 {
+    color: #94a3b8 !important;
+}
+
+:not(.dark) .text-slate-500 {
+    color: #64748b !important;
+}
+
+.text-slate-300 {
+    color: #cbd5e1 !important;
+}
+
+:not(.dark) .text-slate-300 {
+    color: #cbd5e1 !important;
+}
+
+/* Estilos específicos - Modo oscuro por defecto */
+.product-card {
+    background-color: #334155 !important;
+    border-color: #475569 !important;
+}
+
+:not(.dark) .product-card {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+}
+
+.product-card:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+:not(.dark) .product-card:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.nav-item {
+    color: #cbd5e1 !important;
+}
+
+:not(.dark) .nav-item {
+    color: #4b5563 !important;
+}
+
+.nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
+:not(.dark) .nav-item:hover {
+    background-color: #eef2ff !important;
+    color: #3730a3 !important;
+}
+
+.nav-item-active {
+    background-color: #4f46e5 !important;
+    color: white !important;
+}
+
+.mobile-nav-item {
+    color: #cbd5e1 !important;
+}
+
+:not(.dark) .mobile-nav-item {
+    color: #6b7280 !important;
+}
+
+.mobile-nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
+:not(.dark) .mobile-nav-item:hover {
+    background-color: #eef2ff !important;
+    color: #3730a3 !important;
+}
+
+.mobile-nav-item.text-indigo-600 {
+    color: #818cf8 !important;
+}
+
+:not(.dark) .mobile-nav-item.text-indigo-600 {
+    color: #4f46e5 !important;
+}
+
+/* Estilos específicos para el botón de tema */
+#theme-toggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    min-height: 48px;
+    z-index: 10;
+    position: relative;
+}
+
+#theme-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+#theme-toggle svg {
+    transition: all 0.3s ease;
+}
+
+#theme-toggle:hover svg {
+    transform: rotate(15deg);
 }
