@@ -4,40 +4,74 @@ const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 let firebaseConfig = null;
 try { firebaseConfig = JSON.parse(__firebase_config); } catch (e) {}
 
-// Inicializar Firebase si está disponible
+// Inicializar Firebase si está disponible (modo seguro)
 if (typeof firebase !== 'undefined' && firebaseConfig) {
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    try {
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-    auth.onAuthStateChanged((user) => {});
+        auth.onAuthStateChanged((user) => {});
 
-    if (typeof __initial_auth_token !== 'undefined') {
-        auth.signInWithCustomToken(__initial_auth_token)
-            .catch(error => {
-                auth.signInAnonymously();
-            });
-    } else {
-        auth.signInAnonymously();
+        if (typeof __initial_auth_token !== 'undefined') {
+            auth.signInWithCustomToken(__initial_auth_token)
+                .catch(error => {
+                    auth.signInAnonymously();
+                });
+        } else {
+            auth.signInAnonymously();
+        }
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firestoreDb = db;
+    } catch (error) {
+        console.log('Firebase no disponible, continuando sin autenticación');
     }
-    window.firebaseApp = app;
-    window.firebaseAuth = auth;
-    window.firestoreDb = db;
+} else {
+    console.log('Firebase no disponible, continuando sin autenticación');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Inicializar medidas de seguridad
-    initializeSecurity();
-    secureLogger.info('Aplicación iniciada');
+    console.log('DOM cargado, iniciando aplicación...');
     
-    // Inicializar PWA y notificaciones
-    initializePWA();
+    // Inicializar medidas de seguridad de forma segura
+    try {
+        if (typeof initializeSecurity === 'function') {
+            initializeSecurity();
+        }
+        if (typeof secureLogger !== 'undefined' && secureLogger.info) {
+            secureLogger.info('Aplicación iniciada');
+        }
+    } catch (error) {
+        console.log('Security no disponible, continuando...');
+    }
     
-    // Inicializar gestos móviles
-    initializeMobileGestures();
+    // Inicializar PWA y notificaciones de forma segura
+    try {
+        if (typeof initializePWA === 'function') {
+            initializePWA();
+        }
+    } catch (error) {
+        console.log('PWA no disponible, continuando...');
+    }
     
-    // Mejorar experiencia táctil
-    enhanceTouchExperience();
+    // Inicializar gestos móviles de forma segura
+    try {
+        if (typeof initializeMobileGestures === 'function') {
+            initializeMobileGestures();
+        }
+    } catch (error) {
+        console.log('Gestos móviles no disponibles, continuando...');
+    }
+    
+    // Mejorar experiencia táctil de forma segura
+    try {
+        if (typeof enhanceTouchExperience === 'function') {
+            enhanceTouchExperience();
+        }
+    } catch (error) {
+        console.log('Touch experience no disponible, continuando...');
+    }
 
     let phoneDatabase = []; 
     
