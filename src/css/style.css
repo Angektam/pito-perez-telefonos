@@ -435,3 +435,100 @@ button {
 .dark .mobile-nav-item.text-indigo-600 {
     color: #818cf8 !important;
 }
+
+/* Estilos mejorados para comentarios */
+#comments-view .bg-gradient-to-br {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+#comments-list .bg-white:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+#comments-list .bg-white\/95 {
+    backdrop-filter: blur(10px);
+}
+
+/* Asegurar que todos los textos principales en comentarios sean oscuros */
+#comments-view h2,
+#comments-view h3,
+#comments-view h4,
+#comments-view p:not(.text-yellow-400):not(.text-red-500):not(.text-indigo-600),
+#comments-view .text-slate-900,
+#comments-view .text-slate-800,
+#comments-view .text-slate-700,
+#comments-view .text-slate-600 {
+    color: #0f172a !important;
+}
+
+#comments-view a:not(.text-indigo-600) {
+    color: #0f172a !important;
+}
+
+/* Mantener colores específicos para elementos especiales */
+#comments-view .text-yellow-400,
+#comments-view .rating-star {
+    color: #facc15 !important;
+}
+
+#comments-view .text-indigo-600 {
+    color: #4f46e5 !important;
+}
+
+#comments-view .text-red-500 {
+    color: #ef4444 !important;
+}
+
+/* Animaciones para comentarios */
+@keyframes fadeInComment {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#comments-list > div {
+    animation: fadeInComment 0.4s ease-out;
+}
+
+/* Mejorar selectores de filtros */
+#comment-filter-phone,
+#comment-sort {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23334155' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 12px;
+    padding-right: 2rem;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+/* Mejorar estilos de rating */
+.rating-star.selected {
+    color: #fbbf24 !important;
+    transform: scale(1.2);
+}
+
+/* Estilos responsive adicionales para comentarios */
+@media (max-width: 768px) {
+    #comments-view .bg-white {
+        padding: 1rem !important;
+    }
+    
+    #comments-list .bg-white\/95 {
+        padding: 0.75rem !important;
+    }
+    
+    #comment-search,
+    #comment-filter-phone,
+    #comment-sort {
+        min-width: 100px !important;
+        font-size: 13px !important;
+    }
+}

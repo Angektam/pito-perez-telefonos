@@ -40,6 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Mejorar experiencia táctil
     enhanceTouchExperience();
+    
+    // Inicializar botón de ayuda
+    initializeHelpButton();
 
     // Inicializar variables globales para autenticación
     globalState = null;
@@ -97,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </button>
                             <button class="compare-btn w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 transition-transform ${isInComparison ? 'bg-indigo-500 text-white' : 'text-slate-500'}" data-id="${phone.id}" title="${isInComparison ? 'Quitar de comparación' : 'Agregar a comparación'}">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
-                            </button>
+                        </button>
                         </div>
                     </div>
                     <div class="flex-grow pt-4">
@@ -413,6 +416,12 @@ document.addEventListener('DOMContentLoaded', () => {
         state.easyModeAnswers = {};
         state.currentQuestionIndex = 0;
         
+        // Limpiar resultados anteriores
+        const resultsContainer = document.getElementById('easy-mode-results-container');
+        if (resultsContainer) {
+            resultsContainer.innerHTML = '';
+        }
+        
         easyQuestionsContainer.innerHTML = `
             <div class="mb-8">
                 <div class="flex items-center justify-between mb-4">
@@ -452,22 +461,25 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             
             <div class="flex justify-between items-center mt-8">
-                <button id="prev-question-btn" class="bg-white/20 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                <button id="prev-question-btn" class="bg-white/20 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
                     ← Anterior
                 </button>
-                <button id="next-question-btn" class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-8 py-3 rounded-xl font-bold hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                    Siguiente →
-                </button>
-                <button id="get-recommendations-btn" class="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-8 py-3 rounded-xl font-bold hover:from-green-600 hover:to-emerald-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hidden">
-                    ✨ Ver Recomendaciones
+                <div class="text-white/70 text-sm text-center flex-1 mx-4">
+                    <p>💡 Haz clic en una opción para continuar automáticamente</p>
+                </div>
+                <button id="reset-easy-mode" class="bg-white/20 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/30 transition-all duration-300">
+                    🔄 Reiniciar
                 </button>
             </div>
         `;
 
         // Event listeners
-        document.getElementById('next-question-btn').addEventListener('click', handleNextQuestion);
         document.getElementById('prev-question-btn').addEventListener('click', handlePrevQuestion);
-        document.getElementById('get-recommendations-btn').addEventListener('click', handleGetRecommendations);
+        document.getElementById('reset-easy-mode').addEventListener('click', () => {
+            state.easyModeAnswers = {};
+            state.currentQuestionIndex = 0;
+            renderEasyModeView();
+        });
         easyQuestionsContainer.addEventListener('click', handleEasyAnswer);
         
         // Inicializar primera pregunta
@@ -569,25 +581,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const populatePhoneSelect = () => {
         const phoneSelect = document.getElementById('comment-phone');
-        console.log('Intentando poblar dropdown, elemento encontrado:', !!phoneSelect);
-        console.log('phoneDatabase disponible:', !!phoneDatabase, 'Longitud:', phoneDatabase?.length);
+        const filterSelect = document.getElementById('comment-filter-phone');
         
-        if (phoneSelect) {
-            phoneSelect.innerHTML = '<option value="">Selecciona un teléfono</option>';
-            if (phoneDatabase && phoneDatabase.length > 0) {
-                console.log('Poblando dropdown con', phoneDatabase.length, 'teléfonos');
-                phoneDatabase.forEach((phone, index) => {
-                    console.log(`Agregando teléfono ${index + 1}:`, phone.name);
-                    phoneSelect.innerHTML += `<option value="${phone.id}">${phone.name} - ${phone.brand.charAt(0).toUpperCase() + phone.brand.slice(1)}</option>`;
-                });
-                console.log('Dropdown poblado exitosamente');
+        const populateSelect = (select, includeAllOption = false) => {
+            if (!select) return;
+            
+            if (includeAllOption) {
+                select.innerHTML = '<option value="">Todos los teléfonos</option>';
             } else {
-                console.log('phoneDatabase no está disponible o está vacío');
-                phoneSelect.innerHTML += '<option value="" disabled>No hay teléfonos disponibles</option>';
+                select.innerHTML = '<option value="">Selecciona un teléfono</option>';
             }
-        } else {
-            console.log('No se encontró el elemento comment-phone');
-        }
+            
+            if (phoneDatabase && phoneDatabase.length > 0) {
+                // Ordenar por nombre
+                const sortedPhones = [...phoneDatabase].sort((a, b) => a.name.localeCompare(b.name));
+                sortedPhones.forEach((phone) => {
+                    const option = document.createElement('option');
+                    option.value = phone.id;
+                    option.textContent = `${phone.name} - ${phone.brand.charAt(0).toUpperCase() + phone.brand.slice(1)}`;
+                    select.appendChild(option);
+                });
+            } else {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'No hay teléfonos disponibles';
+                option.disabled = true;
+                select.appendChild(option);
+            }
+        };
+        
+        populateSelect(phoneSelect, false);
+        populateSelect(filterSelect, true);
     };
 
     const renderCommentsView = () => {
@@ -602,6 +626,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Renderizar mensaje de autenticación
         renderCommentAuthInfo();
+        
+        // Actualizar estadísticas iniciales
+        updateCommentsStats();
         
         // Renderizar lista de comentarios
         renderCommentsList();
@@ -644,58 +671,163 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderCommentsList = () => {
         const commentsList = document.getElementById('comments-list');
         
-        if (state.comments.length === 0) {
+        // Obtener filtros actuales
+        const searchQuery = document.getElementById('comment-search')?.value.toLowerCase() || '';
+        const filterPhoneId = document.getElementById('comment-filter-phone')?.value || '';
+        const sortBy = document.getElementById('comment-sort')?.value || 'recent';
+        
+        // Filtrar comentarios
+        let filteredComments = [...state.comments];
+        
+        // Filtrar por búsqueda
+        if (searchQuery) {
+            filteredComments = filteredComments.filter(comment => {
+                const phone = phoneDatabase.find(p => p.id === comment.phoneId);
+                const phoneName = phone ? phone.name.toLowerCase() : '';
+                return comment.text.toLowerCase().includes(searchQuery) ||
+                       comment.author.toLowerCase().includes(searchQuery) ||
+                       phoneName.includes(searchQuery);
+            });
+        }
+        
+        // Filtrar por teléfono
+        if (filterPhoneId) {
+            filteredComments = filteredComments.filter(comment => comment.phoneId === parseInt(filterPhoneId));
+        }
+        
+        // Ordenar comentarios
+        filteredComments.sort((a, b) => {
+            switch (sortBy) {
+                case 'recent':
+                    return new Date(b.date) - new Date(a.date);
+                case 'oldest':
+                    return new Date(a.date) - new Date(b.date);
+                case 'rating-high':
+                    return b.rating - a.rating;
+                case 'rating-low':
+                    return a.rating - b.rating;
+                default:
+                    return 0;
+            }
+        });
+        
+        // Actualizar estadísticas
+        updateCommentsStats(filteredComments);
+        
+        if (filteredComments.length === 0) {
             commentsList.innerHTML = `
-                <div class="text-center py-12">
-                    <div class="text-6xl mb-4">💬</div>
-                    <h3 class="text-xl font-bold text-slate-700 mb-2">No hay comentarios aún</h3>
-                    <p class="text-slate-500">Sé el primero en compartir tu opinión sobre estos teléfonos.</p>
+                <div class="text-center py-12 bg-white backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                    <div class="text-6xl mb-4">🔍</div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">No se encontraron comentarios</h3>
+                    <p class="text-slate-700">${state.comments.length === 0 ? 'Sé el primero en compartir tu opinión sobre estos teléfonos.' : 'Intenta ajustar los filtros de búsqueda.'}</p>
                 </div>
             `;
             return;
         }
         
         // Agrupar comentarios por teléfono
-        const commentsByPhone = state.comments.reduce((acc, comment) => {
+        const commentsByPhone = filteredComments.reduce((acc, comment) => {
             const phone = phoneDatabase.find(p => p.id === comment.phoneId);
             const phoneName = phone ? phone.name : 'Teléfono desconocido';
+            const phoneId = phone ? phone.id : 0;
             
             if (!acc[phoneName]) {
-                acc[phoneName] = [];
+                acc[phoneName] = {
+                    phoneId: phoneId,
+                    comments: [],
+                    averageRating: 0
+                };
             }
-            acc[phoneName].push(comment);
+            acc[phoneName].comments.push(comment);
             return acc;
         }, {});
         
-        commentsList.innerHTML = Object.entries(commentsByPhone).map(([phoneName, comments]) => `
-            <div class="bg-slate-50 p-6 rounded-2xl">
-                <h3 class="text-lg font-bold text-slate-800 mb-4">${phoneName}</h3>
-                <div class="space-y-4">
-                    ${comments.map(comment => {
+        // Calcular promedio de rating por teléfono
+        Object.keys(commentsByPhone).forEach(phoneName => {
+            const group = commentsByPhone[phoneName];
+            const totalRating = group.comments.reduce((sum, c) => sum + c.rating, 0);
+            group.averageRating = (totalRating / group.comments.length).toFixed(1);
+        });
+        
+        commentsList.innerHTML = Object.entries(commentsByPhone).map(([phoneName, group]) => {
+            const phone = phoneDatabase.find(p => p.id === group.phoneId);
+            return `
+            <div class="bg-white backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
+                    <div class="flex items-center gap-3">
+                        <h3 class="text-lg md:text-xl font-bold text-slate-900">${phoneName}</h3>
+                        <div class="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full">
+                            <span class="text-yellow-400">⭐</span>
+                            <span class="text-sm font-semibold text-slate-900">${group.averageRating}</span>
+                            <span class="text-xs text-slate-600">(${group.comments.length})</span>
+                        </div>
+                    </div>
+                    ${phone ? `
+                        <a href="#phone-${phone.id}" class="text-xs md:text-sm text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1 font-semibold">
+                            Ver detalles →
+                        </a>
+                    ` : ''}
+                </div>
+                <div class="space-y-3 md:space-y-4">
+                    ${group.comments.map(comment => {
                         const canDelete = state.currentUser && comment.author === state.currentUser.name;
+                        const ratingPercentage = (comment.rating / 5) * 100;
                         return `
-                        <div class="bg-white p-4 rounded-xl border border-slate-200">
-                            <div class="flex justify-between items-start mb-3">
+                        <div class="bg-white/95 backdrop-blur-sm rounded-xl p-4 md:p-5 border border-white/30 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.02]">
+                            <div class="flex justify-between items-start mb-3 gap-3">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
+                                            ${comment.author.charAt(0).toUpperCase()}
+                                        </div>
                                 <div>
                                     <h4 class="font-semibold text-slate-800">${escapeHtml(comment.author)}</h4>
-                                    <div class="flex items-center gap-2 mt-1">
+                                            <span class="text-xs text-slate-500">${comment.date}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex items-center gap-1">
                                         ${renderStars(comment.rating)}
-                                        <span class="text-sm text-slate-500">${comment.date}</span>
+                                        </div>
+                                        <div class="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
+                                            <div class="h-full bg-gradient-to-r from-yellow-400 to-orange-500 transition-all duration-500" style="width: ${ratingPercentage}%"></div>
+                                        </div>
+                                        <span class="text-xs font-semibold text-slate-600">${comment.rating}/5</span>
                                     </div>
                                 </div>
                                 ${canDelete ? `
-                                    <button class="delete-comment-btn text-red-500 hover:text-red-700 text-sm" data-id="${comment.id}" title="Eliminar mi comentario">
-                                        🗑️
+                                    <button class="delete-comment-btn text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-all duration-200 flex-shrink-0" data-id="${comment.id}" title="Eliminar mi comentario">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
                                     </button>
                                 ` : ''}
                             </div>
-                            <p class="text-slate-700">${escapeHtml(comment.text)}</p>
+                            <p class="text-slate-700 leading-relaxed whitespace-pre-wrap">${escapeHtml(comment.text)}</p>
                         </div>
                     `;
                     }).join('')}
                 </div>
             </div>
-        `).join('');
+            `;
+        }).join('');
+    };
+    
+    const updateCommentsStats = (comments = state.comments) => {
+        const totalCount = document.getElementById('total-comments-count');
+        const averageRating = document.getElementById('average-rating');
+        
+        if (totalCount) {
+            totalCount.textContent = comments.length;
+        }
+        
+        if (averageRating && comments.length > 0) {
+            const total = comments.reduce((sum, c) => sum + c.rating, 0);
+            const avg = (total / comments.length).toFixed(1);
+            averageRating.textContent = avg;
+        } else if (averageRating) {
+            averageRating.textContent = '0.0';
+        }
     };
 
     const renderStars = (rating) => {
@@ -711,6 +843,73 @@ document.addEventListener('DOMContentLoaded', () => {
         const commentForm = document.getElementById('comment-form');
         if (commentForm) {
             commentForm.addEventListener('submit', handleCommentSubmit);
+        }
+        
+        // Event listeners para filtros y búsqueda
+        const commentSearch = document.getElementById('comment-search');
+        const commentFilterPhone = document.getElementById('comment-filter-phone');
+        const commentSort = document.getElementById('comment-sort');
+        
+        if (commentSearch) {
+            commentSearch.addEventListener('input', debounce(() => {
+                renderCommentsList();
+            }, 300));
+        }
+        
+        if (commentFilterPhone) {
+            commentFilterPhone.addEventListener('change', () => {
+                renderCommentsList();
+            });
+        }
+        
+        if (commentSort) {
+            commentSort.addEventListener('change', () => {
+                renderCommentsList();
+            });
+        }
+        
+        // Event listener para contador de caracteres
+        const commentText = document.getElementById('comment-text');
+        const commentLength = document.getElementById('comment-length');
+        if (commentText && commentLength) {
+            commentText.addEventListener('input', (e) => {
+                const length = e.target.value.length;
+                commentLength.textContent = `${length} caracteres`;
+                if (length < 10) {
+                    commentLength.classList.add('text-red-500');
+                    commentLength.classList.remove('text-slate-500');
+                } else {
+                    commentLength.classList.remove('text-red-500');
+                    commentLength.classList.add('text-slate-500');
+                }
+            });
+        }
+        
+        // Event listener para texto de rating
+        const ratingText = document.getElementById('rating-text');
+        const ratingInputs = document.querySelectorAll('input[name="rating"]');
+        ratingInputs.forEach(input => {
+            input.addEventListener('change', (e) => {
+                if (ratingText) {
+                    const rating = parseInt(e.target.value);
+                    const ratingLabels = {
+                        1: 'Muy malo',
+                        2: 'Malo',
+                        3: 'Regular',
+                        4: 'Bueno',
+                        5: 'Excelente'
+                    };
+                    ratingText.textContent = ratingLabels[rating] || '';
+                    ratingText.className = 'ml-2 text-sm font-medium flex items-center ' + 
+                        (rating >= 4 ? 'text-green-600' : rating >= 3 ? 'text-yellow-600' : 'text-red-600');
+                }
+            });
+        });
+        
+        // Prellenar nombre si está autenticado
+        const commentAuthor = document.getElementById('comment-author');
+        if (commentAuthor && state.currentUser) {
+            commentAuthor.value = state.currentUser.name;
         }
         
         // Eventos para las estrellas de calificación
@@ -757,18 +956,23 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.rating-star').forEach((star, index) => {
             const starRating = 5 - index;
             if (starRating <= rating) {
-                star.classList.add('text-yellow-400', 'scale-110');
+                star.classList.add('text-yellow-400', 'selected');
                 star.style.transform = 'scale(1.1)';
                 star.style.transition = 'all 0.2s ease-in-out';
             } else {
-                star.classList.remove('text-yellow-400', 'scale-110');
+                star.classList.remove('text-yellow-400', 'selected');
                 star.style.transform = 'scale(1)';
                 star.style.transition = 'all 0.2s ease-in-out';
             }
         });
         
         // Seleccionar el radio button correspondiente
-        document.getElementById(`rating-${rating}`).checked = true;
+        const radioButton = document.getElementById(`rating-${rating}`);
+        if (radioButton) {
+            radioButton.checked = true;
+            // Disparar evento change para actualizar el texto
+            radioButton.dispatchEvent(new Event('change'));
+        }
     };
 
     const handleCommentSubmit = (e) => {
@@ -789,7 +993,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Validar datos
         if (!phoneId || !rating || !text || !author) {
-            alert('Por favor completa todos los campos');
+            showToast('Por favor completa todos los campos', 'error');
+            return;
+        }
+        
+        // Validar longitud mínima del comentario
+        if (text.length < 10) {
+            showToast('El comentario debe tener al menos 10 caracteres', 'error');
             return;
         }
         
@@ -827,8 +1037,29 @@ document.addEventListener('DOMContentLoaded', () => {
             star.style.transition = 'all 0.3s ease-in-out';
         });
         
+        // Limpiar contador y texto de rating
+        const commentLength = document.getElementById('comment-length');
+        if (commentLength) {
+            commentLength.textContent = '0 caracteres';
+            commentLength.classList.remove('text-red-500');
+            commentLength.classList.add('text-slate-500');
+        }
+        
+        const ratingText = document.getElementById('rating-text');
+        if (ratingText) {
+            ratingText.textContent = '';
+        }
+        
+        // Scroll suave a la lista de comentarios
+        setTimeout(() => {
+            const commentsList = document.getElementById('comments-list');
+            if (commentsList) {
+                commentsList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
+        
         secureLogger.info('Comentario publicado por usuario autenticado');
-        alert('¡Comentario publicado exitosamente!');
+        showToast('¡Comentario publicado exitosamente!', 'success');
     };
 
     const deleteComment = (commentId) => {
@@ -1213,19 +1444,37 @@ document.addEventListener('DOMContentLoaded', () => {
             // Guardar respuesta
             state.easyModeAnswers[questionId] = value;
             
-            // Actualizar display de preguntas
-            updateQuestionDisplay();
-            
             // Efecto de selección
             e.target.style.transform = 'scale(0.95)';
+            
+            // Obtener información de preguntas antes de avanzar
+            const questions = document.querySelectorAll('.question-card');
+            const totalQuestions = questions.length;
+            const isLastQuestion = state.currentQuestionIndex === (totalQuestions - 1);
+            
+            // Esperar un momento para mostrar el efecto visual y luego avanzar automáticamente
             setTimeout(() => {
                 e.target.style.transform = '';
-            }, 150);
+                
+                // Verificar si es la última pregunta antes de avanzar
+                if (isLastQuestion) {
+                    // Es la última pregunta, mostrar resultados automáticamente
+                    setTimeout(() => {
+                        handleGetRecommendations();
+                    }, 300);
+                } else {
+                    // No es la última pregunta, avanzar automáticamente
+                    setTimeout(() => {
+                        handleNextQuestion();
+                    }, 300);
+                }
+            }, 200);
         }
     };
 
     const handleNextQuestion = () => {
-        if (state.currentQuestionIndex < 4) {
+        const questions = document.querySelectorAll('.question-card');
+        if (state.currentQuestionIndex < questions.length - 1) {
             state.currentQuestionIndex++;
             updateQuestionDisplay();
         }
@@ -1242,16 +1491,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const questions = document.querySelectorAll('.question-card');
         const currentQuestion = document.getElementById('current-question');
         const progressBar = document.getElementById('progress-bar');
-        const nextBtn = document.getElementById('next-question-btn');
         const prevBtn = document.getElementById('prev-question-btn');
-        const recommendationsBtn = document.getElementById('get-recommendations-btn');
         
         // Ocultar todas las preguntas
         questions.forEach((q, index) => {
             if (index === state.currentQuestionIndex) {
                 q.classList.remove('hidden');
                 q.classList.add('active');
-            } else {
+                // Animación suave al mostrar la pregunta
+                setTimeout(() => {
+                    q.style.opacity = '0';
+                    q.style.transform = 'translateX(20px)';
+                    q.style.transition = 'all 0.3s ease-out';
+                    setTimeout(() => {
+                        q.style.opacity = '1';
+                        q.style.transform = 'translateX(0)';
+                    }, 10);
+                }, 10);
+        } else {
                 q.classList.add('hidden');
                 q.classList.remove('active');
             }
@@ -1267,29 +1524,9 @@ document.addEventListener('DOMContentLoaded', () => {
             progressBar.style.width = `${progress}%`;
         }
         
-        // Actualizar botones
+        // Actualizar botón anterior
         if (prevBtn) {
             prevBtn.disabled = state.currentQuestionIndex === 0;
-        }
-        
-        if (nextBtn) {
-            const currentQuestionId = questions[state.currentQuestionIndex]?.querySelector('.easy-options')?.dataset.questionId;
-            const hasAnswer = currentQuestionId && state.easyModeAnswers[currentQuestionId];
-            nextBtn.disabled = !hasAnswer || state.currentQuestionIndex === questions.length - 1;
-        }
-        
-        if (recommendationsBtn) {
-            const totalQuestions = questions.length;
-            const answeredQuestions = Object.keys(state.easyModeAnswers).length;
-            const shouldShow = answeredQuestions === totalQuestions;
-            
-            if (shouldShow) {
-                recommendationsBtn.classList.remove('hidden');
-                nextBtn.classList.add('hidden');
-            } else {
-                recommendationsBtn.classList.add('hidden');
-                nextBtn.classList.remove('hidden');
-            }
         }
     };
 
@@ -1444,6 +1681,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     </button>
                 </div>
             `;
+            // Scroll a los resultados
+            setTimeout(() => {
+                resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
         } else {
             const topPhones = phones.slice(0, 6);
             const totalMatches = phones.filter(p => p.recommendationScore > 50).length;
@@ -1483,8 +1724,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             `;
+            
+            // Scroll a los resultados
+            setTimeout(() => {
+                resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
         }
     };
+    
+    // Hacer funciones disponibles globalmente después de que estén definidas
+    window.renderEasyModeView = renderEasyModeView;
+    window.handleGetRecommendations = handleGetRecommendations;
 
     function handleLogin(e) {
         e.preventDefault();
@@ -1730,23 +1980,65 @@ document.addEventListener('DOMContentLoaded', () => {
     navButtons.forEach(b => b.addEventListener('click', handleNavClick));
     mobileNavButtons.forEach(b => b.addEventListener('click', handleNavClick));
 
-    fetchAndInitializeApp(loadingIndicator, renderAuthSection, renderCharts, renderSearchView, renderEasyModeView, renderAccountView, updateView, FAKE_STORE_API_URL, mapToPhoneSpecs).then(newPhoneDatabase => {
-        phoneDatabase = newPhoneDatabase;
-        
-        // Asignar variables globales para autenticación
-        globalState = state;
-        globalRenderAuthSection = renderAuthSection;
-        globalShowToast = showToast;
-        
-        // Hacer renderAccountView disponible globalmente
-        window.renderAccountView = renderAccountView;
-        
-        // Detectar si se está usando base de datos de respaldo
-        const isUsingFallback = newPhoneDatabase.some(phone => phone.source === 'fallback-database');
-        if (isUsingFallback) {
-            showOfflineIndicator();
+    // Función para inicializar la aplicación con verificación de dependencias
+    const initializeApp = () => {
+        // Verificar que las funciones necesarias estén disponibles
+        if (typeof fetchAndInitializeApp !== 'function') {
+            console.error('❌ fetchAndInitializeApp no está disponible');
+            if (loadingIndicator) {
+                loadingIndicator.innerHTML = `
+                    <div class="text-7xl mb-4">⚠️</div>
+                    <p class="mt-4 text-xl font-semibold text-red-600">Error al cargar la aplicación</p>
+                    <p class="mt-2 text-lg text-slate-600">Por favor, recarga la página.</p>
+                `;
+            }
+            return;
         }
-        
+
+        const apiUrl = typeof FAKE_STORE_API_URL !== 'undefined' ? FAKE_STORE_API_URL : 'https://fakestoreapi.com/products?limit=20';
+        const mapFunction = typeof mapToPhoneSpecs !== 'undefined' ? mapToPhoneSpecs : null;
+
+        if (!mapFunction) {
+            console.error('❌ mapToPhoneSpecs no está disponible');
+            if (loadingIndicator) {
+                loadingIndicator.innerHTML = `
+                    <div class="text-7xl mb-4">⚠️</div>
+                    <p class="mt-4 text-xl font-semibold text-red-600">Error al cargar la aplicación</p>
+                    <p class="mt-2 text-lg text-slate-600">Por favor, recarga la página.</p>
+                `;
+            }
+            return;
+        }
+
+        fetchAndInitializeApp(loadingIndicator, renderAuthSection, renderCharts, renderSearchView, renderEasyModeView, renderAccountView, updateView, apiUrl, mapFunction)
+        .then(newPhoneDatabase => {
+            // Asegurar que siempre tenemos datos válidos
+            if (!newPhoneDatabase || !Array.isArray(newPhoneDatabase) || newPhoneDatabase.length === 0) {
+                console.error('❌ No se pudieron cargar datos de teléfonos');
+                showToast('Error al cargar el catálogo. Por favor, recarga la página.', 'error');
+                // Ocultar loading indicator por si acaso
+                if (loadingIndicator) {
+                    loadingIndicator.classList.add('hidden');
+                }
+                return;
+            }
+            
+        phoneDatabase = newPhoneDatabase;
+            
+            // Asignar variables globales para autenticación
+            globalState = state;
+            globalRenderAuthSection = renderAuthSection;
+            globalShowToast = showToast;
+            
+            // Hacer renderAccountView disponible globalmente
+            window.renderAccountView = renderAccountView;
+            
+            // Detectar si se está usando base de datos de respaldo
+            const isUsingFallback = newPhoneDatabase.some && newPhoneDatabase.some(phone => phone.source === 'fallback-database');
+            if (isUsingFallback) {
+                showOfflineIndicator();
+            }
+            
         renderAuthSection();
         renderCharts();
         renderSearchView();
@@ -1757,23 +2049,77 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Inicializar tema después de que todo esté cargado
         initializeTheme();
-        
-        // Configurar listeners de conexión
-        window.addEventListener('online', () => {
-            showToast('Conexión restaurada', 'success');
-            const offlineIndicator = document.getElementById('offline-indicator');
-            if (offlineIndicator) {
-                offlineIndicator.remove();
+            
+            // Configurar listeners de conexión
+            window.addEventListener('online', () => {
+                showToast('Conexión restaurada', 'success');
+                const offlineIndicator = document.getElementById('offline-indicator');
+                if (offlineIndicator) {
+                    offlineIndicator.remove();
+                }
+            });
+            
+            window.addEventListener('offline', () => {
+                checkConnectionStatus();
+            });
+            
+            // Verificar estado inicial
+            checkConnectionStatus();
+            
+            // Asegurar que el loading indicator esté oculto
+            if (loadingIndicator) {
+                loadingIndicator.classList.add('hidden');
+            }
+        })
+        .catch(error => {
+            console.error('❌ Error en la inicialización:', error);
+            // Ocultar loading indicator en caso de error
+            if (loadingIndicator) {
+                loadingIndicator.classList.add('hidden');
+            }
+            // Mostrar mensaje de error al usuario
+            showToast('Error al cargar la aplicación. Por favor, recarga la página.', 'error');
+            // Intentar cargar datos de respaldo directamente
+            try {
+                if (window.getFallbackPhoneData && typeof window.getFallbackPhoneData === 'function') {
+                    const fallbackData = window.getFallbackPhoneData();
+                    if (fallbackData && Array.isArray(fallbackData) && fallbackData.length > 0) {
+                        phoneDatabase = fallbackData;
+                        updateView('dashboard');
+                    }
+                }
+            } catch (e) {
+                console.error('Error al cargar datos de respaldo:', e);
             }
         });
-        
-        window.addEventListener('offline', () => {
-            checkConnectionStatus();
-        });
-        
-        // Verificar estado inicial
-        checkConnectionStatus();
-    });
+    };
+
+    // Intentar inicializar inmediatamente, o esperar un poco si las funciones no están disponibles
+    if (typeof fetchAndInitializeApp === 'function' && typeof mapToPhoneSpecs === 'function') {
+        initializeApp();
+    } else {
+        // Esperar un poco para que los módulos se carguen
+        let attempts = 0;
+        const maxAttempts = 10;
+        const checkInterval = setInterval(() => {
+            attempts++;
+            if ((typeof fetchAndInitializeApp === 'function' && typeof mapToPhoneSpecs === 'function') || attempts >= maxAttempts) {
+                clearInterval(checkInterval);
+                if (typeof fetchAndInitializeApp === 'function' && typeof mapToPhoneSpecs === 'function') {
+                    initializeApp();
+                } else {
+                    console.error('❌ No se pudieron cargar las funciones necesarias después de varios intentos');
+                    if (loadingIndicator) {
+                        loadingIndicator.innerHTML = `
+                            <div class="text-7xl mb-4">⚠️</div>
+                            <p class="mt-4 text-xl font-semibold text-red-600">Error al cargar la aplicación</p>
+                            <p class="mt-2 text-lg text-slate-600">Por favor, recarga la página.</p>
+                        `;
+                    }
+                }
+            }
+        }, 100);
+    }
 });
 
 // Debounce function for real-time search
@@ -1907,11 +2253,27 @@ function handleSwipeGesture(startX, startY, endX, endY) {
 
 // Mejorar la experiencia táctil
 function enhanceTouchExperience() {
-    // Agregar feedback háptico si está disponible
+    // Variable para rastrear si el usuario ya ha interactuado
+    let userHasInteracted = false;
+    
+    // Marcar que el usuario ha interactuado en cualquier evento de interacción
+    const markInteraction = () => {
+        userHasInteracted = true;
+    };
+    
+    ['touchstart', 'click', 'mousedown'].forEach(eventType => {
+        document.addEventListener(eventType, markInteraction, { once: true, passive: true });
+    });
+    
+    // Agregar feedback háptico si está disponible y el usuario ya interactuó
     if ('vibrate' in navigator) {
         document.addEventListener('touchstart', (e) => {
-            if (e.target.matches('button, .product-card, .mobile-nav-item')) {
-                navigator.vibrate(10);
+            if (userHasInteracted && e.target.matches('button, .product-card, .mobile-nav-item')) {
+                try {
+                    navigator.vibrate(10);
+                } catch (error) {
+                    // Silenciar errores de vibración
+                }
             }
         }, { passive: true });
     }
@@ -1930,6 +2292,71 @@ function enhanceTouchExperience() {
     });
 }
 
+// Inicializar botón de ayuda
+function initializeHelpButton() {
+    const helpBtn = document.getElementById('help-btn');
+    const helpModal = document.getElementById('help-modal');
+    const closeHelpModal = document.getElementById('close-help-modal');
+    
+    if (helpBtn && helpModal) {
+        // Abrir modal al hacer clic en el botón de ayuda
+        helpBtn.addEventListener('click', () => {
+            helpModal.classList.remove('hidden');
+            // Forzar reflow para que la animación funcione
+            helpModal.offsetHeight;
+            // Animación de entrada
+            setTimeout(() => {
+                const modalContent = helpModal.querySelector('.bg-white');
+                if (modalContent) {
+                    modalContent.style.transform = 'scale(1)';
+                    modalContent.style.opacity = '1';
+                }
+            }, 10);
+        });
+        
+        // Cerrar modal al hacer clic en el botón de cerrar
+        if (closeHelpModal) {
+            closeHelpModal.addEventListener('click', () => {
+                const modalContent = helpModal.querySelector('.bg-white');
+                if (modalContent) {
+                    modalContent.style.transform = 'scale(0.95)';
+                    modalContent.style.opacity = '0';
+                }
+                setTimeout(() => {
+                    helpModal.classList.add('hidden');
+                }, 300);
+            });
+        }
+        
+        // Cerrar modal al hacer clic fuera del contenido
+        helpModal.addEventListener('click', (e) => {
+            if (e.target === helpModal) {
+                const modalContent = helpModal.querySelector('.bg-white');
+                if (modalContent) {
+                    modalContent.style.transform = 'scale(0.95)';
+                    modalContent.style.opacity = '0';
+                }
+                setTimeout(() => {
+                    helpModal.classList.add('hidden');
+                }, 300);
+            }
+        });
+        
+        // Cerrar modal con la tecla Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !helpModal.classList.contains('hidden')) {
+                const modalContent = helpModal.querySelector('.bg-white');
+                if (modalContent) {
+                    modalContent.style.transform = 'scale(0.95)';
+                    modalContent.style.opacity = '0';
+                }
+                setTimeout(() => {
+                    helpModal.classList.add('hidden');
+                }, 300);
+            }
+        });
+    }
+}
 
 function showToast(message, type = 'info', duration = 3000) {
     const toast = document.createElement('div');
@@ -1971,15 +2398,19 @@ function showToast(message, type = 'info', duration = 3000) {
         setTimeout(() => toast.remove(), 300);
     }, duration);
     
-    // Feedback háptico
+    // Feedback háptico (solo si el usuario ya interactuó)
     if ('vibrate' in navigator) {
-        const vibrationPattern = {
-            success: [100],
-            error: [200, 100, 200],
-            warning: [150],
-            info: [50]
-        };
-        navigator.vibrate(vibrationPattern[type] || [50]);
+        try {
+            const vibrationPattern = {
+                success: [100],
+                error: [200, 100, 200],
+                warning: [150],
+                info: [50]
+            };
+            navigator.vibrate(vibrationPattern[type] || [50]);
+        } catch (error) {
+            // Silenciar errores de vibración (puede fallar si el usuario no ha interactuado)
+        }
     }
 }
 

@@ -45,6 +45,12 @@
                     <button data-view="comments" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105">💬 Comentarios</button>
                 </nav>
                 <div id="auth-section" class="flex items-center space-x-4">
+                    <!-- Botón de ayuda -->
+                    <button id="help-btn" class="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300" title="Ayuda">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </button>
                     <!-- Botón de modo oscuro -->
                     <button id="theme-toggle" class="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300" title="Cambiar tema">
                         <svg id="sun-icon" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,26 +158,40 @@
         </div>
 
         <div id="comments-view" class="view-container hidden">
-            <div class="glass p-8 rounded-3xl shadow-2xl border border-white/20">
-                <h2 class="text-3xl font-bold text-white mb-2 text-center">💬 Comentarios y Opiniones</h2>
-                <p class="text-white/90 text-center mb-8">Comparte tu experiencia y lee opiniones de otros usuarios sobre los teléfonos.</p>
+            <div class="glass p-4 md:p-8 rounded-3xl shadow-2xl border border-white/20">
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-2 text-center">💬 Comentarios y Opiniones</h2>
+                <p class="text-slate-700 text-sm md:text-base text-center mb-4 md:mb-8">Comparte tu experiencia y lee opiniones de otros usuarios sobre los teléfonos.</p>
                 
                 <!-- Formulario para agregar comentario -->
-                <div class="bg-slate-50 p-6 rounded-2xl mb-8">
-                    <h3 class="text-xl font-semibold text-slate-800 mb-4">Agregar Comentario</h3>
+                <div class="bg-gradient-to-br from-white to-slate-50 p-6 rounded-2xl mb-8 shadow-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                            <span class="text-2xl">✍️</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">Agregar Comentario</h3>
+                            <p class="text-sm text-slate-600">Comparte tu experiencia con la comunidad</p>
+                        </div>
+                    </div>
                     <div id="comment-auth-info" class="mb-4">
                         <!-- Mensaje de autenticación se agregará aquí dinámicamente -->
                     </div>
                     <form id="comment-form" class="space-y-4">
                         <div>
-                            <label for="comment-phone" class="block text-sm font-medium text-slate-700 mb-2">Teléfono</label>
-                            <select id="comment-phone" required class="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <label for="comment-phone" class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                                <span>📱</span>
+                                Teléfono
+                            </label>
+                            <select id="comment-phone" required class="w-full p-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white">
                                 <option value="">Selecciona un teléfono</option>
                             </select>
                         </div>
                         <div>
-                            <label for="comment-rating" class="block text-sm font-medium text-slate-700 mb-2">Calificación</label>
-                            <div class="flex space-x-1">
+                            <label for="comment-rating" class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                                <span>⭐</span>
+                                Calificación
+                            </label>
+                            <div class="flex space-x-2 bg-slate-100 p-3 rounded-lg">
                                 <input type="radio" id="rating-5" name="rating" value="5" class="sr-only">
                                 <label for="rating-5" class="rating-star text-3xl cursor-pointer hover:text-yellow-400 transition-all duration-200 hover:scale-125 transform" data-rating="5">⭐</label>
                                 <input type="radio" id="rating-4" name="rating" value="4" class="sr-only">
@@ -182,20 +202,66 @@
                                 <label for="rating-2" class="rating-star text-3xl cursor-pointer hover:text-yellow-400 transition-all duration-200 hover:scale-125 transform" data-rating="2">⭐</label>
                                 <input type="radio" id="rating-1" name="rating" value="1" class="sr-only">
                                 <label for="rating-1" class="rating-star text-3xl cursor-pointer hover:text-yellow-400 transition-all duration-200 hover:scale-125 transform" data-rating="1">⭐</label>
+                                <span id="rating-text" class="ml-2 text-sm font-medium text-slate-600 flex items-center"></span>
                             </div>
                         </div>
                         <div>
-                            <label for="comment-text" class="block text-sm font-medium text-slate-700 mb-2">Comentario</label>
-                            <textarea id="comment-text" required rows="4" placeholder="Escribe tu opinión sobre este teléfono..." class="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                            <label for="comment-text" class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                                <span>💬</span>
+                                Comentario
+                            </label>
+                            <textarea id="comment-text" required rows="4" placeholder="Escribe tu opinión sobre este teléfono... ¿Qué te gustó? ¿Qué no te gustó? ¿Lo recomendarías?" class="w-full p-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all resize-none bg-white"></textarea>
+                            <div class="text-xs text-slate-500 mt-1 flex justify-between">
+                                <span>Mínimo 10 caracteres</span>
+                                <span id="comment-length">0 caracteres</span>
+                            </div>
                         </div>
                         <div>
-                            <label for="comment-author" class="block text-sm font-medium text-slate-700 mb-2">Tu nombre</label>
-                            <input type="text" id="comment-author" required placeholder="Tu nombre" class="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <label for="comment-author" class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                                <span>👤</span>
+                                Tu nombre
+                            </label>
+                            <input type="text" id="comment-author" required placeholder="Tu nombre o alias" class="w-full p-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white">
                         </div>
-                        <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors">
+                        <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-2">
+                            <span>📤</span>
                             Publicar Comentario
                         </button>
                     </form>
+                </div>
+
+                <!-- Filtros y estadísticas -->
+                <div class="bg-white backdrop-blur-sm p-4 md:p-6 rounded-2xl mb-6 border border-slate-200 shadow-lg">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+                        <div class="flex items-center gap-4 flex-wrap">
+                            <div class="flex items-center gap-2">
+                                <span class="text-2xl">📊</span>
+                                <div>
+                                    <div class="text-sm text-slate-600">Total de comentarios</div>
+                                    <div id="total-comments-count" class="text-xl font-bold text-slate-900">0</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-2xl">⭐</span>
+                                <div>
+                                    <div class="text-sm text-slate-600">Calificación promedio</div>
+                                    <div id="average-rating" class="text-xl font-bold text-slate-900">0.0</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 flex-wrap">
+                            <input type="text" id="comment-search" placeholder="🔍 Buscar comentarios..." class="flex-1 min-w-[200px] px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <select id="comment-filter-phone" class="px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Todos los teléfonos</option>
+                            </select>
+                            <select id="comment-sort" class="px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="recent">Más recientes</option>
+                                <option value="oldest">Más antiguos</option>
+                                <option value="rating-high">Mejor valorados</option>
+                                <option value="rating-low">Peor valorados</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Lista de comentarios -->
@@ -233,12 +299,29 @@
         </div>
     </div>
     
+    <!-- Modal de ayuda -->
+    <div id="help-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full m-4 relative transform transition-all duration-300 opacity-0 scale-95">
+            <button id="close-help-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors z-10 bg-white rounded-full p-2 shadow-lg">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            <div class="p-6">
+                <div class="text-center mb-4">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-2">Ayuda</h2>
+                </div>
+                <div class="flex justify-center">
+                    <img id="help-image" src="src/images/b4ad327a-a040-42bf-862e-fd1e192ba284.webp" alt="Ayuda" class="max-w-full h-auto rounded-lg shadow-lg" style="max-height: 70vh;">
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Scripts organizados en orden correcto -->
     <script src="src/js/security.js"></script>
     <script src="src/js/fallback-db.js"></script>
     <script type="module" src="src/js/api.js"></script>
-    <!-- Base de datos de respaldo -->
-    <script src="src/js/fallback-db.js"></script>
     <script type="module" src="src/js/script.js"></script>
     <script>
         // Registrar Service Worker
