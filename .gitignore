@@ -48,10 +48,14 @@ backup-*/
 # Archivos de configuración local
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
 
-# Archivos de build (si se agregan)
-dist/
-build/
+# Vercel
+.vercel
+
+# Archivos de desarrollo
+*.local
+
+# Carpetas de desarrollo (mantener estructura pero ignorar contenido temporal)
+scripts/*.log
+config/*.local.json
