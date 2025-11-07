@@ -423,35 +423,57 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         easyQuestionsContainer.innerHTML = `
-            <div class="mb-8">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-2xl font-bold text-white">🎯 Modo Fácil</h2>
-                    <div class="text-white/80 text-sm">
-                        <span id="current-question">1</span> de ${questions.length}
+            <div class="mb-8 glass p-6 rounded-3xl shadow-xl border border-white/20">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">🎯 Encuentra tu teléfono ideal</h2>
+                        <p class="text-white/80 text-sm md:text-base">Solo unas preguntas y te mostraremos las mejores opciones</p>
                         </div>
+                    <div class="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
+                        <span class="text-2xl">📊</span>
+                        <div class="text-white">
+                            <div class="text-xs text-white/70">Progreso</div>
+                            <div class="text-lg font-bold">
+                                <span id="current-question">1</span> / <span>${questions.length}</span>
                     </div>
-                <div class="w-full bg-white/20 rounded-full h-2 mb-2">
-                    <div id="progress-bar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-500" style="width: ${100/questions.length}%"></div>
                 </div>
-                <p class="text-white/70 text-sm">Responde las preguntas para encontrar tu teléfono ideal</p>
+                    </div>
+                </div>
+                <div class="w-full bg-white/20 rounded-full h-3 mb-2 overflow-hidden shadow-inner">
+                    <div id="progress-bar" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 h-3 rounded-full transition-all duration-700 ease-out shadow-lg relative overflow-hidden" style="width: ${100/questions.length}%">
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center gap-2 mt-3">
+                    <span class="text-white/70 text-sm">💡</span>
+                    <p class="text-white/70 text-sm text-center">Haz clic en una opción para continuar automáticamente</p>
+                </div>
             </div>
             
-            <div id="questions-container">
+            <div id="questions-container" class="relative">
                 ${questions.map((q, index) => `
-                    <div class="question-card ${index === 0 ? 'active' : 'hidden'} transition-all duration-300" data-question-index="${index}">
-                        <div class="glass p-8 rounded-3xl shadow-2xl border border-white/20 mb-6">
-                            <div class="text-center mb-6">
-                                <div class="text-6xl mb-4">${q.icon}</div>
-                                <h3 class="text-2xl font-bold text-white mb-2">${q.title}</h3>
-                                <p class="text-white/80">${q.description}</p>
+                    <div class="question-card ${index === 0 ? 'active' : 'hidden'} transition-all duration-500 ease-out" data-question-index="${index}">
+                        <div class="glass p-6 md:p-10 rounded-3xl shadow-2xl border-2 border-white/30 mb-6 transform transition-all duration-500 hover:shadow-3xl">
+                            <div class="text-center mb-8">
+                                <div class="text-7xl md:text-8xl mb-4 animate-pulse">${q.icon}</div>
+                                <h3 class="text-2xl md:text-3xl font-extrabold text-white mb-3 drop-shadow-lg">${q.title}</h3>
+                                <p class="text-white/90 text-base md:text-lg font-medium">${q.description}</p>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 easy-options" data-question-id="${q.id}">
-                                ${q.options.map(opt => `
-                                    <button data-value="${opt.value}" class="easy-option p-6 rounded-2xl border-2 border-white/20 bg-white/10 hover:border-white/40 hover:bg-white/20 transition-all duration-300 text-center group hover:scale-105 hover:shadow-lg">
-                                        <div class="text-5xl mb-3 group-hover:scale-110 transition-transform duration-300">${opt.emoji}</div>
-                                        <div class="font-bold text-white text-lg mb-1">${opt.label}</div>
-                                        <div class="text-white/70 text-sm">${opt.sublabel}</div>
-                                        <div class="mt-3 w-8 h-1 bg-gradient-to-r from-${opt.color}-400 to-${opt.color}-600 rounded-full mx-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 easy-options" data-question-id="${q.id}">
+                                ${q.options.map((opt, optIndex) => `
+                                    <button data-value="${opt.value}" class="easy-option relative p-6 md:p-8 rounded-2xl border-2 border-white/20 bg-white/10 hover:border-white/50 hover:bg-white/25 transition-all duration-300 text-center group hover:scale-110 hover:shadow-2xl transform backdrop-blur-sm overflow-hidden" style="animation-delay: ${optIndex * 50}ms">
+                                        <div class="absolute inset-0 bg-gradient-to-br from-${opt.color}-500/20 to-${opt.color}-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                        <div class="relative z-10">
+                                            <div class="text-5xl md:text-6xl mb-4 group-hover:scale-125 group-hover:rotate-12 transition-all duration-300 transform">${opt.emoji}</div>
+                                            <div class="font-extrabold text-white text-lg md:text-xl mb-2 drop-shadow-md">${opt.label}</div>
+                                            <div class="text-white/80 text-sm md:text-base font-medium">${opt.sublabel}</div>
+                                            <div class="mt-4 w-12 h-1.5 bg-gradient-to-r from-${opt.color}-400 to-${opt.color}-600 rounded-full mx-auto opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-x-0 group-hover:scale-x-100"></div>
+                                        </div>
+                                        <div class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                        </div>
                                     </button>
                                 `).join('')}
                             </div>
@@ -460,15 +482,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 `).join('')}
             </div>
             
-            <div class="flex justify-between items-center mt-8">
-                <button id="prev-question-btn" class="bg-white/20 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-                    ← Anterior
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 glass p-4 rounded-2xl border border-white/20">
+                <button id="prev-question-btn" class="w-full sm:w-auto bg-white/20 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white/20 flex items-center justify-center gap-2 transform hover:scale-105">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    <span>Anterior</span>
                 </button>
-                <div class="text-white/70 text-sm text-center flex-1 mx-4">
-                    <p>💡 Haz clic en una opción para continuar automáticamente</p>
+                <div class="text-white/80 text-xs sm:text-sm text-center flex-1 px-4">
+                    <p class="flex items-center justify-center gap-2">
+                        <span>✨</span>
+                        <span>Puedes volver atrás para cambiar tus respuestas</span>
+                    </p>
                 </div>
-                <button id="reset-easy-mode" class="bg-white/20 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/30 transition-all duration-300">
-                    🔄 Reiniciar
+                <button id="reset-easy-mode" class="w-full sm:w-auto bg-red-500/80 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 transform hover:scale-105 shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    <span>Reiniciar</span>
                 </button>
             </div>
         `;
@@ -506,6 +537,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
+        // Verificar si es usuario especial (Pito Pérez) para mostrar opciones de administración
+        const isAdmin = state.currentUser.isPitoPerez || state.currentUser.name.toLowerCase() === 'admin';
+        
         let pitoPerezImageHTML = '';
         if (state.currentUser.isPitoPerez) {
             const specialImageUrl = 'image_49fc42.jpg';
@@ -532,9 +566,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${pitoPerezImageHTML}
 
                         <div class="border-b border-slate-200 mb-6">
-                            <nav class="-mb-px flex space-x-6" id="account-tabs">
+                            <nav class="-mb-px flex space-x-6 flex-wrap" id="account-tabs">
                                 <button data-tab="favorites" class="account-tab-btn py-3 px-1 border-b-2 font-semibold border-indigo-500 text-indigo-600">❤️ Favoritos</button>
                                 <button data-tab="history" class="account-tab-btn py-3 px-1 border-b-2 font-semibold border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300">📜 Historial</button>
+                                ${isAdmin ? '<button data-tab="database" class="account-tab-btn py-3 px-1 border-b-2 font-semibold border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300">🗄️ Base de Datos</button>' : ''}
                             </nav>
                         </div>
                         <div id="account-content"></div>
@@ -576,7 +611,247 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button class="delete-history-btn bg-red-100 text-red-700 font-semibold p-2 rounded-lg text-sm hover:bg-red-200" data-id="${item.id}">Eliminar</button>
                         </div>
                     `).join('');
+        } else if (tab === 'database') {
+            renderDatabaseView(container);
         }
+    };
+    
+    const renderDatabaseView = (container) => {
+        const users = getRegisteredUsers();
+        const totalUsers = users.length;
+        const uniqueEmails = new Set(users.map(u => u.email)).size;
+        const today = new Date().toISOString().split('T')[0];
+        const todayRegistrations = users.filter(u => u.registeredAt && u.registeredAt.startsWith(today)).length;
+        
+        container.innerHTML = `
+            <div class="space-y-6">
+                <!-- Estadísticas -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200">
+                        <div class="text-3xl mb-2">👥</div>
+                        <div class="text-2xl font-bold text-blue-800">${totalUsers}</div>
+                        <div class="text-sm text-blue-600">Total de Usuarios</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200">
+                        <div class="text-3xl mb-2">📧</div>
+                        <div class="text-2xl font-bold text-green-800">${uniqueEmails}</div>
+                        <div class="text-sm text-green-600">Correos Únicos</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200">
+                        <div class="text-3xl mb-2">📅</div>
+                        <div class="text-2xl font-bold text-purple-800">${todayRegistrations}</div>
+                        <div class="text-sm text-purple-600">Registros Hoy</div>
+                    </div>
+                </div>
+                
+                <!-- Acciones -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 mb-6">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">Acciones de Base de Datos</h3>
+                    <div class="flex flex-wrap gap-3">
+                        <button id="export-db-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2">
+                            <span>📥</span>
+                            Exportar JSON
+                        </button>
+                        <button id="export-csv-btn" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
+                            <span>📊</span>
+                            Exportar CSV
+                        </button>
+                        <button id="import-db-btn" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2">
+                            <span>📤</span>
+                            Importar JSON
+                        </button>
+                        <button id="clear-db-btn" class="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2">
+                            <span>🗑️</span>
+                            Limpiar Base de Datos
+                        </button>
+                        <input type="file" id="import-file-input" accept=".json" class="hidden">
+                    </div>
+                </div>
+                
+                <!-- Lista de Usuarios -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-slate-800">Usuarios Registrados (${totalUsers})</h3>
+                        <input type="text" id="db-search-input" placeholder="🔍 Buscar usuario..." class="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    <div id="users-list" class="space-y-2 max-h-96 overflow-y-auto">
+                        ${users.length === 0 ? '<p class="text-center text-slate-500 py-8">No hay usuarios registrados</p>' : users.map(user => `
+                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors user-item" data-username="${user.name.toLowerCase()}">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="font-bold text-slate-800">${escapeHtml(user.name)}</span>
+                                            ${user.isPitoPerez ? '<span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full font-semibold">⭐ Especial</span>' : ''}
+                                        </div>
+                                        <div class="text-sm text-slate-600 mb-1">📧 ${escapeHtml(user.email)}</div>
+                                        <div class="text-xs text-slate-500">🆔 ID: ${user.id} | 📅 ${user.registeredAt ? new Date(user.registeredAt).toLocaleDateString('es-ES') : 'N/A'}</div>
+                                    </div>
+                                    <button class="delete-user-btn bg-red-100 text-red-700 font-semibold p-2 rounded-lg text-sm hover:bg-red-200 transition-colors ml-4" data-id="${user.id}" data-name="${escapeHtml(user.name)}">
+                                        🗑️
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Event listeners
+        setupDatabaseEvents();
+    };
+    
+    const setupDatabaseEvents = () => {
+        // Exportar JSON
+        const exportDbBtn = document.getElementById('export-db-btn');
+        if (exportDbBtn) {
+            exportDbBtn.addEventListener('click', () => {
+                const users = getRegisteredUsers();
+                const dataStr = JSON.stringify(users, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `usuarios-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                showToast('Base de datos exportada exitosamente', 'success');
+            });
+        }
+        
+        // Exportar CSV
+        const exportCsvBtn = document.getElementById('export-csv-btn');
+        if (exportCsvBtn) {
+            exportCsvBtn.addEventListener('click', () => {
+                const users = getRegisteredUsers();
+                const headers = ['ID', 'Nombre', 'Email', 'Fecha de Registro', 'Especial'];
+                const csvRows = [headers.join(',')];
+                
+                users.forEach(user => {
+                    const row = [
+                        user.id,
+                        `"${user.name.replace(/"/g, '""')}"`,
+                        `"${user.email.replace(/"/g, '""')}"`,
+                        `"${user.registeredAt ? new Date(user.registeredAt).toLocaleDateString('es-ES') : 'N/A'}"`,
+                        user.isPitoPerez ? 'Sí' : 'No'
+                    ];
+                    csvRows.push(row.join(','));
+                });
+                
+                const csvContent = csvRows.join('\n');
+                const dataBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `usuarios-${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+                URL.revokeObjectURL(url);
+                showToast('Base de datos exportada a CSV exitosamente', 'success');
+            });
+        }
+        
+        // Importar JSON
+        const importDbBtn = document.getElementById('import-db-btn');
+        const importFileInput = document.getElementById('import-file-input');
+        if (importDbBtn && importFileInput) {
+            importDbBtn.addEventListener('click', () => {
+                importFileInput.click();
+            });
+            
+            importFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const importedUsers = JSON.parse(event.target.result);
+                        if (!Array.isArray(importedUsers)) {
+                            showToast('El archivo no contiene un array válido de usuarios', 'error');
+                            return;
+                        }
+                        
+                        // Validar estructura de usuarios
+                        const validUsers = importedUsers.filter(user => 
+                            user.id && user.name && user.email
+                        );
+                        
+                        if (validUsers.length === 0) {
+                            showToast('No se encontraron usuarios válidos en el archivo', 'error');
+                            return;
+                        }
+                        
+                        // Confirmar importación
+                        if (confirm(`¿Importar ${validUsers.length} usuarios? Esto agregará los usuarios a la base de datos existente.`)) {
+                            const existingUsers = getRegisteredUsers();
+                            const mergedUsers = [...existingUsers];
+                            
+                            validUsers.forEach(newUser => {
+                                // Evitar duplicados por ID
+                                if (!mergedUsers.find(u => u.id === newUser.id)) {
+                                    mergedUsers.push(newUser);
+                                }
+                            });
+                            
+                            localStorage.setItem('registeredUsers', JSON.stringify(mergedUsers));
+                            showToast(`${validUsers.length} usuarios importados exitosamente`, 'success');
+                            renderAccountContent('database');
+                        }
+                    } catch (error) {
+                        showToast('Error al importar el archivo: ' + error.message, 'error');
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = ''; // Reset input
+            });
+        }
+        
+        // Limpiar base de datos
+        const clearDbBtn = document.getElementById('clear-db-btn');
+        if (clearDbBtn) {
+            clearDbBtn.addEventListener('click', () => {
+                if (confirm('⚠️ ¿Estás seguro de que quieres eliminar TODOS los usuarios? Esta acción no se puede deshacer.')) {
+                    if (confirm('⚠️ ÚLTIMA CONFIRMACIÓN: ¿Eliminar TODA la base de datos de usuarios?')) {
+                        localStorage.removeItem('registeredUsers');
+                        showToast('Base de datos limpiada exitosamente', 'success');
+                        renderAccountContent('database');
+                    }
+                }
+            });
+        }
+        
+        // Buscar usuarios
+        const searchInput = document.getElementById('db-search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                const userItems = document.querySelectorAll('.user-item');
+                userItems.forEach(item => {
+                    const username = item.dataset.username || '';
+                    if (username.includes(query)) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        }
+        
+        // Eliminar usuario individual
+        document.querySelectorAll('.delete-user-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const userId = parseInt(e.target.closest('.delete-user-btn').dataset.id);
+                const userName = e.target.closest('.delete-user-btn').dataset.name;
+                
+                if (confirm(`¿Eliminar al usuario "${userName}"?`)) {
+                    const users = getRegisteredUsers();
+                    const filteredUsers = users.filter(u => u.id !== userId);
+                    localStorage.setItem('registeredUsers', JSON.stringify(filteredUsers));
+                    showToast(`Usuario "${userName}" eliminado`, 'success');
+                    renderAccountContent('database');
+                }
+            });
+        });
     };
 
     const populatePhoneSelect = () => {
@@ -716,10 +991,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (filteredComments.length === 0) {
             commentsList.innerHTML = `
-                <div class="text-center py-12 bg-white backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg">
+                <div class="text-center py-12 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg">
                     <div class="text-6xl mb-4">🔍</div>
-                    <h3 class="text-xl font-bold text-slate-900 mb-2">No se encontraron comentarios</h3>
-                    <p class="text-slate-700">${state.comments.length === 0 ? 'Sé el primero en compartir tu opinión sobre estos teléfonos.' : 'Intenta ajustar los filtros de búsqueda.'}</p>
+                    <h3 class="text-xl font-bold text-white mb-2">No se encontraron comentarios</h3>
+                    <p class="text-white/80">${state.comments.length === 0 ? 'Sé el primero en compartir tu opinión sobre estos teléfonos.' : 'Intenta ajustar los filtros de búsqueda.'}</p>
                 </div>
             `;
             return;
@@ -752,18 +1027,18 @@ document.addEventListener('DOMContentLoaded', () => {
         commentsList.innerHTML = Object.entries(commentsByPhone).map(([phoneName, group]) => {
             const phone = phoneDatabase.find(p => p.id === group.phoneId);
             return `
-            <div class="bg-white backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300">
+            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
                     <div class="flex items-center gap-3">
-                        <h3 class="text-lg md:text-xl font-bold text-slate-900">${phoneName}</h3>
-                        <div class="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full">
+                        <h3 class="text-lg md:text-xl font-bold text-white">${phoneName}</h3>
+                        <div class="flex items-center gap-1 bg-white/20 backdrop-blur-sm px-2 py-1 rounded-full">
                             <span class="text-yellow-400">⭐</span>
-                            <span class="text-sm font-semibold text-slate-900">${group.averageRating}</span>
-                            <span class="text-xs text-slate-600">(${group.comments.length})</span>
+                            <span class="text-sm font-semibold text-white">${group.averageRating}</span>
+                            <span class="text-xs text-white/80">(${group.comments.length})</span>
                         </div>
                     </div>
                     ${phone ? `
-                        <a href="#phone-${phone.id}" class="text-xs md:text-sm text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1 font-semibold">
+                        <a href="#phone-${phone.id}" class="text-xs md:text-sm text-white hover:text-indigo-300 transition-colors flex items-center gap-1 font-semibold">
                             Ver detalles →
                         </a>
                     ` : ''}
@@ -773,7 +1048,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const canDelete = state.currentUser && comment.author === state.currentUser.name;
                         const ratingPercentage = (comment.rating / 5) * 100;
                         return `
-                        <div class="bg-white/95 backdrop-blur-sm rounded-xl p-4 md:p-5 border border-white/30 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.02]">
+                        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 md:p-5 border border-white/20 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.02]">
                             <div class="flex justify-between items-start mb-3 gap-3">
                                 <div class="flex-1">
                                     <div class="flex items-center gap-2 mb-2">
@@ -781,29 +1056,29 @@ document.addEventListener('DOMContentLoaded', () => {
                                             ${comment.author.charAt(0).toUpperCase()}
                                         </div>
                                 <div>
-                                    <h4 class="font-semibold text-slate-800">${escapeHtml(comment.author)}</h4>
-                                            <span class="text-xs text-slate-500">${comment.date}</span>
+                                    <h4 class="font-semibold text-white">${escapeHtml(comment.author)}</h4>
+                                            <span class="text-xs text-white/70">${comment.date}</span>
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <div class="flex items-center gap-1">
                                         ${renderStars(comment.rating)}
                                         </div>
-                                        <div class="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
+                                        <div class="w-24 h-2 bg-white/20 rounded-full overflow-hidden">
                                             <div class="h-full bg-gradient-to-r from-yellow-400 to-orange-500 transition-all duration-500" style="width: ${ratingPercentage}%"></div>
                                         </div>
-                                        <span class="text-xs font-semibold text-slate-600">${comment.rating}/5</span>
+                                        <span class="text-xs font-semibold text-white/80">${comment.rating}/5</span>
                                     </div>
                                 </div>
                                 ${canDelete ? `
-                                    <button class="delete-comment-btn text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-all duration-200 flex-shrink-0" data-id="${comment.id}" title="Eliminar mi comentario">
+                                    <button class="delete-comment-btn text-red-400 hover:text-red-300 hover:bg-red-500/20 p-2 rounded-lg transition-all duration-200 flex-shrink-0" data-id="${comment.id}" title="Eliminar mi comentario">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                         </svg>
                                     </button>
                                 ` : ''}
                             </div>
-                            <p class="text-slate-700 leading-relaxed whitespace-pre-wrap">${escapeHtml(comment.text)}</p>
+                            <p class="text-white/90 leading-relaxed whitespace-pre-wrap">${escapeHtml(comment.text)}</p>
                         </div>
                     `;
                     }).join('')}
@@ -880,7 +1155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     commentLength.classList.remove('text-slate-500');
                 } else {
                     commentLength.classList.remove('text-red-500');
-                    commentLength.classList.add('text-slate-500');
+                    commentLength.classList.add('text-white/70');
                 }
             });
         }
@@ -900,8 +1175,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         5: 'Excelente'
                     };
                     ratingText.textContent = ratingLabels[rating] || '';
-                    ratingText.className = 'ml-2 text-sm font-medium flex items-center ' + 
-                        (rating >= 4 ? 'text-green-600' : rating >= 3 ? 'text-yellow-600' : 'text-red-600');
+                    ratingText.className = 'ml-2 text-sm font-medium flex items-center text-white/80';
                 }
             });
         });
@@ -1042,7 +1316,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (commentLength) {
             commentLength.textContent = '0 caracteres';
             commentLength.classList.remove('text-red-500');
-            commentLength.classList.add('text-slate-500');
+            commentLength.classList.add('text-white/70');
         }
         
         const ratingText = document.getElementById('rating-text');
@@ -1427,25 +1701,33 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const handleEasyAnswer = (e) => {
-        if (e.target.matches('.easy-option')) {
-            const questionId = e.target.closest('.easy-options').dataset.questionId;
-            const value = e.target.dataset.value;
+        if (e.target.matches('.easy-option') || e.target.closest('.easy-option')) {
+            const option = e.target.matches('.easy-option') ? e.target : e.target.closest('.easy-option');
+            const questionId = option.closest('.easy-options').dataset.questionId;
+            const value = option.dataset.value;
             
             // Remover selección anterior en esta pregunta
-            e.target.closest('.easy-options').querySelectorAll('.easy-option').forEach(btn => {
-                btn.classList.remove('border-indigo-500', 'bg-indigo-500/20', 'ring-2', 'ring-indigo-500/50');
+            option.closest('.easy-options').querySelectorAll('.easy-option').forEach(btn => {
+                btn.classList.remove('border-indigo-500', 'bg-indigo-500/30', 'ring-4', 'ring-indigo-500/50', 'scale-110');
                 btn.classList.add('border-white/20', 'bg-white/10');
             });
             
-            // Marcar selección actual
-            e.target.classList.remove('border-white/20', 'bg-white/10');
-            e.target.classList.add('border-indigo-500', 'bg-indigo-500/20', 'ring-2', 'ring-indigo-500/50');
+            // Marcar selección actual con animación
+            option.classList.remove('border-white/20', 'bg-white/10');
+            option.classList.add('border-indigo-500', 'bg-indigo-500/30', 'ring-4', 'ring-indigo-500/50', 'scale-110');
+            
+            // Efecto de pulso
+            option.style.animation = 'pulse 0.5s ease-out';
             
             // Guardar respuesta
             state.easyModeAnswers[questionId] = value;
             
-            // Efecto de selección
-            e.target.style.transform = 'scale(0.95)';
+            // Feedback háptico
+            if ('vibrate' in navigator) {
+                try {
+                    navigator.vibrate(50);
+                } catch (e) {}
+            }
             
             // Obtener información de preguntas antes de avanzar
             const questions = document.querySelectorAll('.question-card');
@@ -1454,21 +1736,29 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Esperar un momento para mostrar el efecto visual y luego avanzar automáticamente
             setTimeout(() => {
-                e.target.style.transform = '';
+                option.style.animation = '';
                 
                 // Verificar si es la última pregunta antes de avanzar
                 if (isLastQuestion) {
-                    // Es la última pregunta, mostrar resultados automáticamente
+                    // Es la última pregunta, mostrar resultados automáticamente con animación
+                    setTimeout(() => {
+                        // Animación de desvanecimiento antes de mostrar resultados
+                        const currentCard = document.querySelector('.question-card.active');
+                        if (currentCard) {
+                            currentCard.style.opacity = '0';
+                            currentCard.style.transform = 'translateX(-50px)';
+                        }
                     setTimeout(() => {
                         handleGetRecommendations();
                     }, 300);
+                    }, 400);
                 } else {
                     // No es la última pregunta, avanzar automáticamente
                     setTimeout(() => {
                         handleNextQuestion();
-                    }, 300);
+                    }, 400);
                 }
-            }, 200);
+                    }, 300);
         }
     };
 
@@ -1493,41 +1783,62 @@ document.addEventListener('DOMContentLoaded', () => {
         const progressBar = document.getElementById('progress-bar');
         const prevBtn = document.getElementById('prev-question-btn');
         
-        // Ocultar todas las preguntas
+        // Ocultar todas las preguntas con animación
         questions.forEach((q, index) => {
             if (index === state.currentQuestionIndex) {
                 q.classList.remove('hidden');
-                q.classList.add('active');
-                // Animación suave al mostrar la pregunta
+                // Animación de entrada mejorada
                 setTimeout(() => {
                     q.style.opacity = '0';
-                    q.style.transform = 'translateX(20px)';
-                    q.style.transition = 'all 0.3s ease-out';
+                    q.style.transform = 'translateX(50px) scale(0.95)';
+                    q.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
                     setTimeout(() => {
+                        q.classList.add('active');
                         q.style.opacity = '1';
-                        q.style.transform = 'translateX(0)';
+                        q.style.transform = 'translateX(0) scale(1)';
                     }, 10);
                 }, 10);
         } else {
                 q.classList.add('hidden');
                 q.classList.remove('active');
+                q.style.opacity = '0';
+                q.style.transform = 'translateX(-50px) scale(0.95)';
             }
         });
         
-        // Actualizar contador y barra de progreso
+        // Actualizar contador con animación
         if (currentQuestion) {
+            currentQuestion.style.transform = 'scale(1.3)';
+            currentQuestion.style.transition = 'transform 0.3s ease-out';
+            setTimeout(() => {
             currentQuestion.textContent = state.currentQuestionIndex + 1;
+                currentQuestion.style.transform = 'scale(1)';
+            }, 150);
         }
         
+        // Actualizar barra de progreso con animación suave
         if (progressBar) {
             const progress = ((state.currentQuestionIndex + 1) / questions.length) * 100;
             progressBar.style.width = `${progress}%`;
+            // Efecto de brillo
+            progressBar.style.boxShadow = '0 0 20px rgba(139, 92, 246, 0.5)';
+            setTimeout(() => {
+                progressBar.style.boxShadow = 'none';
+            }, 500);
         }
         
         // Actualizar botón anterior
         if (prevBtn) {
             prevBtn.disabled = state.currentQuestionIndex === 0;
         }
+        
+        // Scroll suave a la pregunta actual
+        setTimeout(() => {
+            const activeCard = document.querySelector('.question-card.active');
+            if (activeCard) {
+                activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
     };
 
     const handleGetRecommendations = () => {
@@ -1768,7 +2079,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Validar email
         if (!validateEmail(rawEmail)) {
-            alert('Por favor ingresa un email válido');
+            showToast('Por favor ingresa un email válido', 'error');
             secureLogger.warn('Intento de registro con email inválido');
             return;
         }
@@ -1778,14 +2089,47 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = sanitizeInput(rawEmail);
         const password = e.target.elements[2].value.trim(); 
         
+        // Validar que el nombre no esté vacío
+        if (!name || name.trim().length === 0) {
+            showToast('El nombre de usuario es requerido', 'error');
+            return;
+        }
+        
+        // Validar que el nombre de usuario no esté repetido
+        if (isUsernameTaken(name)) {
+            showToast('Este nombre de usuario ya está en uso. Por favor elige otro.', 'error');
+            secureLogger.warn(`Intento de registro con nombre duplicado: ${name}`);
+            return;
+        }
+        
+        // El correo y contraseña pueden repetirse, solo validamos el nombre
+        
         let isPitoPerez = false;
         if (name.toLowerCase() === 'pito pérez' && password.toLowerCase() === 'peraza') {
             isPitoPerez = true;
         }
 
-        state.currentUser = { id: Date.now(), name, email, isPitoPerez };
+        // Crear objeto de usuario
+        const newUser = {
+            id: Date.now(),
+            name,
+            email,
+            password: password, // Guardar contraseña (en producción debería estar hasheada)
+            isPitoPerez,
+            registeredAt: new Date().toISOString()
+        };
+
+        // Guardar usuario en localStorage
+        if (saveRegisteredUser(newUser)) {
+            state.currentUser = { id: newUser.id, name, email, isPitoPerez };
         modalBackdrop.classList.add('hidden');
+            showToast('¡Cuenta creada exitosamente!', 'success');
         updateAll();
+            return true;
+        } else {
+            showToast('Error al crear la cuenta. Por favor intenta de nuevo.', 'error');
+            return false;
+        }
     }
 
     const handleLogout = () => {
@@ -2542,6 +2886,40 @@ let globalState = null;
 let globalRenderAuthSection = null;
 let globalShowToast = null;
 
+// Funciones para gestionar usuarios en localStorage
+function getRegisteredUsers() {
+    try {
+        const usersJson = localStorage.getItem('registeredUsers');
+        return usersJson ? JSON.parse(usersJson) : [];
+    } catch (error) {
+        console.error('Error al obtener usuarios registrados:', error);
+        return [];
+    }
+}
+
+function saveRegisteredUser(user) {
+    try {
+        const users = getRegisteredUsers();
+        users.push(user);
+        localStorage.setItem('registeredUsers', JSON.stringify(users));
+        return true;
+    } catch (error) {
+        console.error('Error al guardar usuario:', error);
+        return false;
+    }
+}
+
+function isUsernameTaken(username) {
+    const users = getRegisteredUsers();
+    // Comparar nombres sin importar mayúsculas/minúsculas
+    return users.some(user => user.name.toLowerCase().trim() === username.toLowerCase().trim());
+}
+
+function findUserByUsername(username) {
+    const users = getRegisteredUsers();
+    return users.find(user => user.name.toLowerCase().trim() === username.toLowerCase().trim());
+}
+
 // Modal de autenticación
 function showAuthModal(type = 'login') {
     const modal = document.createElement('div');
@@ -2562,14 +2940,17 @@ function showAuthModal(type = 'login') {
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Nombre</label>
                     <input type="text" id="auth-name" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-slate-100" required>
+                    <div id="username-feedback" class="mt-1 text-xs hidden"></div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email</label>
                     <input type="email" id="auth-email" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-slate-100" required>
+                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">El correo puede repetirse</p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Contraseña</label>
                     <input type="password" id="auth-password" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-slate-100" required>
+                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">La contraseña puede repetirse</p>
                 </div>
                 <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors">
                     ${type === 'login' ? 'Iniciar Sesión' : 'Registrarse'}
@@ -2580,6 +2961,41 @@ function showAuthModal(type = 'login') {
     
     document.body.appendChild(modal);
     
+    // Validación en tiempo real del nombre de usuario (solo para registro)
+    if (type === 'register') {
+        const nameInput = document.getElementById('auth-name');
+        const feedbackDiv = document.getElementById('username-feedback');
+        
+        // Debounce para evitar demasiadas verificaciones
+        let checkTimeout;
+        nameInput.addEventListener('input', (e) => {
+            clearTimeout(checkTimeout);
+            const username = e.target.value.trim();
+            
+            if (username.length === 0) {
+                feedbackDiv.classList.add('hidden');
+                nameInput.classList.remove('border-red-500', 'border-green-500');
+                return;
+            }
+            
+            checkTimeout = setTimeout(() => {
+                if (window.isUsernameTaken && window.isUsernameTaken(username)) {
+                    feedbackDiv.textContent = '❌ Este nombre de usuario ya está en uso';
+                    feedbackDiv.className = 'mt-1 text-xs text-red-600 dark:text-red-400';
+                    feedbackDiv.classList.remove('hidden');
+                    nameInput.classList.add('border-red-500');
+                    nameInput.classList.remove('border-green-500');
+                } else {
+                    feedbackDiv.textContent = '✅ Nombre de usuario disponible';
+                    feedbackDiv.className = 'mt-1 text-xs text-green-600 dark:text-green-400';
+                    feedbackDiv.classList.remove('hidden');
+                    nameInput.classList.add('border-green-500');
+                    nameInput.classList.remove('border-red-500');
+                }
+            }, 300);
+        });
+    }
+    
     // Event listener para el formulario
     document.getElementById('auth-form').addEventListener('submit', (e) => {
         e.preventDefault();
@@ -2589,11 +3005,14 @@ function showAuthModal(type = 'login') {
         
         if (type === 'login') {
             handleLogin(name, email, password);
+            modal.remove();
         } else {
-            handleRegister(name, email, password);
-        }
-        
+            // Para registro, no cerrar el modal si hay error
+            const wasSuccessful = handleRegister(name, email, password);
+            if (wasSuccessful) {
         modal.remove();
+            }
+        }
     });
 }
 
@@ -2615,9 +3034,34 @@ function handleLogin(name, email, password) {
 }
 
 function handleRegister(name, email, password) {
-    if (!globalState) return;
-    // Simulación de registro
-    globalState.currentUser = { id: 1, name, email };
+    if (!globalState) return false;
+    
+    // Validar que el nombre no esté vacío
+    if (!name || name.trim().length === 0) {
+        if (globalShowToast) globalShowToast('El nombre de usuario es requerido', 'error');
+        return false;
+    }
+    
+    // Validar que el nombre de usuario no esté repetido
+    if (isUsernameTaken(name)) {
+        if (globalShowToast) globalShowToast('Este nombre de usuario ya está en uso. Por favor elige otro.', 'error');
+        return false;
+    }
+    
+    // El correo y contraseña pueden repetirse, solo validamos el nombre
+    
+    // Crear objeto de usuario
+    const newUser = {
+        id: Date.now(),
+        name: name.trim(),
+        email: email.trim(),
+        password: password, // Guardar contraseña (en producción debería estar hasheada)
+        registeredAt: new Date().toISOString()
+    };
+
+    // Guardar usuario en localStorage
+    if (saveRegisteredUser(newUser)) {
+        globalState.currentUser = { id: newUser.id, name: newUser.name, email: newUser.email };
     if (globalRenderAuthSection) globalRenderAuthSection();
     if (globalShowToast) globalShowToast('¡Cuenta creada exitosamente!', 'success');
     
@@ -2627,6 +3071,11 @@ function handleRegister(name, email, password) {
         if (window.renderAccountView) {
             window.renderAccountView();
         }
+        }
+        return true;
+    } else {
+        if (globalShowToast) globalShowToast('Error al crear la cuenta. Por favor intenta de nuevo.', 'error');
+        return false;
     }
 }
 
@@ -2688,3 +3137,6 @@ window.handleLogin = handleLogin;
 window.handleRegister = handleRegister;
 window.handleLogout = handleLogout;
 window.showOfflineIndicator = showOfflineIndicator;
+window.isUsernameTaken = isUsernameTaken;
+window.getRegisteredUsers = getRegisteredUsers;
+window.saveRegisteredUser = saveRegisteredUser;

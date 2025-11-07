@@ -1,45 +1,44 @@
 const FAKE_STORE_API_URL = 'https://fakestoreapi.com/products?limit=20';
 window.FAKE_STORE_API_URL = FAKE_STORE_API_URL;
 
-// Imágenes reales verificadas de teléfonos específicos de Unsplash
-const realPhoneImages = {
-    apple: [
-        'https://images.unsplash.com/photo-1592286927505-2fd0908938ef?w=400&h=400&fit=crop',  // iPhone
-        'https://images.unsplash.com/photo-1591337676887-a217a6970a8a?w=400&h=400&fit=crop',  // iPhone
-        'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?w=400&h=400&fit=crop',  // iPhone
-        'https://images.unsplash.com/photo-1632661674711-e12e4d09fc88?w=400&h=400&fit=crop'   // iPhone
-    ],
-    samsung: [
-        'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400&h=400&fit=crop',  // Samsung Galaxy
-        'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&h=400&fit=crop',  // Android phone
-        'https://images.unsplash.com/photo-1585060544812-6b45742d762f?w=400&h=400&fit=crop',  // Smartphone
-        'https://images.unsplash.com/photo-1616348436168-de43ad0db179?w=400&h=400&fit=crop'   // Phone
-    ],
-    google: [
-        'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=400&h=400&fit=crop',  // Google Pixel
-        'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400&h=400&fit=crop',  // Smartphone
-        'https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=400&h=400&fit=crop',  // Phone
-        'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop'   // Modern phone
-    ],
-    xiaomi: [
-        'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&h=400&fit=crop',  // Android phone
-        'https://images.unsplash.com/photo-1585060544812-6b45742d762f?w=400&h=400&fit=crop',  // Smartphone
-        'https://images.unsplash.com/photo-1616348436168-de43ad0db179?w=400&h=400&fit=crop',  // Phone
-        'https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=400&h=400&fit=crop'   // Modern device
-    ],
-    oneplus: [
-        'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop',  // Smartphone
-        'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400&h=400&fit=crop',  // Phone
-        'https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=400&h=400&fit=crop',  // Modern phone
-        'https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=400&h=400&fit=crop'   // Device
-    ]
+// Mapeo de imágenes por marca (para productos de la API que no tienen modelo específico)
+const brandDefaultImages = {
+    apple: 'https://images.unsplash.com/photo-1592286927505-2fd0908938ef?w=400&h=400&fit=crop',
+    samsung: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400&h=400&fit=crop',
+    google: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=400&h=400&fit=crop',
+    xiaomi: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&h=400&fit=crop',
+    oneplus: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop'
 };
 
-// Función para obtener URLs de imágenes reales por marca
-function getPhoneImageUrl(brand, productId) {
-    const brandImages = realPhoneImages[brand] || realPhoneImages.apple;
-    const imageIndex = (productId - 1) % brandImages.length;
-    return brandImages[imageIndex];
+// Función para obtener imagen por marca (para productos de la API)
+function getPhoneImageUrl(brand, productName) {
+    // Intentar usar la función getModelImage si está disponible (desde fallback-db.js)
+    if (typeof window.getModelImage === 'function' && productName) {
+        // Intentar con el nombre completo primero
+        let image = window.getModelImage(productName);
+        
+        // Si no funciona, extraer el modelo del nombre del producto
+        if (!image || !image.startsWith('src/images/')) {
+            const modelMatch = productName.match(/(iPhone|Galaxy|Pixel|Xiaomi|OnePlus|Redmi|Huawei|Motorola|Nothing|Realme|Vivo)\s*[\d\w\s]*/i);
+            if (modelMatch) {
+                const model = modelMatch[0].trim();
+                image = window.getModelImage(model);
+            }
+        }
+        
+        // Si encontramos una imagen local, usarla
+        if (image && image.startsWith('src/images/')) {
+            return image;
+        }
+        
+        // Si encontramos una imagen válida (aunque sea URL), usarla
+        if (image) {
+            return image;
+        }
+    }
+    
+    // Fallback: usar imagen por defecto de la marca
+    return brandDefaultImages[brand] || brandDefaultImages.apple;
 }
 
 function mapToPhoneSpecs(products) {
@@ -82,7 +81,7 @@ function mapToPhoneSpecs(products) {
             condition: condition,
             price: Math.round(price),
             specs: specs,
-            image: getPhoneImageUrl(brand, product.id), // Use specific phone images based on product ID
+            image: getPhoneImageUrl(brand, baseName + (index % 2 === 0 ? ' Pro' : ' Lite')), // Use specific phone images based on product name
             fullSpecs: { 
                 Processor: "Simulado A20 Bionic / Snapdragon Gen 9", 
                 Display: `${screen.toUpperCase()} ${Math.floor(Math.random() * 1.5 + 6)}.${index} \" Display`, 
@@ -141,6 +140,29 @@ async function fetchAndInitializeApp(loadingIndicator, renderAuthSection, render
             
             const newPhoneDatabase = mapToPhoneSpecs(rawProducts);
             console.log('✅ Datos cargados desde la API:', newPhoneDatabase.length, 'productos');
+            
+            // Actualizar imágenes a locales antes de guardar en caché
+            newPhoneDatabase = newPhoneDatabase.map(phone => {
+                if (phone.brand === 'apple' || phone.brand === 'samsung') {
+                    // Intentar obtener imagen local si está disponible
+                    if (typeof window.getModelImage === 'function') {
+                        // Intentar con el nombre completo primero
+                        let localImage = window.getModelImage(phone.name);
+                        
+                        // Si no funciona, intentar solo con el modelo
+                        if (!localImage || !localImage.startsWith('src/images/')) {
+                            const modelName = phone.name.replace(/Apple\s+|Samsung\s+/i, '');
+                            localImage = window.getModelImage(modelName);
+                        }
+                        
+                        // Si encontramos una imagen local, usarla
+                        if (localImage && localImage.startsWith('src/images/')) {
+                            phone.image = localImage;
+                        }
+                    }
+                }
+                return phone;
+            });
             
             // Guardar en localStorage para uso offline
             try {
@@ -218,6 +240,31 @@ async function fetchAndInitializeApp(loadingIndicator, renderAuthSection, render
                     console.error('❌ Error al cargar base de datos de respaldo:', e);
                     fallbackData = [];
                 }
+            }
+            
+            // Actualizar imágenes a locales si están disponibles
+            if (fallbackData && Array.isArray(fallbackData)) {
+                fallbackData = fallbackData.map(phone => {
+                    if (phone.brand === 'apple' || phone.brand === 'samsung') {
+                        // Usar imagen local si está disponible
+                        if (typeof window.getModelImage === 'function' && phone.name) {
+                            // Intentar con el nombre completo primero
+                            let localImage = window.getModelImage(phone.name);
+                            
+                            // Si no funciona, intentar solo con el modelo
+                            if (!localImage || !localImage.startsWith('src/images/')) {
+                                const modelName = phone.name.replace(/Apple\s+|Samsung\s+/i, '');
+                                localImage = window.getModelImage(modelName);
+                            }
+                            
+                            // Si encontramos una imagen local, usarla
+                            if (localImage && localImage.startsWith('src/images/')) {
+                                phone.image = localImage;
+                            }
+                        }
+                    }
+                    return phone;
+                });
             }
             
             // Asegurar que siempre se retorne un array

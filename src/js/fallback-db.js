@@ -1,44 +1,117 @@
-// Imágenes reales verificadas de teléfonos específicos de Unsplash
-const realPhoneImages = {
-    apple: [
-        'https://images.unsplash.com/photo-1592286927505-2fd0908938ef?w=400&h=400&fit=crop',  // iPhone
-        'https://images.unsplash.com/photo-1591337676887-a217a6970a8a?w=400&h=400&fit=crop',  // iPhone
-        'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?w=400&h=400&fit=crop',  // iPhone
-        'https://images.unsplash.com/photo-1632661674711-e12e4d09fc88?w=400&h=400&fit=crop'   // iPhone
-    ],
-    samsung: [
-        'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400&h=400&fit=crop',  // Samsung Galaxy
-        'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&h=400&fit=crop',  // Android phone
-        'https://images.unsplash.com/photo-1585060544812-6b45742d762f?w=400&h=400&fit=crop',  // Smartphone
-        'https://images.unsplash.com/photo-1616348436168-de43ad0db179?w=400&h=400&fit=crop'   // Phone
-    ],
-    google: [
-        'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=400&h=400&fit=crop',  // Google Pixel
-        'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400&h=400&fit=crop',  // Smartphone
-        'https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=400&h=400&fit=crop',  // Phone
-        'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop'   // Modern phone
-    ],
-    xiaomi: [
-        'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&h=400&fit=crop',  // Android phone
-        'https://images.unsplash.com/photo-1585060544812-6b45742d762f?w=400&h=400&fit=crop',  // Smartphone
-        'https://images.unsplash.com/photo-1616348436168-de43ad0db179?w=400&h=400&fit=crop',  // Phone
-        'https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=400&h=400&fit=crop'   // Modern device
-    ],
-    oneplus: [
-        'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop',  // Smartphone
-        'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400&h=400&fit=crop',  // Phone
-        'https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=400&h=400&fit=crop',  // Modern phone
-        'https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=400&h=400&fit=crop'   // Device
-    ]
+// Mapeo directo de cada modelo a su imagen original específica
+// Imágenes descargadas y almacenadas localmente en src/images/phones/
+const modelImages = {
+    // Apple - iPhone (imágenes locales descargadas)
+    'iPhone 15 Pro': 'src/images/phones/iphone-15-pro.jpg',
+    'iPhone 15': 'src/images/phones/iphone-15.jpg',
+    'iPhone 14 Pro': 'src/images/phones/iphone-14-pro.jpg',
+    'iPhone 14': 'src/images/phones/iphone-14.jpg',
+    
+    // Samsung - Galaxy (imágenes locales descargadas)
+    'Galaxy S24': 'src/images/phones/galaxy-s24.jpg',
+    'Galaxy S23': 'src/images/phones/galaxy-s23.jpg',
+    'Galaxy A54': 'src/images/phones/galaxy-a54.jpg',
+    'Galaxy A34': 'src/images/phones/galaxy-a34.jpg',
+    
+    // Google
+    'Pixel 8 Pro': 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=400&h=400&fit=crop',
+    'Pixel 8': 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400&h=400&fit=crop',
+    'Pixel 7 Pro': 'https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=400&h=400&fit=crop',
+    'Pixel 7': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop',
+    
+    // Xiaomi
+    'Xiaomi 14': 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&h=400&fit=crop',
+    'Xiaomi 13': 'https://images.unsplash.com/photo-1585060544812-6b45742d762f?w=400&h=400&fit=crop',
+    'Redmi Note 13': 'https://images.unsplash.com/photo-1616348436168-de43ad0db179?w=400&h=400&fit=crop',
+    'Redmi 12': 'https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=400&h=400&fit=crop',
+    
+    // OnePlus
+    'OnePlus 12': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop',
+    'OnePlus 11': 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400&h=400&fit=crop',
+    'OnePlus 10T': 'https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=400&h=400&fit=crop',
+    'OnePlus Nord': 'https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=400&h=400&fit=crop',
+    
+    // Otras marcas
+    'Huawei P60': 'https://images.unsplash.com/photo-1592286927505-2fd0908938ef?w=400&h=400&fit=crop',
+    'Motorola Edge': 'https://images.unsplash.com/photo-1591337676887-a217a6970a8a?w=400&h=400&fit=crop',
+    'Nothing Phone': 'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?w=400&h=400&fit=crop',
+    'Realme GT': 'https://images.unsplash.com/photo-1632661674711-e12e4d09fc88?w=400&h=400&fit=crop',
+    'Vivo X100': 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400&h=400&fit=crop'
 };
 
-// Función para obtener imagen real por marca e índice
-function createPhoneImageSVG(brand, model) {
-    const brandImages = realPhoneImages[brand] || realPhoneImages.apple;
-    // Usar un índice basado en el modelo para consistencia
-    const modelHash = model.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const imageIndex = modelHash % brandImages.length;
-    return brandImages[imageIndex];
+// Función para obtener imagen original específica por modelo
+// Prioriza imágenes locales, luego URLs oficiales, luego fallback
+function getModelImage(model) {
+    if (!model) {
+        return 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop';
+    }
+    
+    // Normalizar el nombre del modelo
+    let normalizedModel = model.trim();
+    
+    // Mapear nombres comunes a los nombres en modelImages
+    const nameMapping = {
+        // Apple
+        'apple 15 pro': 'iPhone 15 Pro',
+        'apple 15 lite': 'iPhone 15',
+        'apple 15': 'iPhone 15',
+        'apple 14 pro': 'iPhone 14 Pro',
+        'apple 14': 'iPhone 14',
+        'iphone 15 pro': 'iPhone 15 Pro',
+        'iphone 15': 'iPhone 15',
+        'iphone 14 pro': 'iPhone 14 Pro',
+        'iphone 14': 'iPhone 14',
+        
+        // Samsung
+        'samsung 16 pro': 'Galaxy S24',
+        'samsung 17 lite': 'Galaxy S23',
+        'samsung 16 lite': 'Galaxy A54',
+        'samsung 19 pro': 'Galaxy A34',
+        'galaxy s24': 'Galaxy S24',
+        'galaxy s23': 'Galaxy S23',
+        'galaxy a54': 'Galaxy A54',
+        'galaxy a34': 'Galaxy A34',
+    };
+    
+    // Buscar en el mapeo de nombres
+    const lowerModel = normalizedModel.toLowerCase();
+    if (nameMapping[lowerModel]) {
+        normalizedModel = nameMapping[lowerModel];
+    }
+    
+    // Buscar coincidencia exacta en el mapeo
+    if (modelImages[normalizedModel]) {
+        return modelImages[normalizedModel];
+    }
+    
+    // Buscar coincidencia parcial (por si el nombre tiene variaciones)
+    for (const [key, image] of Object.entries(modelImages)) {
+        const keyLower = key.toLowerCase();
+        const modelLower = normalizedModel.toLowerCase();
+        
+        // Buscar si el modelo contiene la clave o viceversa
+        if (modelLower.includes(keyLower) || keyLower.includes(modelLower)) {
+            return image;
+        }
+        
+        // Buscar por número de modelo (ej: "15 Pro" coincide con "iPhone 15 Pro")
+        const modelNumber = modelLower.match(/\d+/);
+        const keyNumber = keyLower.match(/\d+/);
+        if (modelNumber && keyNumber && modelNumber[0] === keyNumber[0]) {
+            // Verificar que también coincida la marca
+            if ((modelLower.includes('iphone') || modelLower.includes('apple')) && 
+                (keyLower.includes('iphone'))) {
+                return image;
+            }
+            if ((modelLower.includes('galaxy') || modelLower.includes('samsung')) && 
+                (keyLower.includes('galaxy'))) {
+                return image;
+            }
+        }
+    }
+    
+    // Fallback: imagen genérica de smartphone
+    return 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop';
 }
 
 // Base de datos de respaldo para cuando la API falle
@@ -57,7 +130,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 24999,
         specs: '8gb RAM • 256gb • 48mp Camera • 4422 mAh Batería.',
-        image: createPhoneImageSVG('apple', 'iPhone 15 Pro'),
+        image: getModelImage('iPhone 15 Pro'),
         fullSpecs: {
             Processor: 'Apple A17 Pro Bionic',
             Display: 'OLED 6.1" Super Retina XDR',
@@ -85,7 +158,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 19999,
         specs: '8gb RAM • 128gb • 48mp Camera • 3877 mAh Batería.',
-        image: createPhoneImageSVG('apple', 'iPhone 15'),
+        image: getModelImage('iPhone 15'),
         fullSpecs: {
             Processor: 'Apple A16 Bionic',
             Display: 'OLED 6.1" Super Retina',
@@ -114,7 +187,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 22999,
         specs: '12gb RAM • 512gb • 64mp Camera • 5200 mAh Batería.',
-        image: createPhoneImageSVG('samsung', 'Galaxy S24'),
+        image: getModelImage('Galaxy S24'),
         fullSpecs: {
             Processor: 'Snapdragon 8 Gen 3',
             Display: 'AMOLED 6.8" Dynamic AMOLED 2X',
@@ -142,7 +215,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 17999,
         specs: '8gb RAM • 256gb • 50mp Camera • 4800 mAh Batería.',
-        image: createPhoneImageSVG('samsung', 'Galaxy S23'),
+        image: getModelImage('Galaxy S23'),
         fullSpecs: {
             Processor: 'Snapdragon 8 Gen 2',
             Display: 'AMOLED 6.6" Dynamic AMOLED',
@@ -171,7 +244,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 21999,
         specs: '12gb RAM • 256gb • 50mp Camera • 5050 mAh Batería.',
-        image: createPhoneImageSVG('google', 'Pixel 8 Pro'),
+        image: getModelImage('Pixel 8 Pro'),
         fullSpecs: {
             Processor: 'Google Tensor G3',
             Display: 'OLED 6.7" LTPO Display',
@@ -199,7 +272,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 15999,
         specs: '8gb RAM • 128gb • 50mp Camera • 4575 mAh Batería.',
-        image: createPhoneImageSVG('google', 'Pixel 8'),
+        image: getModelImage('Pixel 8'),
         fullSpecs: {
             Processor: 'Google Tensor G3',
             Display: 'OLED 6.2" Display',
@@ -228,7 +301,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 18999,
         specs: '16gb RAM • 512gb • 64mp Camera • 5500 mAh Batería.',
-        image: createPhoneImageSVG('xiaomi', 'Xiaomi 14'),
+        image: getModelImage('Xiaomi 14'),
         fullSpecs: {
             Processor: 'Snapdragon 8 Gen 3',
             Display: 'AMOLED 6.73" LTPO Display',
@@ -256,7 +329,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 12999,
         specs: '8gb RAM • 256gb • 48mp Camera • 5000 mAh Batería.',
-        image: createPhoneImageSVG('xiaomi', 'Xiaomi 13'),
+        image: getModelImage('Xiaomi 13'),
         fullSpecs: {
             Processor: 'Snapdragon 7 Gen 2',
             Display: 'AMOLED 6.67" Display',
@@ -285,7 +358,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 20999,
         specs: '16gb RAM • 512gb • 50mp Camera • 5400 mAh Batería.',
-        image: createPhoneImageSVG('oneplus', 'OnePlus 12'),
+        image: getModelImage('OnePlus 12'),
         fullSpecs: {
             Processor: 'Snapdragon 8 Gen 3',
             Display: 'AMOLED 6.82" LTPO Display 120Hz',
@@ -313,7 +386,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 14999,
         specs: '12gb RAM • 256gb • 48mp Camera • 4800 mAh Batería.',
-        image: createPhoneImageSVG('oneplus', 'OnePlus 11'),
+        image: getModelImage('OnePlus 11'),
         fullSpecs: {
             Processor: 'Snapdragon 8 Gen 2',
             Display: 'AMOLED 6.7" Display 120Hz',
@@ -342,7 +415,7 @@ const fallbackPhoneDatabase = [
         condition: 'refurbished',
         price: 21999,
         specs: '8gb RAM • 512gb • 48mp Camera • 4422 mAh Batería.',
-        image: createPhoneImageSVG('apple', 'iPhone 14 Pro'),
+        image: getModelImage('iPhone 14 Pro'),
         fullSpecs: {
             Processor: 'Apple A16 Bionic',
             Display: 'OLED 6.1" Super Retina XDR',
@@ -370,7 +443,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 13999,
         specs: '8gb RAM • 256gb • 50mp Camera • 5000 mAh Batería.',
-        image: createPhoneImageSVG('samsung', 'Galaxy A54'),
+        image: getModelImage('Galaxy A54'),
         fullSpecs: {
             Processor: 'Exynos 1380',
             Display: 'AMOLED 6.4" Display',
@@ -398,7 +471,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 13499,
         specs: '8gb RAM • 128gb • 48mp Camera • 4385 mAh Batería.',
-        image: createPhoneImageSVG('google', 'Pixel 7 Pro'),
+        image: getModelImage('Pixel 7 Pro'),
         fullSpecs: {
             Processor: 'Google Tensor G2',
             Display: 'OLED 6.3" Display',
@@ -426,7 +499,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 8999,
         specs: '12gb RAM • 256gb • 64mp Camera • 5200 mAh Batería.',
-        image: createPhoneImageSVG('xiaomi', 'Redmi Note 13'),
+        image: getModelImage('Redmi Note 13'),
         fullSpecs: {
             Processor: 'MediaTek Dimensity 7200',
             Display: 'AMOLED 6.67" Display',
@@ -454,7 +527,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 12999,
         specs: '8gb RAM • 256gb • 50mp Camera • 5000 mAh Batería.',
-        image: createPhoneImageSVG('oneplus', 'OnePlus 10T'),
+        image: getModelImage('OnePlus 10T'),
         fullSpecs: {
             Processor: 'Snapdragon 8+ Gen 1',
             Display: 'AMOLED 6.7" Display 120Hz',
@@ -482,7 +555,7 @@ const fallbackPhoneDatabase = [
         condition: 'refurbished',
         price: 18999,
         specs: '8gb RAM • 128gb • 48mp Camera • 3279 mAh Batería.',
-        image: createPhoneImageSVG('apple', 'iPhone 14'),
+        image: getModelImage('iPhone 14'),
         fullSpecs: {
             Processor: 'Apple A15 Bionic',
             Display: 'OLED 6.1" Super Retina',
@@ -510,7 +583,7 @@ const fallbackPhoneDatabase = [
         condition: 'refurbished',
         price: 11999,
         specs: '8gb RAM • 128gb • 50mp Camera • 4500 mAh Batería.',
-        image: createPhoneImageSVG('samsung', 'Galaxy A34'),
+        image: getModelImage('Galaxy A34'),
         fullSpecs: {
             Processor: 'MediaTek Dimensity 1080',
             Display: 'AMOLED 6.6" Display',
@@ -538,7 +611,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 14499,
         specs: '8gb RAM • 256gb • 50mp Camera • 4614 mAh Batería.',
-        image: createPhoneImageSVG('google', 'Pixel 7'),
+        image: getModelImage('Pixel 7'),
         fullSpecs: {
             Processor: 'Google Tensor G2',
             Display: 'OLED 6.3" Display',
@@ -566,7 +639,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 6999,
         specs: '8gb RAM • 128gb • 50mp Camera • 5000 mAh Batería.',
-        image: createPhoneImageSVG('xiaomi', 'Redmi 12'),
+        image: getModelImage('Redmi 12'),
         fullSpecs: {
             Processor: 'MediaTek Helio G88',
             Display: 'IPS LCD 6.79" Display',
@@ -594,7 +667,7 @@ const fallbackPhoneDatabase = [
         condition: 'refurbished',
         price: 10999,
         specs: '8gb RAM • 128gb • 50mp Camera • 4500 mAh Batería.',
-        image: createPhoneImageSVG('oneplus', 'OnePlus Nord'),
+        image: getModelImage('OnePlus Nord'),
         fullSpecs: {
             Processor: 'MediaTek Dimensity 9000',
             Display: 'AMOLED 6.59" Display 120Hz',
@@ -623,7 +696,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 17999,
         specs: '12gb RAM • 512gb • 48mp Camera • 4815 mAh Batería.',
-        image: createPhoneImageSVG('xiaomi', 'Huawei P60'),
+        image: getModelImage('Huawei P60'),
         fullSpecs: {
             Processor: 'Snapdragon 8+ Gen 1',
             Display: 'OLED 6.67" LTPO Display',
@@ -651,7 +724,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 9999,
         specs: '8gb RAM • 256gb • 50mp Camera • 4400 mAh Batería.',
-        image: createPhoneImageSVG('xiaomi', 'Motorola Edge'),
+        image: getModelImage('Motorola Edge'),
         fullSpecs: {
             Processor: 'MediaTek Dimensity 8020',
             Display: 'OLED 6.55" Display 144Hz',
@@ -679,7 +752,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 15999,
         specs: '12gb RAM • 256gb • 50mp Camera • 4700 mAh Batería.',
-        image: createPhoneImageSVG('xiaomi', 'Nothing Phone'),
+        image: getModelImage('Nothing Phone'),
         fullSpecs: {
             Processor: 'Snapdragon 8+ Gen 1',
             Display: 'OLED 6.7" Display 120Hz',
@@ -707,7 +780,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 11999,
         specs: '16gb RAM • 512gb • 50mp Camera • 5240 mAh Batería.',
-        image: createPhoneImageSVG('xiaomi', 'Realme GT'),
+        image: getModelImage('Realme GT'),
         fullSpecs: {
             Processor: 'Snapdragon 8 Gen 2',
             Display: 'AMOLED 6.74" Display 144Hz',
@@ -735,7 +808,7 @@ const fallbackPhoneDatabase = [
         condition: 'new',
         price: 19999,
         specs: '16gb RAM • 512gb • 64mp Camera • 5400 mAh Batería.',
-        image: createPhoneImageSVG('xiaomi', 'Vivo X100'),
+        image: getModelImage('Vivo X100'),
         fullSpecs: {
             Processor: 'MediaTek Dimensity 9300',
             Display: 'AMOLED 6.78" LTPO Display',
@@ -827,4 +900,6 @@ window.fallbackPhoneDatabase = fallbackPhoneDatabase;
 window.getFallbackPhoneData = getFallbackPhoneData;
 window.searchFallbackDatabase = searchFallbackDatabase;
 window.getFallbackDatabaseStats = getFallbackDatabaseStats;
+window.getModelImage = getModelImage;
+window.modelImages = modelImages;
 
