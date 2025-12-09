@@ -886,7 +886,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     ` : '<p class="text-xs text-white/50 italic mt-2">Sin filtros aplicados</p>'}
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <button onclick="updateView('search')" class="text-xs bg-indigo-500/30 text-indigo-200 font-semibold px-4 py-2 rounded-lg hover:bg-indigo-500/50 transition-colors opacity-0 group-hover:opacity-100 backdrop-blur-sm">
+                                    <button class="repeat-search-btn text-xs bg-indigo-500/30 text-indigo-200 font-semibold px-4 py-2 rounded-lg hover:bg-indigo-500/50 transition-colors opacity-0 group-hover:opacity-100 backdrop-blur-sm" data-filters='${JSON.stringify(filters)}' data-query="${(item.query || '').replace(/"/g, '&quot;')}">
                                         🔄 Repetir
                                     </button>
                                     <button class="delete-history-btn text-red-300 hover:text-red-200 p-2 rounded-lg hover:bg-red-500/20 transition-colors" data-id="${item.id}" title="Eliminar esta búsqueda">
@@ -901,6 +901,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     }).join('')}
                 </div>
             `;
+            
+            // Event listener para repetir búsqueda
+            container.querySelectorAll('.repeat-search-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const filtersJson = btn.dataset.filters;
+                    const query = btn.dataset.query || '';
+                    try {
+                        const filters = filtersJson ? JSON.parse(filtersJson) : {};
+                        if (window.repeatSearch) {
+                            window.repeatSearch(filters, query);
+                        }
+                    } catch (error) {
+                        console.error('Error al parsear filtros:', error);
+                        if (globalShowToast) globalShowToast('Error al restaurar la búsqueda', 'error');
+                    }
+                });
+            });
             
             // Event listener para eliminar historial individual
             container.querySelectorAll('.delete-history-btn').forEach(btn => {
@@ -1772,6 +1789,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <span class="text-slate-500">${key}</span>
                                     <span class="font-semibold text-right">${value}</span>
                                 </div>`).join('')}
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Condición</span>
+                                    <span class="font-semibold text-right">${translateCondition(phone.condition)}</span>
+                                </div>
                             </div>
                         </div>
 
@@ -2122,6 +2143,76 @@ document.addEventListener('DOMContentLoaded', () => {
         
         handleSearch();
         showToast('Filtros limpiados', 'info');
+    };
+
+    // Función para repetir una búsqueda del historial
+    const repeatSearch = (filters, query = '') => {
+        // Cambiar a la vista de búsqueda
+        updateView('search');
+        
+        // Esperar a que se renderice la vista de búsqueda
+        setTimeout(() => {
+            // Restaurar filtros
+            if (filters) {
+                if (filters.brand) {
+                    const brandSelect = document.getElementById('filter-brand');
+                    if (brandSelect) brandSelect.value = filters.brand;
+                }
+                if (filters.storage) {
+                    const storageSelect = document.getElementById('filter-storage');
+                    if (storageSelect) storageSelect.value = filters.storage;
+                }
+                if (filters.ram) {
+                    const ramSelect = document.getElementById('filter-ram');
+                    if (ramSelect) ramSelect.value = filters.ram;
+                }
+                if (filters.os) {
+                    const osSelect = document.getElementById('filter-os');
+                    if (osSelect) osSelect.value = filters.os;
+                }
+                if (filters.condition) {
+                    const conditionSelect = document.getElementById('filter-condition');
+                    if (conditionSelect) conditionSelect.value = filters.condition;
+                }
+                if (filters.screen) {
+                    const screenSelect = document.getElementById('filter-screen');
+                    if (screenSelect) screenSelect.value = filters.screen;
+                }
+                if (filters.minCamera) {
+                    const minCameraSelect = document.getElementById('filter-minCamera');
+                    if (minCameraSelect) minCameraSelect.value = filters.minCamera;
+                }
+                if (filters.minBattery) {
+                    const minBatterySelect = document.getElementById('filter-minBattery');
+                    if (minBatterySelect) minBatterySelect.value = filters.minBattery;
+                }
+                if (filters.minPrice) {
+                    const minPriceInput = document.getElementById('filter-minPrice');
+                    if (minPriceInput) minPriceInput.value = filters.minPrice;
+                }
+                if (filters.maxPrice) {
+                    const maxPriceInput = document.getElementById('filter-maxPrice');
+                    if (maxPriceInput) maxPriceInput.value = filters.maxPrice;
+                }
+                if (filters.sort) {
+                    const sortSelect = document.getElementById('filter-sort');
+                    if (sortSelect) sortSelect.value = filters.sort;
+                }
+            }
+            
+            // Restaurar búsqueda por nombre si existe
+            if (query) {
+                const nameInput = document.getElementById('filter-name');
+                if (nameInput) nameInput.value = query;
+            }
+            
+            // Ejecutar la búsqueda
+            if (typeof handleSearch === 'function') {
+                handleSearch();
+            }
+            
+            if (globalShowToast) globalShowToast('Filtros restaurados y búsqueda ejecutada', 'success');
+        }, 100);
     };
 
     const exportComparison = () => {
@@ -2541,7 +2632,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     // Hacer funciones disponibles globalmente después de que estén definidas
+    window.updateView = updateView;
     window.renderEasyModeView = renderEasyModeView;
+    window.repeatSearch = repeatSearch;
     window.handleGetRecommendations = handleGetRecommendations;
 
     function handleLogin(e) {
@@ -2759,6 +2852,95 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `).join('');
 
+        // Función para calcular el mejor teléfono
+        const calculateBestPhone = (phones) => {
+            if (phones.length < 2) return null;
+            
+            const scores = phones.map(phone => {
+                let score = 0;
+                
+                // Score basado en relación precio-calidad (mayor es mejor)
+                const valueScore = ((parseInt(phone.ram) || 0) + (parseInt(phone.storage) || 0) + (parseInt(phone.camera) || 0) + (phone.battery || 0)) / phone.price * 1000;
+                score += valueScore * 0.3; // 30% del score
+                
+                // Score basado en características técnicas (mayor es mejor)
+                const techScore = (
+                    (parseInt(phone.ram) || 0) * 0.2 +
+                    (parseInt(phone.storage) || 0) * 0.15 +
+                    (parseInt(phone.camera) || 0) * 0.25 +
+                    (phone.battery || 0) * 0.4
+                ) / 100; // Normalizar
+                score += techScore * 0.4; // 40% del score
+                
+                // Score basado en precio (menor es mejor, pero normalizado)
+                const maxPrice = Math.max(...phones.map(p => p.price));
+                const minPrice = Math.min(...phones.map(p => p.price));
+                const priceRange = maxPrice - minPrice;
+                if (priceRange > 0) {
+                    const priceScore = 1 - ((phone.price - minPrice) / priceRange);
+                    score += priceScore * 0.3; // 30% del score
+                }
+                
+                return { phone, score };
+            });
+            
+            // Ordenar por score y retornar el mejor
+            scores.sort((a, b) => b.score - a.score);
+            return scores[0].phone;
+        };
+
+        const bestPhone = calculateBestPhone(state.comparisonPhones);
+        const bestPhoneHTML = bestPhone ? `
+            <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(22, 163, 74, 0.3) 100%); border: 2px solid rgba(34, 197, 94, 0.5); border-radius: 1.5rem; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 10px 25px rgba(34, 197, 94, 0.2);">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                    <div style="font-size: 3rem; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));">🏆</div>
+                    <div>
+                        <h3 style="font-size: 1.5rem; font-weight: 700; color: #ffffff; margin-bottom: 0.25rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                            Mejor Opción Recomendada
+                        </h3>
+                        <p style="color: rgba(255, 255, 255, 0.9); font-size: 1rem;">
+                            Basado en relación precio-calidad y características técnicas
+                        </p>
+                    </div>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.1); border-radius: 1rem; padding: 1.5rem; backdrop-filter: blur(10px);">
+                    <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <h4 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span>📱</span> ${bestPhone.name}
+                            </h4>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #4ade80; margin-bottom: 1rem;">
+                                $${bestPhone.price.toLocaleString('es-MX')} <span style="font-size: 0.875rem; font-weight: 400; color: rgba(255, 255, 255, 0.7);">MXN</span>
+                            </div>
+                        </div>
+                        <div style="flex: 2; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 0.25rem;">🚀 RAM</div>
+                                <div style="font-size: 1.125rem; font-weight: 600; color: #ffffff;">${bestPhone.ram}</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 0.25rem;">💾 Almacenamiento</div>
+                                <div style="font-size: 1.125rem; font-weight: 600; color: #ffffff;">${bestPhone.storage}</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 0.25rem;">📷 Cámara</div>
+                                <div style="font-size: 1.125rem; font-weight: 600; color: #ffffff;">${bestPhone.camera}</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 0.25rem;">🔋 Batería</div>
+                                <div style="font-size: 1.125rem; font-weight: 600; color: #ffffff;">${bestPhone.battery} mAh</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.2);">
+                        <p style="color: rgba(255, 255, 255, 0.9); font-size: 0.875rem; line-height: 1.6;">
+                            <strong style="color: #4ade80;">💡 ¿Por qué este teléfono?</strong> Este modelo ofrece la mejor combinación de características técnicas, rendimiento y precio entre los teléfonos comparados. Proporciona excelente valor por tu inversión.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        ` : '';
+
         return `
             <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 1.5rem; padding: 2rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); margin-bottom: 2rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
@@ -2775,6 +2957,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </button>
                     </div>
                 </div>
+                ${bestPhoneHTML}
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
                     ${comparisonHTML}
                 </div>
