@@ -518,24 +518,111 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const renderAccountView = () => {
-        if (!state.currentUser) {
-            accountViewContainer.innerHTML = `
-                        <div class="text-center bg-white p-12 rounded-3xl shadow-lg border border-slate-200">
-                             <div class="text-7xl mb-4">👤</div>
-                            <h2 class="text-2xl font-bold text-slate-800 mb-2">Accede a tu cuenta</h2>
-                            <p class="text-slate-500 mb-6">Inicia sesión para ver tus favoritos e historial de búsqueda.</p>
-                            <button id="account-login-btn" class="bg-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors">
-                                Iniciar Sesión / Registrarse
-                            </button>
+    if (!state.currentUser) {
+        accountViewContainer.innerHTML = `
+            <div class="max-w-md mx-auto">
+                <div class="text-center mb-8">
+                    <h1 class="text-3xl font-bold text-white mb-2">👤 Mi Cuenta</h1>
+                    <p class="text-white/80">Inicia sesión o regístrate para guardar tus preferencias</p>
+                </div>
+                
+                <!-- Formulario de Login -->
+                <div class="glass p-6 rounded-2xl mb-6 border border-white/20">
+                    <h2 class="text-xl font-bold text-white mb-4">Iniciar Sesión</h2>
+                    <form id="login-form" class="space-y-4">
+                        <div>
+                            <label for="login-email" class="block text-sm font-medium text-white mb-2">Correo Electrónico</label>
+                            <input type="email" id="login-email" required 
+                                   class="w-full p-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all"
+                                   placeholder="tu@email.com">
                         </div>
-                    `;
+                        <div>
+                            <label for="login-password" class="block text-sm font-medium text-white mb-2">Contraseña</label>
+                            <input type="password" id="login-password" required 
+                                   class="w-full p-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all"
+                                   placeholder="••••••••">
+                        </div>
+                        <button type="submit" 
+                                class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl">
+                            Iniciar Sesión
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Formulario de Registro -->
+                <div class="glass p-6 rounded-2xl border border-white/20">
+                    <h2 class="text-xl font-bold text-white mb-4">Crear Cuenta</h2>
+                    <form id="register-form" class="space-y-4">
+                        <div>
+                            <label for="register-name" class="block text-sm font-medium text-white mb-2">Nombre Completo</label>
+                            <input type="text" id="register-name" required 
+                                   class="w-full p-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all"
+                                   placeholder="Tu nombre">
+                        </div>
+                        <div>
+                            <label for="register-email" class="block text-sm font-medium text-white mb-2">Correo Electrónico</label>
+                            <input type="email" id="register-email" required 
+                                   class="w-full p-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all"
+                                   placeholder="tu@email.com">
+                        </div>
+                        <div>
+                            <label for="register-password" class="block text-sm font-medium text-white mb-2">Contraseña</label>
+                            <input type="password" id="register-password" required 
+                                   class="w-full p-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all"
+                                   placeholder="••••••••">
+                            <p class="text-xs text-white/60 mt-1">Mínimo 8 caracteres</p>
+                        </div>
+                        <div>
+                            <label for="register-password-confirm" class="block text-sm font-medium text-white mb-2">Confirmar Contraseña</label>
+                            <input type="password" id="register-password-confirm" required 
+                                   class="w-full p-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all"
+                                   placeholder="••••••••">
+                        </div>
+                        
+                        <!-- TÉRMINOS Y CONDICIONES - NUEVO CAMPO -->
+                        <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+                            <div class="flex items-start">
+                                <input type="checkbox" id="terms-accepted" required
+                                       class="mt-1 mr-3 h-5 w-5 rounded border-white/30 bg-white/20 text-indigo-600 focus:ring-indigo-400 focus:ring-offset-0">
+                                <div>
+                                    <label for="terms-accepted" class="text-sm font-medium text-white">
+                                        He leído y acepto los 
+                                        <button type="button" id="terms-link" 
+                                                class="text-indigo-300 hover:text-indigo-200 underline transition-colors">
+                                            Términos y Condiciones del Servicio
+                                        </button>
+                                    </label>
+                                    <p class="text-xs text-white/60 mt-1">
+                                        Al marcar esta casilla, aceptas nuestras políticas de privacidad, términos de uso y condiciones del servicio.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" 
+                                class="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold py-3 px-6 rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl">
+                            Crear Cuenta
+                        </button>
+                    </form>
+                </div>
+            </div>
+        `;
         
-        // Agregar event listener al botón
-        document.getElementById('account-login-btn').addEventListener('click', () => {
-            showAuthModal('login');
-        });
-            return;
-        }
+        // Agregar evento para abrir términos y condiciones
+        setTimeout(() => {
+            const termsLink = document.getElementById('terms-link');
+            if (termsLink) {
+                termsLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showTermsModal();
+                });
+            }
+        }, 100);
+        
+        // Manejar formulario de registro
+        document.getElementById('register-form').addEventListener('submit', handleRegister);
+        document.getElementById('login-form').addEventListener('submit', handleLogin);
+    } else {
         
         // Verificar si es usuario especial (Pito Pérez) para mostrar opciones de administración
         const isAdmin = state.currentUser.isPitoPerez || state.currentUser.name.toLowerCase() === 'admin';
@@ -589,6 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         renderAccountContent('favorites');
+    }
     };
 
     const renderAccountContent = (tab) => {
@@ -2922,8 +3010,26 @@ function findUserByUsername(username) {
 
 // Modal de autenticación
 function showAuthModal(type = 'login') {
-    const modal = document.createElement('div');
+        const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+    
+    const registerFormHTML = type === 'register' ? `
+        <!-- Términos y Condiciones en modal de autenticación -->
+        <div class="mt-4 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div class="flex items-start">
+                <input type="checkbox" id="auth-terms-accepted" required 
+                       class="mt-1 mr-2 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500">
+                <label for="auth-terms-accepted" class="text-sm text-slate-700 dark:text-slate-300">
+                    He leído y acepto los 
+                    <button type="button" onclick="showTermsModal()" 
+                            class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 underline">
+                        Términos y Condiciones
+                    </button>
+                </label>
+            </div>
+        </div>
+    ` : '';
+    
     modal.innerHTML = `
         <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6">
             <div class="flex justify-between items-center mb-6">
@@ -2950,8 +3056,17 @@ function showAuthModal(type = 'login') {
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Contraseña</label>
                     <input type="password" id="auth-password" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-slate-100" required>
-                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">La contraseña puede repetirse</p>
+                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Mínimo 8 caracteres</p>
                 </div>
+                ${type === 'register' ? `
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Confirmar Contraseña</label>
+                    <input type="password" id="auth-password-confirm" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-slate-100" required>
+                </div>
+                ` : ''}
+                
+                ${registerFormHTML}
+                
                 <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors">
                     ${type === 'login' ? 'Iniciar Sesión' : 'Registrarse'}
                 </button>
@@ -2997,23 +3112,36 @@ function showAuthModal(type = 'login') {
     }
     
     // Event listener para el formulario
-    document.getElementById('auth-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const name = document.getElementById('auth-name').value;
-        const email = document.getElementById('auth-email').value;
-        const password = document.getElementById('auth-password').value;
-        
-        if (type === 'login') {
-            handleLogin(name, email, password);
-            modal.remove();
-        } else {
-            // Para registro, no cerrar el modal si hay error
-            const wasSuccessful = handleRegister(name, email, password);
-            if (wasSuccessful) {
+// En el event listener del formulario en showAuthModal:
+document.getElementById('auth-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('auth-name').value;
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    const passwordConfirm = type === 'register' ? document.getElementById('auth-password-confirm')?.value : '';
+    const termsAccepted = type === 'register' ? document.getElementById('auth-terms-accepted')?.checked : true;
+    
+    if (type === 'login') {
+        handleLogin(name, email, password);
         modal.remove();
-            }
+    } else {
+        // Validaciones adicionales para registro
+        if (password !== passwordConfirm) {
+            showToast('Las contraseñas no coinciden', 'error');
+            return;
         }
-    });
+        
+        if (!termsAccepted) {
+            showToast('Debes aceptar los términos y condiciones', 'error');
+            return;
+        }
+        
+        const wasSuccessful = handleRegister(name, email, password);
+        if (wasSuccessful) {
+            modal.remove();
+        }
+    }
+});
 }
 
 // Funciones de autenticación
@@ -3033,52 +3161,100 @@ function handleLogin(name, email, password) {
     }
 }
 
-function handleRegister(name, email, password) {
-    if (!globalState) return false;
+function handleRegister(e) {
+    e.preventDefault();
+    const rawName = e.target.elements[0].value.trim();
+    const rawEmail = e.target.elements[1].value;
+    
+    // Validar email
+    if (!validateEmail(rawEmail)) {
+        showToast('Por favor ingresa un email válido', 'error');
+        secureLogger.warn('Intento de registro con email inválido');
+        return;
+    }
+    
+    // Sanitizar entradas
+    const name = escapeHtml(sanitizeInput(rawName));
+    const email = sanitizeInput(rawEmail);
+    const password = e.target.elements[2].value.trim(); 
+    const passwordConfirm = e.target.elements[3].value.trim();
+    const termsAccepted = document.getElementById('terms-accepted')?.checked || false;
     
     // Validar que el nombre no esté vacío
     if (!name || name.trim().length === 0) {
-        if (globalShowToast) globalShowToast('El nombre de usuario es requerido', 'error');
-        return false;
+        showToast('El nombre de usuario es requerido', 'error');
+        return;
+    }
+    
+    // Validar contraseñas
+    if (password !== passwordConfirm) {
+        showToast('Las contraseñas no coinciden', 'error');
+        return;
+    }
+    
+    if (password.length < 8) {
+        showToast('La contraseña debe tener al menos 8 caracteres', 'error');
+        return;
+    }
+    
+    // Validar términos y condiciones
+    if (!termsAccepted) {
+        showToast('Debes aceptar los términos y condiciones para registrarte', 'error');
+        return;
     }
     
     // Validar que el nombre de usuario no esté repetido
     if (isUsernameTaken(name)) {
-        if (globalShowToast) globalShowToast('Este nombre de usuario ya está en uso. Por favor elige otro.', 'error');
-        return false;
+        showToast('Este nombre de usuario ya está en uso. Por favor elige otro.', 'error');
+        secureLogger.warn(`Intento de registro con nombre duplicado: ${name}`);
+        return;
     }
     
     // El correo y contraseña pueden repetirse, solo validamos el nombre
     
+    let isPitoPerez = false;
+    if (name.toLowerCase() === 'pito pérez' && password.toLowerCase() === 'peraza') {
+        isPitoPerez = true;
+    }
+
     // Crear objeto de usuario
     const newUser = {
         id: Date.now(),
-        name: name.trim(),
-        email: email.trim(),
+        name,
+        email,
         password: password, // Guardar contraseña (en producción debería estar hasheada)
-        registeredAt: new Date().toISOString()
+        isPitoPerez,
+        termsAccepted: true, // Añadir campo de términos aceptados
+        registeredAt: new Date().toISOString(),
+        lastLogin: new Date().toISOString()
     };
 
     // Guardar usuario en localStorage
     if (saveRegisteredUser(newUser)) {
-        globalState.currentUser = { id: newUser.id, name: newUser.name, email: newUser.email };
-    if (globalRenderAuthSection) globalRenderAuthSection();
-    if (globalShowToast) globalShowToast('¡Cuenta creada exitosamente!', 'success');
-    
-    // Actualizar vista de cuenta si está activa
-    if (globalState.currentView === 'account') {
-        // Buscar la función renderAccountView en el scope global
-        if (window.renderAccountView) {
-            window.renderAccountView();
+        state.currentUser = { 
+            id: newUser.id, 
+            name, 
+            email, 
+            isPitoPerez,
+            termsAccepted: true 
+        };
+        
+        // Actualizar autenticación
+        if (globalRenderAuthSection) globalRenderAuthSection();
+        
+        showToast('¡Cuenta creada exitosamente!', 'success');
+        
+        // Actualizar vista de cuenta
+        if (state.currentView === 'account') {
+            renderAccountView();
         }
-        }
+        
         return true;
     } else {
-        if (globalShowToast) globalShowToast('Error al crear la cuenta. Por favor intenta de nuevo.', 'error');
+        showToast('Error al crear la cuenta. Por favor intenta de nuevo.', 'error');
         return false;
     }
 }
-
 function handleLogout() {
     if (!globalState) return;
     globalState.currentUser = null;
@@ -3130,8 +3306,102 @@ function checkConnectionStatus() {
         showToast('Sin conexión a internet. Usando datos locales.', 'warning', 5000);
     }
 }
+function showTermsModal() {
+    const modalBackdrop = document.getElementById('modal-backdrop');
+    const modalContent = document.getElementById('modal-content');
+    
+    if (modalBackdrop && modalContent) {
+        modalContent.innerHTML = `
+            <div class="p-6 max-h-[80vh] overflow-y-auto">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-2">📜 Términos y Condiciones del Servicio</h2>
+                    <p class="text-slate-600">Última actualización: ${new Date().toLocaleDateString('es-MX')}</p>
+                </div>
+                
+                <div class="space-y-4 text-slate-700">
+                    <section>
+                        <h3 class="text-lg font-semibold mb-2 text-indigo-700">1. Aceptación de los Términos</h3>
+                        <p>Al acceder y utilizar la Guía Interactiva de Smartphones "Pito Pérez", usted acepta estar sujeto a estos Términos y Condiciones.</p>
+                    </section>
+                    
+                    <section>
+                        <h3 class="text-lg font-semibold mb-2 text-indigo-700">2. Uso del Servicio</h3>
+                        <p>Este servicio está destinado a proporcionar información sobre smartphones para fines de comparación y decisión de compra. La información se proporciona "tal cual" sin garantías de precisión.</p>
+                    </section>
+                    
+                    <section>
+                        <h3 class="text-lg font-semibold mb-2 text-indigo-700">3. Registro de Cuenta</h3>
+                        <p>Para acceder a funciones adicionales, debe registrarse proporcionando información verídica y actual. Usted es responsable de mantener la confidencialidad de su cuenta y contraseña.</p>
+                    </section>
+                    
+                    <section>
+                        <h3 class="text-lg font-semibold mb-2 text-indigo-700">4. Privacidad</h3>
+                        <p>Su información personal será tratada de acuerdo con nuestra Política de Privacidad. No compartimos su información con terceros sin su consentimiento.</p>
+                    </section>
+                    
+                    <section>
+                        <h3 class="text-lg font-semibold mb-2 text-indigo-700">5. Contenido Generado por Usuarios</h3>
+                        <p>Los comentarios y reseñas publicados por usuarios son responsabilidad exclusiva de quienes los publican. Nos reservamos el derecho de eliminar contenido inapropiado.</p>
+                    </section>
+                    
+                    <section>
+                        <h3 class="text-lg font-semibold mb-2 text-indigo-700">6. Limitación de Responsabilidad</h3>
+                        <p>No somos responsables de decisiones de compra basadas en la información proporcionada. Los precios y especificaciones pueden variar.</p>
+                    </section>
+                    
+                    <section>
+                        <h3 class="text-lg font-semibold mb-2 text-indigo-700">7. Modificaciones</h3>
+                        <p>Nos reservamos el derecho de modificar estos términos en cualquier momento. Las modificaciones serán efectivas inmediatamente después de su publicación.</p>
+                    </section>
+                    
+                    <section class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <h3 class="text-lg font-semibold mb-2 text-blue-700">✅ Confirmación de Aceptación</h3>
+                        <p>Al marcar la casilla de aceptación, confirma que:</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-1">
+                            <li>Ha leído y comprendido estos términos</li>
+                            <li>Acepta cumplir con todas las disposiciones</li>
+                            <li>Es mayor de edad o tiene consentimiento parental</li>
+                            <li>Proporcionará información verídica en su registro</li>
+                        </ul>
+                    </section>
+                </div>
+                
+                <div class="mt-8 pt-6 border-t border-slate-200">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button id="accept-terms-btn" 
+                                class="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold py-3 px-6 rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300">
+                            ✅ Aceptar Términos
+                        </button>
+                        <button id="close-terms-modal" 
+                                class="flex-1 bg-slate-200 text-slate-700 font-bold py-3 px-6 rounded-lg hover:bg-slate-300 transition-all duration-300">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        modalBackdrop.classList.remove('hidden');
+        
+        // Agregar eventos para los botones del modal
+        document.getElementById('accept-terms-btn').addEventListener('click', function() {
+            const checkbox = document.getElementById('terms-accepted');
+            if (checkbox) {
+                checkbox.checked = true;
+                checkbox.dispatchEvent(new Event('change'));
+            }
+            modalBackdrop.classList.add('hidden');
+            showToast('Términos aceptados. Ahora puedes continuar con tu registro.', 'success');
+        });
+        
+        document.getElementById('close-terms-modal').addEventListener('click', function() {
+            modalBackdrop.classList.add('hidden');
+        });
+    }
+}
 
-// Hacer funciones disponibles globalmente
+// Hacer la función globalmente disponible
+window.showTermsModal = showTermsModal;
 window.showAuthModal = showAuthModal;
 window.handleLogin = handleLogin;
 window.handleRegister = handleRegister;
