@@ -3730,13 +3730,18 @@ function showAuthModal(type = 'login') {
         submitBtn.textContent = newType === 'login' ? 'Iniciar Sesión' : 'Registrarse';
         
         // Actualizar textos de ayuda
-        usernameHelp.textContent = newType === 'register' ? 'El nombre de usuario debe ser único' : 'Ingresa tu nombre de usuario';
+        usernameHelp.textContent = newType === 'register' ? 'El nombre de usuario debe ser único' : 'Ingresa tu nombre de usuario registrado';
         emailHelp.textContent = newType === 'register' ? 'El correo puede repetirse' : 'Ingresa tu correo electrónico';
         passwordHelp.textContent = newType === 'register' ? 'La contraseña debe cumplir todos los requisitos' : 'Ingresa tu contraseña';
         
-        // Limpiar validación
-        usernameInput.classList.remove('border-red-500', 'border-green-500');
-        usernameFeedback.classList.add('hidden');
+        // Limpiar validación pero mantener feedback si hay texto
+        if (usernameInput.value.trim().length > 0) {
+            // Disparar evento para actualizar feedback según el tipo actual
+            usernameInput.dispatchEvent(new Event('input'));
+        } else {
+            usernameInput.classList.remove('border-red-500', 'border-green-500', 'border-amber-500');
+            usernameFeedback.classList.add('hidden');
+        }
         passwordInput.classList.remove('border-red-500', 'border-green-500');
         updatePasswordFeedback(passwordInput.value);
     };
@@ -3760,24 +3765,25 @@ function showAuthModal(type = 'login') {
         termsCheckbox.checked = false;
     }
     
-    // Validación en tiempo real del nombre de usuario (solo para registro)
-    if (type === 'register') {
-        const nameInput = document.getElementById('auth-name');
-        const feedbackDiv = document.getElementById('username-feedback');
+    // Validación en tiempo real del nombre de usuario
+    const nameInput = document.getElementById('auth-name');
+    const feedbackDiv = document.getElementById('username-feedback');
+    
+    // Debounce para evitar demasiadas verificaciones
+    let checkTimeout;
+    nameInput.addEventListener('input', (e) => {
+        clearTimeout(checkTimeout);
+        const username = e.target.value.trim();
         
-        // Debounce para evitar demasiadas verificaciones
-        let checkTimeout;
-        nameInput.addEventListener('input', (e) => {
-            clearTimeout(checkTimeout);
-            const username = e.target.value.trim();
-            
-            if (username.length === 0) {
-                feedbackDiv.classList.add('hidden');
-                nameInput.classList.remove('border-red-500', 'border-green-500');
-                return;
-            }
-            
-            checkTimeout = setTimeout(() => {
+        if (username.length === 0) {
+            feedbackDiv.classList.add('hidden');
+            nameInput.classList.remove('border-red-500', 'border-green-500');
+            return;
+        }
+        
+        checkTimeout = setTimeout(() => {
+            if (currentType === 'register') {
+                // Para registro: verificar si el nombre está disponible
                 if (window.isUsernameTaken && window.isUsernameTaken(username)) {
                     feedbackDiv.textContent = '❌ Este nombre de usuario ya está en uso';
                     feedbackDiv.className = 'mt-1 text-xs text-red-600 dark:text-red-400';
@@ -3791,9 +3797,24 @@ function showAuthModal(type = 'login') {
                     nameInput.classList.add('border-green-500');
                     nameInput.classList.remove('border-red-500');
                 }
-            }, 300);
-        });
-    }
+            } else {
+                // Para login: verificar si el usuario existe
+                if (window.findUserByUsername && window.findUserByUsername(username)) {
+                    feedbackDiv.textContent = '✅ Usuario encontrado';
+                    feedbackDiv.className = 'mt-1 text-xs text-green-600 dark:text-green-400';
+                    feedbackDiv.classList.remove('hidden');
+                    nameInput.classList.add('border-green-500');
+                    nameInput.classList.remove('border-red-500');
+                } else {
+                    feedbackDiv.textContent = '⚠️ Usuario no encontrado. ¿Necesitas registrarte?';
+                    feedbackDiv.className = 'mt-1 text-xs text-amber-600 dark:text-amber-400';
+                    feedbackDiv.classList.remove('hidden');
+                    nameInput.classList.add('border-amber-500');
+                    nameInput.classList.remove('border-green-500', 'border-red-500');
+                }
+            }
+        }, 300);
+    });
     
     // Event listener para el formulario
     document.getElementById('auth-form').addEventListener('submit', (e) => {
@@ -3807,8 +3828,44 @@ function showAuthModal(type = 'login') {
         const formType = currentType;
         
         if (formType === 'login') {
-            handleLogin(name, email, password);
-            modal.remove();
+            // Validar que el nombre de usuario no esté vacío
+            if (!name || name.trim().length === 0) {
+                if (globalShowToast) globalShowToast('El nombre de usuario es requerido', 'error');
+                usernameInput.classList.add('border-red-500');
+                usernameInput.focus();
+                return;
+            }
+            
+            // Validar que el usuario existe
+            const user = window.findUserByUsername && window.findUserByUsername(name);
+            if (!user) {
+                if (globalShowToast) globalShowToast('Usuario no encontrado. Verifica tu nombre de usuario o regístrate.', 'error');
+                usernameInput.classList.add('border-red-500');
+                usernameInput.classList.remove('border-green-500', 'border-amber-500');
+                usernameFeedback.textContent = '❌ Usuario no encontrado';
+                usernameFeedback.className = 'mt-1 text-xs text-red-600 dark:text-red-400';
+                usernameFeedback.classList.remove('hidden');
+                usernameInput.focus();
+                return;
+            }
+            
+            // Validar que la contraseña no esté vacía
+            if (!password || password.length === 0) {
+                if (globalShowToast) globalShowToast('La contraseña es requerida', 'error');
+                passwordInput.classList.add('border-red-500');
+                passwordInput.focus();
+                return;
+            }
+            
+            // Intentar login
+            const loginSuccess = handleLogin(name, email, password);
+            if (loginSuccess) {
+                modal.remove();
+            } else {
+                // El error ya fue mostrado por handleLogin
+                passwordInput.classList.add('border-red-500');
+                passwordInput.focus();
+            }
         } else {
             // Validar nombre antes de registrar
             if (!name || name.length === 0) {
@@ -3868,9 +3925,29 @@ function showAuthModal(type = 'login') {
 
 // Funciones de autenticación
 function handleLogin(name, email, password) {
-    if (!globalState) return;
-    // Simulación de login
-    globalState.currentUser = { id: 1, name, email };
+    if (!globalState) return false;
+    
+    // Validar que el nombre de usuario no esté vacío
+    if (!name || name.trim().length === 0) {
+        if (globalShowToast) globalShowToast('El nombre de usuario es requerido', 'error');
+        return false;
+    }
+    
+    // Validar que el usuario existe
+    const user = findUserByUsername(name);
+    if (!user) {
+        if (globalShowToast) globalShowToast('Usuario no encontrado. Verifica tu nombre de usuario o regístrate.', 'error');
+        return false;
+    }
+    
+    // Validar que la contraseña es correcta
+    if (user.password !== password) {
+        if (globalShowToast) globalShowToast('Contraseña incorrecta. Por favor verifica tus credenciales.', 'error');
+        return false;
+    }
+    
+    // Login exitoso
+    globalState.currentUser = { id: user.id, name: user.name, email: user.email };
     
     // Cargar datos del usuario desde localStorage
     try {
@@ -3903,6 +3980,8 @@ function handleLogin(name, email, password) {
             window.renderAccountView();
         }
     }
+    
+    return true;
 }
 
 function handleRegister(name, email, password) {
@@ -4028,6 +4107,7 @@ window.isUsernameTaken = isUsernameTaken;
 window.getRegisteredUsers = getRegisteredUsers;
 window.saveRegisteredUser = saveRegisteredUser;
 window.validatePassword = validatePassword;
+window.findUserByUsername = findUserByUsername;
 
 // ============================================
 // CHATBOT - Asistente Virtual
