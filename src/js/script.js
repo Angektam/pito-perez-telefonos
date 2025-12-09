@@ -270,6 +270,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    // Funciones de traducción globales
+    const translateCondition = (value) => {
+        if (!value) return '';
+        const translations = {
+            'new': 'Nuevo',
+            'used': 'Usado',
+            'refurbished': 'Reacondicionado',
+            'like-new': 'Como nuevo',
+            'excellent': 'Excelente',
+            'good': 'Bueno',
+            'fair': 'Regular'
+        };
+        return translations[value.toLowerCase()] || value.charAt(0).toUpperCase() + value.slice(1);
+    };
+
+    const translateScreen = (value) => {
+        if (!value) return '';
+        const translations = {
+            'small': 'Pequeña (< 6")',
+            'medium': 'Mediana (6" - 6.5")',
+            'large': 'Grande (> 6.5")',
+            'compact': 'Compacta',
+            'standard': 'Estándar',
+            'phablet': 'Phablet'
+        };
+        return translations[value.toLowerCase()] || value.charAt(0).toUpperCase() + value.slice(1);
+    };
+
     const renderSearchView = () => {
         const filterOptions = {
             brand: [...new Set(phoneDatabase.map(p => p.brand))],
@@ -279,21 +307,80 @@ document.addEventListener('DOMContentLoaded', () => {
             condition: [...new Set(phoneDatabase.map(p => p.condition))],
             screen: [...new Set(phoneDatabase.map(p => p.screen))],
         };
-        
-        const selectHTML = (id, label, options) => `
+
+        const selectHTML = (id, label, options) => {
+            // Determinar qué función de traducción usar según el ID
+            let translateFn = (val) => val.charAt(0).toUpperCase() + val.slice(1);
+            if (id === 'filter-condition') {
+                translateFn = translateCondition;
+            } else if (id === 'filter-screen') {
+                translateFn = translateScreen;
+            }
+            
+            return `
             <div style="flex: 1; min-width: 150px;">
                 <label for="${id}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #ffffff; margin-bottom: 0.5rem;">${label}</label>
                 <select id="${id}" style="width: 100%; padding: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 0.875rem; margin-top: 0.25rem; outline: none; transition: all 0.2s; cursor: pointer;" onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99, 102, 241, 0.1)'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.3)'; this.style.boxShadow='none'">
                     <option value="" style="background: #1e293b; color: #ffffff;">Todos</option>
-                    ${options.map(o => `<option value="${o}" style="background: #1e293b; color: #ffffff;">${o.charAt(0).toUpperCase() + o.slice(1)}</option>`).join('')}
+                    ${options.map(o => `<option value="${o}" style="background: #1e293b; color: #ffffff;">${translateFn(o)}</option>`).join('')}
                 </select>
             </div>`;
+        };
 
-        const inputHTML = (id, label, placeholder, type = 'number') => `
+        const inputHTML = (id, label, placeholder, type = 'number', helpText = '') => `
             <div style="flex: 1; min-width: 150px;">
-                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #ffffff; margin-bottom: 0.5rem;">${label}</label>
-                <input type="${type}" id="${id}" placeholder="${placeholder}" style="width: 100%; padding: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 0.875rem; margin-top: 0.25rem; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99, 102, 241, 0.1)'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.3)'; this.style.boxShadow='none'">
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #ffffff; margin-bottom: 0.35rem;">${label}</label>
+                <input type="${type}" id="${id}" placeholder="${placeholder}" min="0" inputmode="decimal"
+                    style="width: 100%; padding: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 0.875rem; margin-top: 0.1rem; outline: none; transition: all 0.2s;"
+                    onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99, 102, 241, 0.1)'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.3)'; this.style.boxShadow='none'">
+                ${helpText ? `<p style="margin-top: 0.35rem; font-size: 0.75rem; color: rgba(255,255,255,0.75);">💡 ${helpText}</p>` : ''}
             </div>`;
+
+        // Función para crear selector de cámara
+        const cameraSelectHTML = (id, label) => {
+            const cameraOptions = [
+                { value: '', text: 'Cualquier cámara' },
+                { value: '12', text: '12 MP - Básico' },
+                { value: '16', text: '16 MP - Estándar' },
+                { value: '24', text: '24 MP - Bueno' },
+                { value: '48', text: '48 MP - Excelente' },
+                { value: '50', text: '50 MP - Muy bueno' },
+                { value: '64', text: '64 MP - Premium' },
+                { value: '108', text: '108 MP - Ultra' },
+                { value: '200', text: '200 MP - Profesional' }
+            ];
+            return `
+            <div style="flex: 1; min-width: 150px;">
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #ffffff; margin-bottom: 0.35rem;">${label}</label>
+                <select id="${id}" style="width: 100%; padding: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 0.875rem; margin-top: 0.1rem; outline: none; transition: all 0.2s; cursor: pointer;" onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99, 102, 241, 0.1)'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.3)'; this.style.boxShadow='none'">
+                    ${cameraOptions.map(opt => `<option value="${opt.value}" style="background: #1e293b; color: #ffffff;">${opt.text}</option>`).join('')}
+                </select>
+                <p style="margin-top: 0.35rem; font-size: 0.75rem; color: rgba(255,255,255,0.75);">💡 Valores comunes: 12-200 MP. Más alto = mejores fotos en detalle.</p>
+            </div>`;
+        };
+
+        // Función para crear selector de batería
+        const batterySelectHTML = (id, label) => {
+            const batteryOptions = [
+                { value: '', text: 'Cualquier batería' },
+                { value: '3000', text: '3000 mAh - Básico' },
+                { value: '3500', text: '3500 mAh - Estándar' },
+                { value: '4000', text: '4000 mAh - Bueno' },
+                { value: '4500', text: '4500 mAh - Excelente' },
+                { value: '5000', text: '5000 mAh - Muy bueno' },
+                { value: '5500', text: '5500 mAh - Premium' },
+                { value: '6000', text: '6000 mAh - Ultra' },
+                { value: '7000', text: '7000+ mAh - Profesional' }
+            ];
+            return `
+            <div style="flex: 1; min-width: 150px;">
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #ffffff; margin-bottom: 0.35rem;">${label}</label>
+                <select id="${id}" style="width: 100%; padding: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 0.875rem; margin-top: 0.1rem; outline: none; transition: all 0.2s; cursor: pointer;" onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99, 102, 241, 0.1)'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.3)'; this.style.boxShadow='none'">
+                    ${batteryOptions.map(opt => `<option value="${opt.value}" style="background: #1e293b; color: #ffffff;">${opt.text}</option>`).join('')}
+                </select>
+                <p style="margin-top: 0.35rem; font-size: 0.75rem; color: rgba(255,255,255,0.75);">💡 Rango típico: 3500-6000 mAh. Más alto = mayor autonomía.</p>
+            </div>`;
+        };
 
         searchViewContainer.innerHTML = `
                 <div class="glass p-6 md:p-8 rounded-3xl shadow-2xl border border-white/20" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 1.5rem; padding: 2rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
@@ -332,8 +419,8 @@ document.addEventListener('DOMContentLoaded', () => {
                              <span>📊 Rendimiento y Precio</span>
                          </h3>
                          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                            ${inputHTML('filter-minCamera', '📷 Cámara Mínima (MP)', 'Ej: 48')}
-                            ${inputHTML('filter-minBattery', '🔋 Batería Mínima (mAh)', 'Ej: 4500')}
+                            ${cameraSelectHTML('filter-minCamera', '📷 Cámara Mínima (MP)')}
+                            ${batterySelectHTML('filter-minBattery', '🔋 Batería Mínima (mAh)')}
                             <div style="flex: 1; min-width: 150px;">
                                 <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #ffffff; margin-bottom: 0.5rem;">💰 Precio (MXN)</label>
                                 <div style="display: flex; gap: 0.5rem; margin-top: 0.25rem;">
@@ -2055,8 +2142,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 camara: phone.camera,
                 bateria: `${phone.battery} mAh`,
                 sistema: phone.os.toUpperCase(),
-                condicion: phone.condition.charAt(0).toUpperCase() + phone.condition.slice(1),
-                pantalla: phone.screen.charAt(0).toUpperCase() + phone.screen.slice(1)
+                condicion: translateCondition(phone.condition),
+                pantalla: translateScreen(phone.screen)
             }))
         };
 
@@ -2375,7 +2462,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            return Math.round(score);
+            // El score máximo teórico es 120 (30+25+15+30+20)
+            // Normalizar a porcentaje (0-100%)
+            const maxPossibleScore = 120;
+            const normalizedScore = Math.min((score / maxPossibleScore) * 100, 100);
+            return Math.round(normalizedScore);
         };
         
         // Calcular puntuaciones y ordenar
@@ -2658,7 +2749,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0;">
                         <span style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); display: flex; align-items: center; gap: 0.5rem;"><span>✨</span> Condición</span>
-                        <span style="font-weight: 600; color: #ffffff;">${phone.condition.charAt(0).toUpperCase() + phone.condition.slice(1)}</span>
+                        <span style="font-weight: 600; color: #ffffff;">${translateCondition(phone.condition)}</span>
                     </div>
                 </div>
                 
