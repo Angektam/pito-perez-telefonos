@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Usuario - Sistema Pito Pérez</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #667eea;
+            border-bottom: 3px solid #764ba2;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        h2 {
+            color: #764ba2;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-left: 5px solid #667eea;
+            padding-left: 15px;
+        }
+        
+        h3 {
+            color: #555;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        h4 {
+            color: #666;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+        
+        li {
+            margin-bottom: 10px;
+        }
+        
+        .screenshot {
+            width: 100%;
+            max-width: 900px;
+            margin: 30px auto;
+            border: 3px solid #667eea;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: block;
+            background: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .screenshot img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            display: block;
+        }
+        
+        .screenshot-placeholder {
+            width: 100%;
+            max-width: 900px;
+            margin: 30px auto;
+            border: 3px dashed #667eea;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 60px 20px;
+            text-align: center;
+            color: #667eea;
+            font-weight: bold;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .screenshot-placeholder::before {
+            content: "📷";
+            font-size: 4em;
+            display: block;
+            margin-bottom: 20px;
+        }
+        
+        .screenshot-caption {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+            margin-top: 10px;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+        
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .warning {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .divider {
+            border-top: 2px solid #667eea;
+            margin: 40px 0;
+        }
+        
+        .toc {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .toc ul {
+            list-style: none;
+            margin-left: 0;
+        }
+        
+        .toc li {
+            margin: 10px 0;
+        }
+        
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        table th {
+            background: #667eea;
+            color: white;
+        }
+        
+        table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Manual de Usuario del Sistema Pito Pérez</h1>
+        
+        <div class="info">
+            <strong>Versión:</strong> 1.1<br>
+            <strong>Fecha:</strong> Noviembre 2025<br>
+            <strong>Destinatario:</strong> Usuarios Finales
+        </div>
+        
+        <div class="toc">
+            <h3>Tabla de Contenidos</h3>
+            <ul>
+                <li><a href="#intro">1. Introducción al Sistema</a></li>
+                <li><a href="#acceso">2. Acceso y Configuración Inicial</a></li>
+                <li><a href="#navegacion">3. Navegación y Funcionalidades Clave</a></li>
+                <li><a href="#soporte">4. Soporte y Solución de Problemas</a></li>
+                <li><a href="#recomendaciones">5. Recomendaciones Finales</a></li>
+                <li><a href="#indice-capturas">6. Índice de Capturas de Pantalla</a></li>
+            </ul>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <h2 id="intro">1. Introducción al Sistema</h2>
+        
+        <p>Bienvenido al sistema Pito Pérez. Esta herramienta es su punto central para explorar, comparar y elegir el smartphone ideal que se adapte a sus necesidades y presupuesto. Pito Pérez es una guía interactiva de smartphones diseñada para ayudarte a tomar decisiones informadas mediante gráficos dinámicos, filtros avanzados, comparaciones detalladas y un modo fácil de uso.</p>
+        
+        <p>El sistema funciona como una aplicación web progresiva (PWA), lo que significa que puedes acceder a todas las funcionalidades desde cualquier navegador moderno, y una vez cargada la primera vez, podrás seguir utilizándola incluso sin conexión a Internet.</p>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-01-panel-general.jpg" alt="Pantalla principal del sistema mostrando el menú de navegación y el panel general con gráficos interactivos" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 1</strong><br>Pantalla principal del sistema<br><small>Coloca la imagen como: capturas-manual/captura-01-panel-general.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 1: Vista principal del sistema Pito Pérez - Panel General con gráficos de precio y batería</div>
+        
+        <h3>1.1 Confianza y Disponibilidad</h3>
+        
+        <p>Nuestro sistema ha sido diseñado para ser altamente confiable y accesible:</p>
+        
+        <ul>
+            <li><strong>Disponibilidad Continua:</strong> El sistema está alojado en una infraestructura que minimiza las interrupciones, asegurando que siempre puedas acceder a tu trabajo. Además, gracias a la tecnología de Service Worker y Progressive Web App (PWA), el sistema puede funcionar completamente offline después de la primera carga, permitiéndote consultar información de smartphones incluso cuando no tengas conexión a Internet.</li>
+            <li><strong>Seguridad de Datos:</strong> La información que ingreses (como favoritos, comentarios y preferencias) está protegida mediante almacenamiento local seguro y respaldos automáticos. Tus datos personales nunca se comparten con terceros sin tu consentimiento explícito.</li>
+            <li><strong>Rendimiento Optimizado:</strong> El sistema utiliza técnicas de caché inteligente para cargar rápidamente, incluso con conexiones lentas. Los datos se sincronizan automáticamente cuando detecta una conexión estable.</li>
+        </ul>
+        
+        <div class="divider"></div>
+        
+        <h2 id="acceso">2. Acceso y Configuración Inicial</h2>
+        
+        <h3>2.1 Requisitos Mínimos</h3>
+        
+        <p>Para garantizar una experiencia óptima con Pito Pérez, asegúrate de cumplir con los siguientes requisitos:</p>
+        
+        <ul>
+            <li><strong>Navegador web compatible:</strong> Google Chrome (versión 90 o superior) - Recomendado, Mozilla Firefox (versión 88 o superior), Microsoft Edge (versión 90 o superior), Safari (versión 14 o superior)</li>
+            <li><strong>Conexión a Internet estable:</strong> Se requiere conexión para la primera carga de datos. Velocidad mínima recomendada: 1 Mbps.</li>
+            <li><strong>Resolución de pantalla mínima:</strong> Desktop: 1024x768 píxeles, Tablet: 768x1024 píxeles, Móvil: 360x640 píxeles</li>
+        </ul>
+        
+        <h3>2.2 Inicio de Sesión</h3>
+        
+        <p>Para acceder a todas las funcionalidades del sistema, incluyendo guardar favoritos, dejar comentarios y personalizar tu experiencia, necesitas crear una cuenta e iniciar sesión.</p>
+        
+        <p><strong>URL de Acceso:</strong> https://pito-perez.github.io/</p>
+        
+        <h4>Proceso de Registro (Primera vez):</h4>
+        
+        <ol>
+            <li>Abre tu navegador y navega a la URL de acceso mencionada arriba.</li>
+            <li>Localiza el botón "👤 Iniciar Sesión / Registrarse" en la esquina superior derecha del menú principal y haz clic en él.</li>
+        </ol>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-02-boton-autenticacion.jpg" alt="Vista del header mostrando el botón de autenticación" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 2</strong><br>Botón de autenticación<br><small>Coloca la imagen como: capturas-manual/captura-02-boton-autenticacion.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 2: Botón de autenticación "👤 Iniciar Sesión / Registrarse" en el header</div>
+        
+        <ol start="3">
+            <li>Se abrirá un modal con dos pestañas: "Iniciar Sesión" y "Registrarse". Haz clic en la pestaña "Registrarse".</li>
+        </ol>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-03-modal-registro.jpg" alt="Modal de autenticación con pestaña Registrarse activa" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 3</strong><br>Modal de registro<br><small>Coloca la imagen como: capturas-manual/captura-03-modal-registro.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 3: Modal de autenticación con pestaña "Registrarse" activa</div>
+        
+        <ol start="4">
+            <li>Completa el formulario de registro con la siguiente información:
+                <ul>
+                    <li><strong>Nombre de Usuario:</strong> Elige un nombre único que te identifique (obligatorio). Este nombre será visible en tus comentarios y favoritos.</li>
+                    <li><strong>Correo Electrónico:</strong> Ingresa una dirección de correo válida (obligatorio).</li>
+                    <li><strong>Contraseña:</strong> Crea una contraseña segura con al menos 8 caracteres (obligatorio).</li>
+                </ul>
+            </li>
+        </ol>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-04-formulario-registro.jpg" alt="Formulario de registro con validación" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 4</strong><br>Formulario de registro<br><small>Coloca la imagen como: capturas-manual/captura-04-formulario-registro.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 4: Formulario de registro con campos de Nombre de Usuario, Email y Contraseña</div>
+        
+        <ol start="5">
+            <li>Haz clic en el botón "Registrarse".</li>
+            <li>Si el registro es exitoso, serás redirigido automáticamente a la página principal y verás tu nombre de usuario en el encabezado.</li>
+        </ol>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-05-header-autenticado.jpg" alt="Header después de iniciar sesión" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 5</strong><br>Header autenticado<br><small>Coloca la imagen como: capturas-manual/captura-05-header-autenticado.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 5: Header después de iniciar sesión mostrando el nombre del usuario</div>
+        
+        <h4>Proceso de Inicio de Sesión (Usuarios existentes):</h4>
+        
+        <ol>
+            <li>Navega a la URL de acceso del sistema.</li>
+            <li>Haz clic en el botón "👤 Iniciar Sesión / Registrarse" ubicado en la esquina superior derecha.</li>
+            <li>Se abrirá un modal con dos pestañas. Haz clic en la pestaña "Iniciar Sesión".</li>
+        </ol>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-06-modal-login.jpg" alt="Modal de inicio de sesión" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 6</strong><br>Modal de login<br><small>Coloca la imagen como: capturas-manual/captura-06-modal-login.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 6: Modal de autenticación con pestaña "Iniciar Sesión" activa</div>
+        
+        <ol start="4">
+            <li>Introduce tu Nombre de Usuario, Correo Electrónico y Contraseña.</li>
+            <li>Haz clic en el botón "Iniciar Sesión".</li>
+        </ol>
+        
+        <div class="divider"></div>
+        
+        <h2 id="navegacion">3. Navegación y Funcionalidades Clave</h2>
+        
+        <h3>3.1 El Menú Principal</h3>
+        
+        <p>El menú de navegación, ubicado en la parte superior de la página, contiene las secciones fundamentales del sistema:</p>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-07-menu-principal.jpg" alt="Menú principal de navegación" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 7</strong><br>Menú principal<br><small>Coloca la imagen como: capturas-manual/captura-07-menu-principal.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 7: Menú principal de navegación con todos los botones</div>
+        
+        <h4>📊 Panel General</h4>
+        
+        <p>Esta sección te muestra una visión general del mercado de smartphones mediante gráficos dinámicos e interactivos. Aquí puedes visualizar:</p>
+        
+        <ul>
+            <li>Precio promedio del mercado por rango</li>
+            <li>Distribución de capacidad de batería</li>
+            <li>Popularidad de sistemas operativos (Android, iOS, etc.)</li>
+            <li>Estadísticas de cámaras (megapíxeles promedio)</li>
+        </ul>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-08-panel-graficos.jpg" alt="Panel General con gráficos interactivos" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 8</strong><br>Panel con gráficos<br><small>Coloca la imagen como: capturas-manual/captura-08-panel-graficos.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 8: Panel General mostrando gráficos de Precio por Marca y Capacidad de Batería</div>
+        
+        <h4>🔍 Búsqueda Avanzada</h4>
+        
+        <p>Esta es la herramienta principal para encontrar smartphones que cumplan con tus criterios específicos. Incluye filtros múltiples que te permiten refinar tu búsqueda por marca, sistema operativo, RAM, almacenamiento, cámara, batería y precio.</p>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-09-busqueda-filtros.jpg" alt="Búsqueda Avanzada con todos los filtros" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 9</strong><br>Búsqueda con filtros<br><small>Coloca la imagen como: capturas-manual/captura-09-busqueda-filtros.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 9: Sección de Búsqueda Avanzada mostrando filtros de Información Básica, Especificaciones y Rendimiento y Precio</div>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-10-resultados-busqueda.jpg" alt="Resultados de búsqueda con tarjetas de smartphones" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 10</strong><br>Resultados de búsqueda<br><small>Coloca la imagen como: capturas-manual/captura-10-resultados-busqueda.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 10: Resultados de búsqueda mostrando tarjetas de smartphones (Galaxy A34, A54, A55) con precios y botones de acción</div>
+        
+        <h4>🎯 Modo Fácil</h4>
+        
+        <p>Si no estás seguro de qué características necesitas, el Modo Fácil es tu mejor aliado. Es un asistente interactivo que te hace preguntas simples sobre tu presupuesto, uso principal, preferencias de pantalla, etc.</p>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-11-modo-facil-presupuesto.jpg" alt="Modo Fácil - Pregunta sobre presupuesto" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 11</strong><br>Modo Fácil - Presupuesto<br><small>Coloca la imagen como: capturas-manual/captura-11-modo-facil-presupuesto.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 11: Modo Fácil - Pregunta "¿Cuál es tu presupuesto aproximado?" con opciones (Económico, Accesible, Intermedio, Alto, Premium, Flexible)</div>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-12-modo-facil-uso.jpg" alt="Modo Fácil - Pregunta sobre tipo de uso" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 12</strong><br>Modo Fácil - Uso<br><small>Coloca la imagen como: capturas-manual/captura-12-modo-facil-uso.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 12: Modo Fácil - Pregunta "¿Para qué usarás principalmente tu teléfono?" con opciones (Básico, Redes Sociales, Juegos, Trabajo, Creativo, Estudios, Viajes, Uso Mixto)</div>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-13-resultados-modo-facil.jpg" alt="Resultados del Modo Fácil con recomendaciones" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 13</strong><br>Resultados Modo Fácil<br><small>Coloca la imagen como: capturas-manual/captura-13-resultados-modo-facil.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 13: Resultados del Modo Fácil mostrando "¡Recomendaciones Perfectas!" con smartphones rankeados (iPhone 16 Pro Max, iPhone 16 Pro, iPhone 16) y porcentajes de coincidencia</div>
+        
+        <h4>📊 Comparar</h4>
+        
+        <p>Esta funcionalidad te permite comparar hasta 3 smartphones lado a lado en una tabla detallada.</p>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-14-tabla-comparativa.jpg" alt="Tabla comparativa de smartphones" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 14</strong><br>Tabla comparativa<br><small>Coloca la imagen como: capturas-manual/captura-14-tabla-comparativa.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 14: Vista de comparación vacía con instrucciones "No hay teléfonos para comparar" y botones para ir a Búsqueda Avanzada o Modo Fácil</div>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-15-boton-flotante.jpg" alt="Botón flotante de comparación" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 15</strong><br>Botón flotante<br><small>Coloca la imagen como: capturas-manual/captura-15-boton-flotante.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 15: Botón flotante de comparación en la esquina inferior derecha (se muestra cuando hay smartphones agregados)</div>
+        
+        <h4>👤 Mi Cuenta</h4>
+        
+        <p>Desde aquí puedes gestionar tu perfil y acceder a funciones personalizadas: favoritos, historial de búsquedas, etc.</p>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-16-mi-cuenta-vista.jpg" alt="Vista de Mi Cuenta con pestañas" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 16</strong><br>Mi Cuenta<br><small>Coloca la imagen como: capturas-manual/captura-16-mi-cuenta-vista.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 16: Sección Mi Cuenta mostrando el header con estadísticas (0 Favoritos, 0 Búsquedas) y las pestañas de Favoritos e Historial</div>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-17-favoritos-vacio.jpg" alt="Pestaña de Favoritos" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 17</strong><br>Favoritos<br><small>Coloca la imagen como: capturas-manual/captura-17-favoritos-vacio.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 17: Pestaña de Favoritos mostrando estado vacío con mensaje "No tienes favoritos aún" y botón "Explorar Smartphones"</div>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-18-historial.jpg" alt="Pestaña de Historial de búsquedas" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 18</strong><br>Historial<br><small>Coloca la imagen como: capturas-manual/captura-18-historial.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 18: Pestaña de Historial (se muestra cuando hay búsquedas guardadas con filtros aplicados)</div>
+        
+        <h3>3.2 Búsqueda y Filtrado de Smartphones</h3>
+        
+        <h4>Búsqueda Básica:</h4>
+        
+        <ol>
+            <li>Ve a la sección "🔍 Búsqueda Avanzada" desde el menú principal.</li>
+            <li>En la barra de búsqueda, escribe el nombre del modelo que buscas (ej: "iPhone 15", "Galaxy S23").</li>
+            <li>Los resultados se mostrarán automáticamente mientras escribes.</li>
+        </ol>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-19-busqueda-tiempo-real.jpg" alt="Búsqueda en tiempo real" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 19</strong><br>Búsqueda tiempo real<br><small>Coloca la imagen como: capturas-manual/captura-19-busqueda-tiempo-real.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 19: Barra de búsqueda "Buscar por nombre" con resultados apareciendo en tiempo real</div>
+        
+        <h4>Búsqueda con Filtros:</h4>
+        
+        <p>Puedes combinar múltiples filtros para refinar tu búsqueda. Los resultados se actualizarán automáticamente conforme seleccionas filtros.</p>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-20-filtros-aplicados.jpg" alt="Filtros aplicados y resultados" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 20</strong><br>Filtros aplicados<br><small>Coloca la imagen como: capturas-manual/captura-20-filtros-aplicados.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 20: Filtros aplicados en Búsqueda Avanzada con resultados correspondientes</div>
+        
+        <h3>3.3 Creación y Edición de Registros</h3>
+        
+        <h4>Agregar a Favoritos:</h4>
+        
+        <ol>
+            <li>Navega hasta cualquier smartphone en los resultados de búsqueda.</li>
+            <li>Haz clic en el icono de corazón "❤️" en la esquina superior derecha de la tarjeta del smartphone.</li>
+            <li>El smartphone se agregará automáticamente a tu lista de favoritos.</li>
+        </ol>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-21-boton-favoritos.jpg" alt="Botón de favoritos en tarjeta" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 21</strong><br>Botón favoritos<br><small>Coloca la imagen como: capturas-manual/captura-21-boton-favoritos.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 21: Tarjeta de smartphone mostrando el botón de favoritos (❤️) y comparar (📊) en la esquina superior derecha</div>
+        
+        <h4>Agregar a Comparación:</h4>
+        
+        <ol>
+            <li>En cualquier tarjeta de smartphone, localiza el botón "📊 Comparar".</li>
+            <li>Haz clic en "📊 Comparar" para agregar el smartphone a la lista de comparación.</li>
+            <li>Puedes agregar hasta 3 smartphones a la vez.</li>
+        </ol>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-22-boton-comparar.jpg" alt="Botón de comparar y botón flotante" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 22</strong><br>Botón comparar<br><small>Coloca la imagen como: capturas-manual/captura-22-boton-comparar.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 22: Botón de comparar (📊) en tarjeta y botón flotante con contador (se muestra cuando hay smartphones agregados)</div>
+        
+        <h4>Crear un Comentario:</h4>
+        
+        <ol>
+            <li>Haz clic en "Ver Detalles" en cualquier tarjeta de smartphone.</li>
+            <li>Se abrirá un modal con toda la información. Desplázate hasta la sección "💬 Comentarios y Reseñas".</li>
+            <li>Si estás autenticado, verás un formulario para escribir tu reseña con calificación por estrellas y campo de texto.</li>
+            <li>Haz clic en "Publicar Reseña".</li>
+        </ol>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-23-modal-comentarios.jpg" alt="Modal de detalles con sección de comentarios" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 23</strong><br>Modal con comentarios<br><small>Coloca la imagen como: capturas-manual/captura-23-modal-comentarios.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 23: Modal de detalles de smartphone (Galaxy A34) mostrando sección "💬 Comentarios y Reseñas" con calificación promedio (0.0) y mensaje para iniciar sesión</div>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-24-lista-comentarios.jpg" alt="Lista de comentarios y reseñas" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 24</strong><br>Lista comentarios<br><small>Coloca la imagen como: capturas-manual/captura-24-lista-comentarios.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 24: Sección de comentarios mostrando mensaje "Aún no hay comentarios sobre este teléfono. ¡Sé el primero en compartir tu opinión!"</div>
+        
+        <div class="divider"></div>
+        
+        <h2 id="soporte">4. Soporte y Solución de Problemas</h2>
+        
+        <h3>4.2 Chatbot Integrado</h3>
+        
+        <p>El sistema incluye un chatbot inteligente que puede ayudarte con preguntas frecuentes y guiarte en el uso del sistema.</p>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-25-boton-chatbot.jpg" alt="Botón flotante del chatbot" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 25</strong><br>Botón chatbot<br><small>Coloca la imagen como: capturas-manual/captura-25-boton-chatbot.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 25: Botón flotante del chatbot (💬) en la esquina inferior izquierda</div>
+        
+        <div class="screenshot">
+            <img src="capturas-manual/captura-26-ventana-chatbot.jpg" alt="Ventana del chatbot abierta" onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><strong>CAPTURA DE PANTALLA 26</strong><br>Ventana chatbot<br><small>Coloca la imagen como: capturas-manual/captura-26-ventana-chatbot.jpg</small></div>'">
+        </div>
+        <div class="screenshot-caption">Figura 26: Ventana del chatbot abierta con mensaje de bienvenida y opciones rápidas</div>
+        
+        <div class="divider"></div>
+        
+        <h2 id="recomendaciones">5. Recomendaciones Finales y Consejos de Uso</h2>
+        
+        <p>Para aprovechar al máximo el sistema Pito Pérez, te recomendamos seguir estos consejos:</p>
+        
+        <ul>
+            <li>Usa el "Modo Fácil" si no estás seguro de qué teléfono elegir</li>
+            <li>Activa la función "📊 Comparar" desde cualquier tarjeta</li>
+            <li>Aprovecha el modo offline después de tu primera visita</li>
+            <li>Consulta el chatbot para dudas rápidas</li>
+            <li>Revisa los comentarios de otros usuarios en los detalles de cada smartphone</li>
+            <li>Guarda tus favoritos para consultarlos más tarde</li>
+        </ul>
+        
+        <div class="divider"></div>
+        
+        <h2 id="indice-capturas">6. Índice de Capturas de Pantalla</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Número</th>
+                    <th>Descripción</th>
+                    <th>Sección</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Pantalla principal del sistema con menú de navegación y panel general</td>
+                    <td>1. Introducción</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Botón de autenticación en el header</td>
+                    <td>2.2 Inicio de Sesión</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Modal de autenticación con pestañas</td>
+                    <td>2.2 Inicio de Sesión</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Formulario de registro completo</td>
+                    <td>2.2 Inicio de Sesión</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Header después de iniciar sesión</td>
+                    <td>2.2 Inicio de Sesión</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Modal de inicio de sesión</td>
+                    <td>2.2 Inicio de Sesión</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Menú principal completo de navegación</td>
+                    <td>3.1 El Menú Principal</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>Panel General con gráficos interactivos</td>
+                    <td>3.1 El Menú Principal</td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>Sección de Búsqueda Avanzada con filtros</td>
+                    <td>3.1 El Menú Principal</td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>Resultados de búsqueda con tarjetas de smartphones</td>
+                    <td>3.1 El Menú Principal</td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td>Modo Fácil - Primera pregunta (presupuesto)</td>
+                    <td>3.1 El Menú Principal</td>
+                </tr>
+                <tr>
+                    <td>12</td>
+                    <td>Modo Fácil - Pregunta sobre tipo de uso</td>
+                    <td>3.1 El Menú Principal</td>
+                </tr>
+                <tr>
+                    <td>13</td>
+                    <td>Resultados del Modo Fácil con recomendaciones</td>
+                    <td>3.1 El Menú Principal</td>
+                </tr>
+                <tr>
+                    <td>14</td>
+                    <td>Tabla comparativa de smartphones</td>
+                    <td>3.1 El Menú Principal</td>
+                </tr>
+                <tr>
+                    <td>15</td>
+                    <td>Botón flotante de comparación</td>
+                    <td>3.1 El Menú Principal</td>
+                </tr>
+                <tr>
+                    <td>16</td>
+                    <td>Sección Mi Cuenta con pestañas</td>
+                    <td>3.1 El Menú Principal</td>
+                </tr>
+                <tr>
+                    <td>17</td>
+                    <td>Pestaña de Favoritos</td>
+                    <td>3.1 El Menú Principal</td>
+                </tr>
+                <tr>
+                    <td>18</td>
+                    <td>Pestaña de Historial de búsquedas</td>
+                    <td>3.1 El Menú Principal</td>
+                </tr>
+                <tr>
+                    <td>19</td>
+                    <td>Barra de búsqueda con resultados en tiempo real</td>
+                    <td>3.2 Búsqueda y Filtrado</td>
+                </tr>
+                <tr>
+                    <td>20</td>
+                    <td>Filtros aplicados y resultados filtrados</td>
+                    <td>3.2 Búsqueda y Filtrado</td>
+                </tr>
+                <tr>
+                    <td>21</td>
+                    <td>Botón de favoritos en tarjeta de smartphone</td>
+                    <td>3.3 Creación y Edición</td>
+                </tr>
+                <tr>
+                    <td>22</td>
+                    <td>Botón de comparar y botón flotante</td>
+                    <td>3.3 Creación y Edición</td>
+                </tr>
+                <tr>
+                    <td>23</td>
+                    <td>Modal de detalles con formulario de comentarios</td>
+                    <td>3.3 Creación y Edición</td>
+                </tr>
+                <tr>
+                    <td>24</td>
+                    <td>Sección de comentarios con reseñas existentes</td>
+                    <td>3.3 Creación y Edición</td>
+                </tr>
+                <tr>
+                    <td>25</td>
+                    <td>Botón flotante del chatbot</td>
+                    <td>4.2 Chatbot Integrado</td>
+                </tr>
+                <tr>
+                    <td>26</td>
+                    <td>Ventana del chatbot abierta</td>
+                    <td>4.2 Chatbot Integrado</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="note" style="margin-top: 30px;">
+            <strong>Nota importante:</strong> Para agregar las capturas de pantalla reales, reemplaza cada placeholder (caja con borde punteado) con la imagen correspondiente. Las capturas deben ser claras, en alta resolución y mostrar exactamente lo que se describe en cada caso.
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #667eea;">
+            <p><strong>¡Gracias por usar Pito Pérez!</strong></p>
+            <p>Esperamos que esta guía te haya sido útil.</p>
+            <p style="margin-top: 20px; color: #666; font-size: 0.9em;">
+                Versión del Manual: 1.1<br>
+                Última actualización: Noviembre 2025
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+

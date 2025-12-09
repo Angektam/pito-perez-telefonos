@@ -5,11 +5,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pito Pérez - Guía Interactiva de Smartphones</title>
+    <meta name="description" content="Guía interactiva para encontrar el smartphone perfecto. Compara precios, características, batería y más. Búsqueda avanzada, modo fácil y comparación de dispositivos.">
+    <meta name="keywords" content="smartphones, teléfonos móviles, comparar celulares, guía de compra, iPhone, Samsung, Android, iOS">
+    <meta name="author" content="Pito Pérez">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Spanish">
     
     <!-- Meta Tags de Seguridad -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta name="referrer" content="strict-origin-when-cross-origin">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pito-perez.github.io/">
+    <meta property="og:title" content="Pito Pérez - Guía Interactiva de Smartphones">
+    <meta property="og:description" content="Guía interactiva para encontrar el smartphone perfecto. Compara precios, características, batería y más.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&h=630&fit=crop">
+    <meta property="og:locale" content="es_ES">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://pito-perez.github.io/">
+    <meta name="twitter:title" content="Pito Pérez - Guía Interactiva de Smartphones">
+    <meta name="twitter:description" content="Guía interactiva para encontrar el smartphone perfecto. Compara precios, características, batería y más.">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&h=630&fit=crop">
     
     <!-- Meta Tags PWA -->
     <meta name="theme-color" content="#4f46e5">
@@ -17,14 +37,19 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Pito Pérez">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%234f46e5'/><text y='.9em' font-size='90' text-anchor='middle' fill='white'>📱</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%234f46e5'/><text y='.9em' font-size='90' text-anchor='middle' fill='white'>📱</text></svg>">
     
-    <!-- Preconnect para fuentes -->
+    <!-- Preconnect para fuentes (solo si hay internet) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
-    <!-- Fuentes -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Preload recursos críticos -->
+    <link rel="preload" href="src/css/style.css" as="style">
+    
+    <!-- Fuentes con fallback offline -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
     
     <!-- Estilos -->
     <link rel="stylesheet" href="src/css/style.css">
@@ -35,49 +60,73 @@
         }
     </style>
     
-    <!-- Scripts Externos -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Scripts Externos con fallback offline -->
+    <script>
+        // Detectar si hay conexión y cargar scripts externos solo si hay internet
+        if (navigator.onLine) {
+            // Cargar Tailwind CSS
+            const tailwindScript = document.createElement('script');
+            tailwindScript.src = 'https://cdn.tailwindcss.com';
+            tailwindScript.defer = true;
+            tailwindScript.onerror = function() {
+                console.warn('Tailwind CDN no disponible, usando estilos locales');
+            };
+            document.head.appendChild(tailwindScript);
+            
+            // Cargar Chart.js
+            const chartScript = document.createElement('script');
+            chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+            chartScript.defer = true;
+            chartScript.onerror = function() {
+                console.warn('Chart.js CDN no disponible, algunos gráficos pueden no funcionar');
+            };
+            document.head.appendChild(chartScript);
+        } else {
+            console.log('Modo offline: scripts externos no cargados');
+        }
+    </script>
 </head>
 <body class="bg-slate-50 text-slate-800">
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigo-600 focus:text-white focus:rounded-lg focus:shadow-lg">Saltar al contenido principal</a>
+    
     <!-- ============================================ -->
     <!-- HEADER - Navegación Principal -->
     <!-- ============================================ -->
-    <header class="glass sticky top-0 z-40 shadow-lg border-b border-white/20">
+    <header class="glass sticky top-0 z-40 shadow-lg border-b border-white/20" role="banner">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <!-- Logo -->
                 <div class="flex items-center space-x-3">
-                    <span class="text-3xl font-extrabold gradient-text animate-pulse">
+                    <h1 class="text-3xl font-extrabold gradient-text animate-pulse">
                         Pito Pérez
-                    </span>
+                    </h1>
                 </div>
                 
                 <!-- Navegación Desktop -->
-                <nav class="hidden md:flex items-center space-x-2">
-                    <button data-view="dashboard" class="nav-item nav-item-active px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105">📊 Panel General</button>
-                    <button data-view="search" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105">🔍 Búsqueda Avanzada</button>
-                    <button data-view="easy" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105">🎯 Modo Fácil</button>
-                    <button data-view="comparison" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105">📊 Comparar</button>
-                    <button data-view="account" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105">👤 Mi Cuenta</button>
-                    <button data-view="comments" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105">💬 Comentarios</button>
+                <nav class="hidden md:flex items-center space-x-2" role="navigation" aria-label="Navegación principal">
+                    <button data-view="dashboard" class="nav-item nav-item-active px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105" aria-label="Ver panel general" aria-current="page">📊 Panel General</button>
+                    <button data-view="search" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105" aria-label="Búsqueda avanzada de smartphones">🔍 Búsqueda Avanzada</button>
+                    <button data-view="easy" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105" aria-label="Modo fácil para encontrar tu smartphone ideal">🎯 Modo Fácil</button>
+                    <button data-view="comparison" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105" aria-label="Comparar smartphones">📊 Comparar</button>
+                    <button data-view="account" class="nav-item px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 modern-btn hover:scale-105" aria-label="Mi cuenta de usuario">👤 Mi Cuenta</button>
                 </nav>
                 
                 <!-- Sección de Utilidades y Autenticación -->
                 <div id="auth-section" class="flex items-center space-x-4">
                     <!-- Botón de Ayuda -->
-                    <button id="help-btn" class="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300" title="Ayuda">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button id="help-btn" class="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300" title="Ayuda" aria-label="Abrir ayuda" aria-expanded="false">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     </button>
                     
                     <!-- Botón de Modo Oscuro/Claro -->
-                    <button id="theme-toggle" class="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300" title="Cambiar tema">
-                        <svg id="sun-icon" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button id="theme-toggle" class="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-300" title="Cambiar tema" aria-label="Cambiar entre modo claro y oscuro" aria-pressed="false">
+                        <svg id="sun-icon" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                         </svg>
-                        <svg id="moon-icon" class="w-6 h-6 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg id="moon-icon" class="w-6 h-6 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                         </svg>
                     </button>
@@ -94,55 +143,63 @@
     <!-- ============================================ -->
     <!-- MAIN CONTENT - Contenido Principal -->
     <!-- ============================================ -->
-    <main class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
+    <main id="main-content" class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10" role="main">
         <!-- Indicador de Carga -->
-        <div id="loading-indicator" class="text-center py-20">
-            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500 mx-auto"></div>
+        <div id="loading-indicator" class="text-center py-20" role="status" aria-live="polite" aria-label="Cargando contenido">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500 mx-auto" aria-hidden="true"></div>
             <p class="mt-4 text-xl font-semibold text-slate-700">Cargando catálogo dinámico...</p>
         </div>
 
         <!-- Vista: Panel General / Dashboard -->
-        <div id="dashboard-view" class="view-container hidden">
+        <section id="dashboard-view" class="view-container hidden" aria-labelledby="dashboard-title">
             <div class="text-center mb-12 stagger-animation">
-                <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4">Bienvenido a la Guía de Smartphones</h1>
+                <h2 id="dashboard-title" class="text-4xl md:text-5xl font-extrabold text-white mb-4">Bienvenido a la Guía de Smartphones</h2>
                 <p class="mt-4 text-lg text-white/90 max-w-2xl mx-auto">Explora el mercado de teléfonos con nuestros gráficos interactivos o encuentra tu dispositivo ideal con nuestras herramientas de búsqueda. (Datos obtenidos de una API)</p>
             </div>
             <div class="glass p-8 rounded-3xl shadow-2xl border border-white/20 mb-8">
-                <h2 class="text-2xl font-bold text-center mb-2">Resumen del Mercado</h2>
+                <h3 class="text-2xl font-bold text-center mb-2">Resumen del Mercado</h3>
                 <p class="text-slate-500 text-center mb-8">Estos gráficos se basan en nuestro catálogo de productos simulados.</p>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     <div>
-                        <h3 class="text-lg font-semibold text-center mb-4">Precio Promedio por Marca (MXN)</h3>
-                        <div class="chart-container"><canvas id="priceChart"></canvas></div>
+                        <h4 class="text-lg font-semibold text-center mb-4">Precio Promedio por Marca (MXN)</h4>
+                        <div class="chart-container" role="img" aria-label="Gráfico de precio promedio por marca">
+                            <canvas id="priceChart"></canvas>
+                        </div>
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold text-center mb-4">Capacidad de Batería (mAh)</h3>
-                        <div class="chart-container"><canvas id="batteryChart"></canvas></div>
+                        <h4 class="text-lg font-semibold text-center mb-4">Capacidad de Batería (mAh)</h4>
+                        <div class="chart-container" role="img" aria-label="Gráfico de capacidad de batería">
+                            <canvas id="batteryChart"></canvas>
+                        </div>
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold text-center mb-4">Distribución de Sistema Operativo</h3>
-                        <div class="chart-container"><canvas id="osChart"></canvas></div>
+                        <h4 class="text-lg font-semibold text-center mb-4">Distribución de Sistema Operativo</h4>
+                        <div class="chart-container" role="img" aria-label="Gráfico de distribución de sistemas operativos">
+                            <canvas id="osChart"></canvas>
+                        </div>
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold text-center mb-4">Cámara Principal (MP)</h3>
-                        <div class="chart-container"><canvas id="cameraChart"></canvas></div>
+                        <h4 class="text-lg font-semibold text-center mb-4">Cámara Principal (MP)</h4>
+                        <div class="chart-container" role="img" aria-label="Gráfico de cámara principal en megapíxeles">
+                            <canvas id="cameraChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Vista: Búsqueda Avanzada -->
-        <div id="search-view" class="view-container hidden">
+        <section id="search-view" class="view-container hidden" aria-labelledby="search-title">
             <div id="search-results-container" class="mt-8">
                 <!-- Resultados de búsqueda se cargan dinámicamente -->
             </div>
-        </div>
+        </section>
 
         <!-- Vista: Modo Fácil -->
-        <div id="easy-view" class="view-container hidden">
+        <section id="easy-view" class="view-container hidden" aria-labelledby="easy-title">
              <div class="bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 p-8 md:p-12 rounded-3xl shadow-2xl border-4 border-white/30 text-center mb-8 transform transition-all duration-500 hover:scale-[1.02]">
                 <div class="text-6xl md:text-7xl mb-4 animate-bounce">🎯</div>
-                <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 drop-shadow-lg">Modo Fácil</h1>
+                <h2 id="easy-title" class="text-4xl md:text-5xl font-extrabold text-white mb-4 drop-shadow-lg">Modo Fácil</h2>
                 <p class="text-lg md:text-xl text-white/95 leading-relaxed max-w-3xl mx-auto font-medium mb-4">
                     Responde algunas preguntas simples y te ayudaremos a encontrar el teléfono perfecto.
                 </p>
@@ -161,203 +218,167 @@
             <div id="easy-mode-results-container" class="mt-12">
                 <!-- Resultados del modo fácil se cargan dinámicamente -->
             </div>
-        </div>
+        </section>
 
         <!-- Vista: Mi Cuenta -->
-        <div id="account-view" class="view-container hidden">
+        <section id="account-view" class="view-container hidden" aria-labelledby="account-title">
             <!-- Contenido de cuenta se carga dinámicamente -->
-        </div>
+        </section>
 
         <!-- Vista: Comparar -->
-        <div id="comparison-view" class="view-container hidden">
+        <section id="comparison-view" class="view-container hidden" aria-labelledby="comparison-title">
             <div id="comparison-content">
                 <!-- Contenido de comparación se renderiza aquí -->
             </div>
-        </div>
+        </section>
 
-        <!-- Vista: Comentarios -->
-        <div id="comments-view" class="view-container hidden">
-            <div class="glass p-4 md:p-8 rounded-3xl shadow-2xl border border-white/20">
-                <h2 class="text-2xl md:text-3xl font-bold text-white mb-2 text-center">💬 Comentarios y Opiniones</h2>
-                <p class="text-white/90 text-sm md:text-base text-center mb-4 md:mb-8">Comparte tu experiencia y lee opiniones de otros usuarios sobre los teléfonos.</p>
-                
-                <!-- Formulario: Agregar Comentario -->
-                <div class="bg-white/10 backdrop-blur-sm p-6 rounded-2xl mb-8 shadow-lg border border-white/20">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                            <span class="text-2xl">✍️</span>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-white">Agregar Comentario</h3>
-                            <p class="text-sm text-white/80">Comparte tu experiencia con la comunidad</p>
-                        </div>
-                    </div>
-                    <div id="comment-auth-info" class="mb-4">
-                        <!-- Mensaje de autenticación se agregará aquí dinámicamente -->
-                    </div>
-                    <form id="comment-form" class="space-y-4">
-                        <div>
-                            <label for="comment-phone" class="block text-sm font-semibold text-white mb-2 flex items-center gap-2">
-                                <span>📱</span>
-                                Teléfono
-                            </label>
-                            <select id="comment-phone" required class="w-full p-3 border-2 border-white/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all bg-white/20 backdrop-blur-sm text-white">
-                                <option value="">Selecciona un teléfono</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="comment-rating" class="block text-sm font-semibold text-white mb-2 flex items-center gap-2">
-                                <span>⭐</span>
-                                Calificación
-                            </label>
-                            <div class="flex space-x-2 bg-white/20 backdrop-blur-sm p-3 rounded-lg">
-                                <input type="radio" id="rating-5" name="rating" value="5" class="sr-only">
-                                <label for="rating-5" class="rating-star text-3xl cursor-pointer hover:text-yellow-400 transition-all duration-200 hover:scale-125 transform" data-rating="5">⭐</label>
-                                <input type="radio" id="rating-4" name="rating" value="4" class="sr-only">
-                                <label for="rating-4" class="rating-star text-3xl cursor-pointer hover:text-yellow-400 transition-all duration-200 hover:scale-125 transform" data-rating="4">⭐</label>
-                                <input type="radio" id="rating-3" name="rating" value="3" class="sr-only">
-                                <label for="rating-3" class="rating-star text-3xl cursor-pointer hover:text-yellow-400 transition-all duration-200 hover:scale-125 transform" data-rating="3">⭐</label>
-                                <input type="radio" id="rating-2" name="rating" value="2" class="sr-only">
-                                <label for="rating-2" class="rating-star text-3xl cursor-pointer hover:text-yellow-400 transition-all duration-200 hover:scale-125 transform" data-rating="2">⭐</label>
-                                <input type="radio" id="rating-1" name="rating" value="1" class="sr-only">
-                                <label for="rating-1" class="rating-star text-3xl cursor-pointer hover:text-yellow-400 transition-all duration-200 hover:scale-125 transform" data-rating="1">⭐</label>
-                                <span id="rating-text" class="ml-2 text-sm font-medium text-white/80 flex items-center"></span>
-                            </div>
-                        </div>
-                        <div>
-                            <label for="comment-text" class="block text-sm font-semibold text-white mb-2 flex items-center gap-2">
-                                <span>💬</span>
-                                Comentario
-                            </label>
-                            <textarea id="comment-text" required rows="4" placeholder="Escribe tu opinión sobre este teléfono... ¿Qué te gustó? ¿Qué no te gustó? ¿Lo recomendarías?" class="w-full p-3 border-2 border-white/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all resize-none bg-white/20 backdrop-blur-sm text-white placeholder-white/60"></textarea>
-                            <div class="text-xs text-white/70 mt-1 flex justify-between">
-                                <span>Mínimo 10 caracteres</span>
-                                <span id="comment-length">0 caracteres</span>
-                            </div>
-                        </div>
-                        <div>
-                            <label for="comment-author" class="block text-sm font-semibold text-white mb-2 flex items-center gap-2">
-                                <span>👤</span>
-                                Tu nombre
-                            </label>
-                            <input type="text" id="comment-author" required placeholder="Tu nombre o alias" class="w-full p-3 border-2 border-white/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all bg-white/20 backdrop-blur-sm text-white placeholder-white/60">
-                        </div>
-                        <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-2">
-                            <span>📤</span>
-                            Publicar Comentario
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Filtros y Estadísticas -->
-                <div class="bg-white/10 backdrop-blur-sm p-4 md:p-6 rounded-2xl mb-6 border border-white/20 shadow-lg">
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-                        <div class="flex items-center gap-4 flex-wrap">
-                            <div class="flex items-center gap-2">
-                                <span class="text-2xl">📊</span>
-                                <div>
-                                    <div class="text-sm text-white/80">Total de comentarios</div>
-                                    <div id="total-comments-count" class="text-xl font-bold text-white">0</div>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-2xl">⭐</span>
-                                <div>
-                                    <div class="text-sm text-white/80">Calificación promedio</div>
-                                    <div id="average-rating" class="text-xl font-bold text-white">0.0</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex gap-2 flex-wrap">
-                            <input type="text" id="comment-search" placeholder="🔍 Buscar comentarios..." class="flex-1 min-w-[200px] px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400">
-                            <select id="comment-filter-phone" class="px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400">
-                                <option value="" class="text-slate-900">Todos los teléfonos</option>
-                            </select>
-                            <select id="comment-sort" class="px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400">
-                                <option value="recent">Más recientes</option>
-                                <option value="oldest">Más antiguos</option>
-                                <option value="rating-high">Mejor valorados</option>
-                                <option value="rating-low">Peor valorados</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Lista de Comentarios -->
-                <div id="comments-list" class="space-y-6">
-                    <!-- Los comentarios se cargarán aquí dinámicamente -->
-                </div>
-            </div>
-        </div>
     </main>
 
     <!-- ============================================ -->
     <!-- FOOTER - Navegación Móvil -->
     <!-- ============================================ -->
-    <footer class="md:hidden fixed bottom-0 left-0 right-0 glass border-t border-white/20 shadow-t-lg z-40 p-2">
-        <div class="flex justify-around">
-            <button data-view="dashboard" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-indigo-600">
-                <span class="text-2xl">📊</span>
+    <footer class="md:hidden fixed bottom-0 left-0 right-0 glass border-t border-white/20 shadow-t-lg z-40 p-2" role="navigation" aria-label="Navegación móvil">
+        <nav class="flex justify-around">
+            <button data-view="dashboard" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-indigo-600" aria-label="Panel general" aria-current="page">
+                <span class="text-2xl" aria-hidden="true">📊</span>
                 <span>Panel</span>
             </button>
-            <button data-view="search" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-slate-500">
-                <span class="text-2xl">🔍</span>
+            <button data-view="search" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-slate-500" aria-label="Búsqueda avanzada">
+                <span class="text-2xl" aria-hidden="true">🔍</span>
                 <span>Buscar</span>
             </button>
-            <button data-view="easy" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-slate-500">
-                <span class="text-2xl">🎯</span>
+            <button data-view="easy" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-slate-500" aria-label="Modo fácil">
+                <span class="text-2xl" aria-hidden="true">🎯</span>
                 <span>Fácil</span>
             </button>
-            <button data-view="comparison" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-slate-500">
-                <span class="text-2xl">📊</span>
+            <button data-view="comparison" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-slate-500" aria-label="Comparar smartphones">
+                <span class="text-2xl" aria-hidden="true">📊</span>
                 <span>Comparar</span>
             </button>
-            <button data-view="account" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-slate-500">
-                <span class="text-2xl">👤</span>
+            <button data-view="account" class="mobile-nav-item flex flex-col items-center p-2 rounded-lg text-xs font-semibold text-slate-500" aria-label="Mi cuenta">
+                <span class="text-2xl" aria-hidden="true">👤</span>
                 <span>Cuenta</span>
             </button>
-        </div>
+        </nav>
     </footer>
     <div class="h-20 md:hidden"></div>
 
     <!-- ============================================ -->
     <!-- COMPONENTES FLOTANTES -->
     <!-- ============================================ -->
+    <!-- Indicador de Modo Offline -->
+    <div id="offline-indicator" class="fixed top-20 right-4 z-50 hidden" role="status" aria-live="polite" aria-atomic="true">
+        <div class="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 border-2 border-white/30 backdrop-blur-sm animate-pulse hover:animate-none transition-all duration-300 max-w-sm">
+            <div class="flex-shrink-0">
+                <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83M4.93 4.93a9 9 0 000 12.728m0 0l2.829-2.829m-2.829 2.829L3 21"></path>
+                </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="font-bold text-sm leading-tight">📱 Modo Offline</div>
+                <div class="text-xs opacity-95 mt-0.5 leading-tight">Usando datos locales porque está activado</div>
+            </div>
+            <button id="close-offline-indicator" class="flex-shrink-0 text-white/90 hover:text-white hover:bg-white/20 rounded-full p-1 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50" aria-label="Cerrar indicador offline" title="Cerrar">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+    
     <!-- Botón flotante de comparación -->
-    <div id="comparison-fab" class="fixed bottom-20 right-4 z-50 hidden">
-        <button class="bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition-all duration-300 hover:scale-110 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <div id="comparison-fab" class="fixed bottom-20 right-4 z-50 hidden" role="complementary" aria-label="Comparación de smartphones">
+        <button class="bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition-all duration-300 hover:scale-110 flex items-center gap-2" aria-label="Ver comparación de smartphones seleccionados" aria-describedby="comparison-count">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
             </svg>
             <span class="hidden sm:inline font-semibold">Comparar</span>
-            <span id="comparison-count" class="bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">0</span>
+            <span id="comparison-count" class="bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center" aria-live="polite">0</span>
         </button>
+    </div>
+
+    <!-- Chatbot -->
+    <div id="chatbot-container" style="position: fixed; bottom: 20px; left: 20px; z-index: 50; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <!-- Botón flotante para abrir el chat -->
+        <button id="chatbot-toggle" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border: none; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4); transition: all 0.3s; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 6px 16px rgba(99, 102, 241, 0.6)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(99, 102, 241, 0.4)'" aria-label="Abrir chatbot de ayuda">
+            💬
+        </button>
+        
+        <!-- Ventana del chat -->
+        <div id="chatbot-window" style="display: none; position: absolute; bottom: 80px; left: 0; width: 350px; max-width: calc(100vw - 40px); height: 500px; max-height: calc(100vh - 100px); background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 1rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.3); flex-direction: column; overflow: hidden;">
+            <!-- Header del chat -->
+            <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 1rem; color: white; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.5rem;">🤖</span>
+                    <div>
+                        <h3 style="margin: 0; font-size: 1rem; font-weight: 600;">Asistente Virtual</h3>
+                        <p style="margin: 0; font-size: 0.75rem; opacity: 0.9;">¿En qué puedo ayudarte?</p>
+                    </div>
+                </div>
+                <button id="chatbot-close" style="background: rgba(255, 255, 255, 0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'" aria-label="Cerrar chat">×</button>
+            </div>
+            
+            <!-- Área de mensajes -->
+            <div id="chatbot-messages" style="flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; background: #f8fafc;">
+                <!-- Mensaje de bienvenida -->
+                <div style="display: flex; gap: 0.5rem;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">🤖</div>
+                    <div style="background: white; padding: 0.75rem 1rem; border-radius: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 80%;">
+                        <p style="margin: 0; font-size: 0.875rem; color: #1e293b; line-height: 1.5;">
+                            ¡Hola! 👋 Soy tu asistente virtual. Puedo ayudarte con:
+                        </p>
+                        <ul style="margin: 0.5rem 0 0 0; padding-left: 1.25rem; font-size: 0.875rem; color: #475569;">
+                            <li>Información sobre teléfonos</li>
+                            <li>Funcionalidades de la página</li>
+                            <li>Búsqueda y comparación</li>
+                        </ul>
+                        <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem; color: #64748b; font-style: italic;">
+                            Escribe tu pregunta o selecciona una opción rápida 👇
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Opciones rápidas -->
+            <div id="chatbot-quick-options" style="padding: 0.75rem 1rem; background: white; border-top: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                <button class="quick-option-btn" style="background: #f1f5f9; border: 1px solid #e2e8f0; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; cursor: pointer; color: #475569; transition: all 0.2s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">📱 Mejores teléfonos</button>
+                <button class="quick-option-btn" style="background: #f1f5f9; border: 1px solid #e2e8f0; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; cursor: pointer; color: #475569; transition: all 0.2s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">🔍 Cómo buscar</button>
+                <button class="quick-option-btn" style="background: #f1f5f9; border: 1px solid #e2e8f0; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; cursor: pointer; color: #475569; transition: all 0.2s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">📊 Comparar</button>
+                <button class="quick-option-btn" style="background: #f1f5f9; border: 1px solid #e2e8f0; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; cursor: pointer; color: #475569; transition: all 0.2s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">💡 Ayuda</button>
+            </div>
+            
+            <!-- Input para escribir -->
+            <div style="padding: 1rem; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 0.5rem;">
+                <input type="text" id="chatbot-input" placeholder="Escribe tu pregunta..." style="flex: 1; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; font-size: 0.875rem; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99, 102, 241, 0.1)'" onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none'" onkeypress="if(event.key === 'Enter') { window.sendChatbotMessage(); }">
+                <button id="chatbot-send" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border: none; color: white; padding: 0.75rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 1rem; transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" aria-label="Enviar mensaje">📤</button>
+            </div>
+        </div>
     </div>
 
     <!-- ============================================ -->
     <!-- MODALES -->
     <!-- ============================================ -->
     <!-- Modal Genérico -->
-    <div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 hidden">
+    <div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div id="modal-content" class="bg-white rounded-3xl shadow-2xl w-full max-w-md m-4 relative transform transition-all duration-300">
             <!-- Contenido del modal se carga dinámicamente -->
         </div>
     </div>
     
     <!-- Modal de Ayuda -->
-    <div id="help-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
+    <div id="help-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="help-modal-title">
         <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full m-4 relative transform transition-all duration-300 opacity-0 scale-95">
-            <button id="close-help-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors z-10 bg-white rounded-full p-2 shadow-lg">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button id="close-help-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors z-10 bg-white rounded-full p-2 shadow-lg" aria-label="Cerrar ayuda">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
             <div class="p-6">
                 <div class="text-center mb-4">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-2">Ayuda</h2>
+                    <h2 id="help-modal-title" class="text-2xl font-bold text-slate-800 mb-2">Ayuda</h2>
                 </div>
                 <div class="flex justify-center">
-                    <img id="help-image" src="src/images/b4ad327a-a040-42bf-862e-fd1e192ba284.webp" alt="Ayuda" class="max-w-full h-auto rounded-lg shadow-lg" style="max-height: 70vh;">
+                    <img id="help-image" src="src/images/b4ad327a-a040-42bf-862e-fd1e192ba284.webp" alt="Guía de ayuda de Pito Pérez - Instrucciones para usar la aplicación" class="max-w-full h-auto rounded-lg shadow-lg" style="max-height: 70vh;" loading="lazy">
                 </div>
             </div>
         </div>
@@ -367,8 +388,8 @@
     <!-- SCRIPTS -->
     <!-- ============================================ -->
     <!-- Scripts Base (orden importante) -->
-    <script src="src/js/security.js"></script>
-    <script src="src/js/fallback-db.js"></script>
+    <script src="src/js/security.js" defer></script>
+    <script src="src/js/fallback-db.js" defer></script>
     
     <!-- Script de inicialización para actualizar imágenes -->
     <script>
@@ -409,23 +430,102 @@
         });
     </script>
     
-    <!-- Scripts de Módulos -->
+    <!-- Scripts de Módulos - api.js debe cargarse primero -->
     <script type="module" src="src/js/api.js"></script>
-    <script type="module" src="src/js/script.js"></script>
+    <script type="module" src="src/js/script.js" defer></script>
     
-    <!-- Service Worker -->
+    <!-- Service Worker y detección offline -->
     <script>
+        // Detectar estado de conexión
+        let isOnline = navigator.onLine;
+        
+        // Función para mostrar/ocultar indicador offline
+        function updateOnlineStatus() {
+            const offlineIndicator = document.getElementById('offline-indicator');
+            if (offlineIndicator) {
+                if (!navigator.onLine) {
+                    offlineIndicator.classList.remove('hidden');
+                    isOnline = false;
+                } else {
+                    offlineIndicator.classList.add('hidden');
+                    isOnline = true;
+                }
+            }
+        }
+        
+        // Escuchar cambios de conexión
+        window.addEventListener('online', () => {
+            console.log('✅ Conexión restaurada');
+            updateOnlineStatus();
+            // Recargar datos si es necesario
+            if (typeof window.reloadDataOnReconnect === 'function') {
+                window.reloadDataOnReconnect();
+            }
+        });
+        
+        window.addEventListener('offline', () => {
+            console.log('⚠️ Sin conexión - Modo offline activado');
+            updateOnlineStatus();
+        });
+        
+        // Inicializar estado - asegurar que el indicador esté oculto si hay conexión
+        // Esperar un momento para que el DOM esté listo
+        setTimeout(() => {
+            updateOnlineStatus();
+            // Si hay conexión, asegurar que el indicador esté oculto
+            if (navigator.onLine) {
+                const offlineIndicator = document.getElementById('offline-indicator');
+                if (offlineIndicator) {
+                    offlineIndicator.classList.add('hidden');
+                }
+            }
+        }, 100);
+        
         // Registrar Service Worker para PWA
         if ('serviceWorker' in navigator) {
             const swPath = 'src/js/sw.js';
             navigator.serviceWorker.register(swPath)
                 .then((registration) => {
-                    console.log('✅ SW registrado exitosamente:', registration);
+                    console.log('✅ Service Worker registrado exitosamente:', registration.scope);
+                    
+                    // Verificar actualizaciones periódicamente
+                    setInterval(() => {
+                        registration.update();
+                    }, 60000); // Cada minuto
                 })
                 .catch((error) => {
-                    console.warn('⚠️ Service Worker no disponible (normal en desarrollo):', error.message);
+                    console.warn('⚠️ Service Worker no disponible:', error.message);
                 });
+        } else {
+            console.warn('⚠️ Service Worker no soportado en este navegador');
         }
+        
+        // Hacer función disponible globalmente
+        // Solo mostrar si realmente no hay conexión
+        window.showOfflineIndicator = function() {
+            if (!navigator.onLine) {
+                updateOnlineStatus();
+            } else {
+                // Si hay conexión, asegurar que esté oculto
+                const offlineIndicator = document.getElementById('offline-indicator');
+                if (offlineIndicator) {
+                    offlineIndicator.classList.add('hidden');
+                }
+            }
+        };
+        
+        // Configurar botón de cerrar indicador offline
+        document.addEventListener('DOMContentLoaded', () => {
+            const closeOfflineBtn = document.getElementById('close-offline-indicator');
+            if (closeOfflineBtn) {
+                closeOfflineBtn.addEventListener('click', () => {
+                    const offlineIndicator = document.getElementById('offline-indicator');
+                    if (offlineIndicator) {
+                        offlineIndicator.classList.add('hidden');
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>

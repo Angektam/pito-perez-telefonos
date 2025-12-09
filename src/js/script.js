@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div>
                         <div class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 mb-3">
-                            $${phone.price.toLocaleString('es-MX')}
+                            $${phone.price.toLocaleString('es-MX')} <span class="text-sm font-normal text-slate-600">MXN</span>
                         </div>
                         <div class="flex gap-2">
                             <button class="details-btn flex-1 bg-indigo-600 text-white font-semibold py-3 px-4 rounded-xl hover:bg-indigo-700 transition-colors modern-btn" data-id="${phone.id}">
@@ -151,33 +151,60 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('logout-btn').addEventListener('click', handleLogout);
         } else {
             authButtons.innerHTML = `
-                <button id="login-btn" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm">
-                    Iniciar Sesión
-                </button>
-                <button id="register-btn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors text-sm">
-                    Registrarse
+                <button id="auth-btn" class="bg-gradient-to-r from-blue-600 to-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:from-blue-700 hover:to-green-700 transition-all duration-300 text-sm shadow-lg hover:shadow-xl">
+                    👤 Iniciar Sesión / Registrarse
                 </button>
             `;
-            document.getElementById('login-btn').addEventListener('click', () => showAuthModal('login'));
-            document.getElementById('register-btn').addEventListener('click', () => showAuthModal('register'));
+            document.getElementById('auth-btn').addEventListener('click', () => {
+                // Mostrar modal con opciones de login y registro
+                showAuthModal('login');
+            });
         }
     };
 
     const renderCharts = () => {
         if (phoneDatabase.length === 0) return;
         
+        // Verificar si Chart.js está disponible
+        if (typeof Chart === 'undefined') {
+            console.warn('⚠️ Chart.js no está disponible. Los gráficos no se mostrarán.');
+            // Mostrar mensaje en los contenedores de gráficos
+            ['priceChart', 'batteryChart', 'osChart', 'cameraChart'].forEach(id => {
+                const canvas = document.getElementById(id);
+                if (canvas) {
+                    const container = canvas.parentElement;
+                    if (container) {
+                        container.innerHTML = `
+                            <div style="text-align: center; padding: 2rem; color: #64748b;">
+                                <p style="font-size: 1.5rem; margin-bottom: 0.5rem;">📊</p>
+                                <p style="margin-bottom: 0.5rem;">Los gráficos no están disponibles en modo offline.</p>
+                                <p style="font-size: 0.875rem; margin-top: 0.5rem;">Conecta a internet para ver los gráficos interactivos.</p>
+                            </div>
+                        `;
+                    }
+                }
+            });
+            return;
+        }
+        
         ['priceChart', 'batteryChart', 'osChart', 'cameraChart'].forEach(id => {
             const canvas = document.getElementById(id);
-            if (canvas && Chart.getChart(canvas)) {
-                Chart.getChart(canvas).destroy();
+            if (canvas && Chart && Chart.getChart) {
+                const existingChart = Chart.getChart(canvas);
+                if (existingChart) {
+                    existingChart.destroy();
+                }
             }
         });
 
         const brandData = phoneDatabase.reduce((acc, phone) => {
             if (!acc[phone.brand]) {
-                acc[phone.brand] = { prices: [], count: 0 };
+                acc[phone.brand] = { prices: [], batteries: [], count: 0 };
             }
             acc[phone.brand].prices.push(phone.price);
+            if (phone.battery && !isNaN(phone.battery)) {
+                acc[phone.brand].batteries.push(phone.battery);
+            }
             acc[phone.brand].count++;
             return acc;
         }, {});
@@ -186,6 +213,13 @@ document.addEventListener('DOMContentLoaded', () => {
             brand: brand.charAt(0).toUpperCase() + brand.slice(1),
             avgPrice: data.prices.reduce((a, b) => a + b, 0) / data.count,
         }));
+
+        const avgBatteryByBrand = Object.entries(brandData)
+            .filter(([brand, data]) => data.batteries.length > 0)
+            .map(([brand, data]) => ({
+                brand: brand.charAt(0).toUpperCase() + brand.slice(1),
+                avgBattery: Math.round(data.batteries.reduce((a, b) => a + b, 0) / data.batteries.length),
+            }));
         
         const osData = phoneDatabase.reduce((acc, phone) => {
             acc[phone.os] = (acc[phone.os] || 0) + 1;
@@ -194,11 +228,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const chartOptions = { maintainAspectRatio: false, responsive: true };
 
+        // Verificar nuevamente antes de crear gráficos
+        if (typeof Chart === 'undefined') {
+            return;
+        }
+
         new Chart('priceChart', {
             type: 'bar',
             data: {
                 labels: avgPriceByBrand.map(d => d.brand),
-                datasets: [{ label: 'Precio Promedio (MXN)', data: avgPriceByBrand.map(d => d.avgPrice), backgroundColor: '#4f46e5' }]
+                datasets: [{ label: 'Precio Promedio en Pesos Mexicanos (MXN)', data: avgPriceByBrand.map(d => d.avgPrice), backgroundColor: '#4f46e5' }]
             },
             options: chartOptions
         });
@@ -206,10 +245,10 @@ document.addEventListener('DOMContentLoaded', () => {
         new Chart('batteryChart', {
             type: 'bar',
             data: {
-                labels: phoneDatabase.map(p => p.name),
-                datasets: [{ label: 'Batería (mAh)', data: phoneDatabase.map(p => p.battery), backgroundColor: '#10b981' }]
+                labels: avgBatteryByBrand.map(d => d.brand),
+                datasets: [{ label: 'Capacidad Promedio de Batería (mAh)', data: avgBatteryByBrand.map(d => d.avgBattery), backgroundColor: '#10b981' }]
             },
-            options: { ...chartOptions, indexAxis: 'y' }
+            options: chartOptions
         });
 
         new Chart('osChart', {
@@ -242,77 +281,103 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         const selectHTML = (id, label, options) => `
-            <div class="flex-1 min-w-[150px]">
-                <label for="${id}" class="block text-sm font-medium text-slate-700 dark:text-slate-300">${label}</label>
-                <select id="${id}" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-slate-700 dark:text-slate-100">
-                    <option value="">Todos</option>
-                    ${options.map(o => `<option value="${o}">${o.charAt(0).toUpperCase() + o.slice(1)}</option>`).join('')}
+            <div style="flex: 1; min-width: 150px;">
+                <label for="${id}" style="display: block; font-size: 0.875rem; font-weight: 500; color: #ffffff; margin-bottom: 0.5rem;">${label}</label>
+                <select id="${id}" style="width: 100%; padding: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 0.875rem; margin-top: 0.25rem; outline: none; transition: all 0.2s; cursor: pointer;" onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99, 102, 241, 0.1)'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.3)'; this.style.boxShadow='none'">
+                    <option value="" style="background: #1e293b; color: #ffffff;">Todos</option>
+                    ${options.map(o => `<option value="${o}" style="background: #1e293b; color: #ffffff;">${o.charAt(0).toUpperCase() + o.slice(1)}</option>`).join('')}
                 </select>
             </div>`;
 
         const inputHTML = (id, label, placeholder, type = 'number') => `
-            <div class="flex-1 min-w-[150px]">
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">${label}</label>
-                <input type="${type}" id="${id}" placeholder="${placeholder}" class="block w-full text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md p-2 mt-1 dark:bg-slate-700 dark:text-slate-100">
+            <div style="flex: 1; min-width: 150px;">
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #ffffff; margin-bottom: 0.5rem;">${label}</label>
+                <input type="${type}" id="${id}" placeholder="${placeholder}" style="width: 100%; padding: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 0.875rem; margin-top: 0.25rem; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99, 102, 241, 0.1)'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.3)'; this.style.boxShadow='none'">
             </div>`;
 
         searchViewContainer.innerHTML = `
-                <div class="glass p-8 rounded-3xl shadow-2xl border border-white/20">
-                     <h2 class="text-3xl font-bold text-white mb-2 text-center">Búsqueda Avanzada</h2>
-                     <p class="text-white/90 text-center mb-6">Usa los filtros para encontrar exactamente lo que necesitas. Puedes dejar los campos vacíos.</p>
+                <div class="glass p-6 md:p-8 rounded-3xl shadow-2xl border border-white/20" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 1.5rem; padding: 2rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+                     <div style="text-align: center; margin-bottom: 2rem;">
+                         <h2 style="font-size: 2rem; font-weight: 700; color: #ffffff; margin-bottom: 0.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">🔍 Búsqueda Avanzada</h2>
+                         <p style="color: rgba(255, 255, 255, 0.9); font-size: 1rem; margin-bottom: 0;">Usa los filtros para encontrar exactamente lo que necesitas. Puedes dejar los campos vacíos.</p>
+                     </div>
                      
                      <!-- Filtros principales -->
-                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        ${selectHTML('filter-brand', 'Marca', filterOptions.brand)}
-                        ${selectHTML('filter-os', 'Sistema Operativo', filterOptions.os)}
-                        ${selectHTML('filter-condition', 'Condición', filterOptions.condition)}
+                     <div style="background: rgba(255, 255, 255, 0.05); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.1);">
+                         <h3 style="color: #ffffff; font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                             <span>📱</span> Información Básica
+                         </h3>
+                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            ${selectHTML('filter-brand', '🏷️ Marca', filterOptions.brand)}
+                            ${selectHTML('filter-os', '🤖 Sistema Operativo', filterOptions.os)}
+                            ${selectHTML('filter-condition', '✨ Condición', filterOptions.condition)}
+                         </div>
                      </div>
                      
                      <!-- Filtros de especificaciones -->
-                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        ${selectHTML('filter-storage', 'Almacenamiento', filterOptions.storage)}
-                        ${selectHTML('filter-ram', 'RAM', filterOptions.ram)}
-                        ${selectHTML('filter-screen', 'Tamaño de Pantalla', filterOptions.screen)}
-                        </div>
+                     <div style="background: rgba(255, 255, 255, 0.05); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.1);">
+                         <h3 style="color: #ffffff; font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                             <span>⚙️ Especificaciones</span>
+                         </h3>
+                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            ${selectHTML('filter-storage', '💾 Almacenamiento', filterOptions.storage)}
+                            ${selectHTML('filter-ram', '🚀 RAM', filterOptions.ram)}
+                            ${selectHTML('filter-screen', '📺 Tamaño de Pantalla', filterOptions.screen)}
+                         </div>
+                     </div>
                      
                      <!-- Filtros numéricos -->
-                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        ${inputHTML('filter-minCamera', 'Cámara Mínima (MP)', 'Ej: 48')}
-                        ${inputHTML('filter-minBattery', 'Batería Mínima (mAh)', 'Ej: 4500')}
-                         <div class="flex-1 min-w-[150px]">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Precio (MXN)</label>
-                             <div class="flex gap-2 mt-1">
-                                <input type="number" id="filter-minPrice" placeholder="Mínimo" class="block w-full text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md p-2 dark:bg-slate-700 dark:text-slate-100">
-                                <input type="number" id="filter-maxPrice" placeholder="Máximo" class="block w-full text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md p-2 dark:bg-slate-700 dark:text-slate-100">
-                             </div>
+                     <div style="background: rgba(255, 255, 255, 0.05); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.1);">
+                         <h3 style="color: #ffffff; font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                             <span>📊 Rendimiento y Precio</span>
+                         </h3>
+                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            ${inputHTML('filter-minCamera', '📷 Cámara Mínima (MP)', 'Ej: 48')}
+                            ${inputHTML('filter-minBattery', '🔋 Batería Mínima (mAh)', 'Ej: 4500')}
+                            <div style="flex: 1; min-width: 150px;">
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #ffffff; margin-bottom: 0.5rem;">💰 Precio (MXN)</label>
+                                <div style="display: flex; gap: 0.5rem; margin-top: 0.25rem;">
+                                    <input type="number" id="filter-minPrice" placeholder="Mínimo" style="flex: 1; width: 100%; padding: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 0.875rem; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99, 102, 241, 0.1)'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.3)'; this.style.boxShadow='none'">
+                                    <input type="number" id="filter-maxPrice" placeholder="Máximo" style="flex: 1; width: 100%; padding: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 0.875rem; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99, 102, 241, 0.1)'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.3)'; this.style.boxShadow='none'">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
                     <!-- Filtros adicionales -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                        <div class="flex-1 min-w-[150px]">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Buscar por nombre</label>
-                            <input type="text" id="filter-name" placeholder="Ej: iPhone, Samsung Galaxy..." class="block w-full text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md p-2 mt-1 dark:bg-slate-700 dark:text-slate-100">
-                        </div>
-                        <div class="flex-1 min-w-[150px]">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Ordenar por</label>
-                            <select id="filter-sort" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-slate-700 dark:text-slate-100">
-                                <option value="name">Nombre (A-Z)</option>
-                                <option value="price-asc">Precio (Menor a Mayor)</option>
-                                <option value="price-desc">Precio (Mayor a Menor)</option>
-                                <option value="battery-desc">Batería (Mayor a Menor)</option>
-                                <option value="camera-desc">Cámara (Mayor a Menor)</option>
-                                <option value="storage-desc">Almacenamiento (Mayor a Menor)</option>
-                            </select>
+                    <div style="background: rgba(255, 255, 255, 0.05); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.1);">
+                         <h3 style="color: #ffffff; font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                             <span>🔎 Búsqueda y Ordenamiento</span>
+                         </h3>
+                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                            <div style="flex: 1; min-width: 200px;">
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #ffffff; margin-bottom: 0.5rem;">🔤 Buscar por nombre</label>
+                                <input type="text" id="filter-name" placeholder="Ej: iPhone, Samsung Galaxy..." style="width: 100%; padding: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 0.875rem; margin-top: 0.25rem; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99, 102, 241, 0.1)'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.3)'; this.style.boxShadow='none'" placeholder="Ej: iPhone, Samsung Galaxy...">
+                            </div>
+                            <div style="flex: 1; min-width: 200px;">
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #ffffff; margin-bottom: 0.5rem;">📈 Ordenar por</label>
+                                <select id="filter-sort" style="width: 100%; padding: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.1); color: #ffffff; font-size: 0.875rem; margin-top: 0.25rem; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99, 102, 241, 0.1)'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.3)'; this.style.boxShadow='none'">
+                                    <option value="name" style="background: #1e293b; color: #ffffff;">Nombre (A-Z)</option>
+                                    <option value="price-asc" style="background: #1e293b; color: #ffffff;">Precio (Menor a Mayor)</option>
+                                    <option value="price-desc" style="background: #1e293b; color: #ffffff;">Precio (Mayor a Menor)</option>
+                                    <option value="battery-desc" style="background: #1e293b; color: #ffffff;">Batería (Mayor a Menor)</option>
+                                    <option value="camera-desc" style="background: #1e293b; color: #ffffff;">Cámara (Mayor a Menor)</option>
+                                    <option value="storage-desc" style="background: #1e293b; color: #ffffff;">Almacenamiento (Mayor a Menor)</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="flex justify-center gap-4">
-                        <button id="search-btn" class="bg-indigo-600 text-white font-semibold py-3 px-10 rounded-xl hover:bg-indigo-700 transition-colors modern-btn">Aplicar Filtros</button>
-                        <button id="clear-filters-btn" class="bg-slate-500 text-white font-semibold py-3 px-10 rounded-xl hover:bg-slate-600 transition-colors modern-btn">Limpiar Filtros</button>
+                    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem;">
+                        <button id="search-btn" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: #ffffff; font-weight: 600; padding: 0.75rem 2rem; border-radius: 0.75rem; border: none; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); font-size: 1rem;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(99, 102, 241, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.1)'">
+                            ✅ Aplicar Filtros
+                        </button>
+                        <button id="clear-filters-btn" style="background: rgba(100, 116, 139, 0.8); color: #ffffff; font-weight: 600; padding: 0.75rem 2rem; border-radius: 0.75rem; border: none; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); font-size: 1rem;" onmouseover="this.style.transform='translateY(-2px)'; this.style.background='rgba(100, 116, 139, 1)'; this.style.boxShadow='0 6px 12px rgba(100, 116, 139, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.background='rgba(100, 116, 139, 0.8)'; this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.1)'">
+                            🗑️ Limpiar Filtros
+                        </button>
                     </div>
                 </div>
-                <div id="search-results-container" class="mt-8"></div>
+                <div id="search-results-container" style="margin-top: 2rem;"></div>
                 `;
         
         // Event listeners
@@ -520,11 +585,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderAccountView = () => {
         if (!state.currentUser) {
             accountViewContainer.innerHTML = `
-                        <div class="text-center bg-white p-12 rounded-3xl shadow-lg border border-slate-200">
+                        <div class="text-center glass p-12 rounded-3xl shadow-2xl border border-white/20">
                              <div class="text-7xl mb-4">👤</div>
-                            <h2 class="text-2xl font-bold text-slate-800 mb-2">Accede a tu cuenta</h2>
-                            <p class="text-slate-500 mb-6">Inicia sesión para ver tus favoritos e historial de búsqueda.</p>
-                            <button id="account-login-btn" class="bg-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors">
+                            <h2 class="text-2xl font-bold text-white mb-2">Accede a tu cuenta</h2>
+                            <p class="text-white/80 mb-6">Inicia sesión para ver tus favoritos e historial de búsqueda.</p>
+                            <button id="account-login-btn" class="bg-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors shadow-lg hover:shadow-xl transform hover:scale-105">
                                 Iniciar Sesión / Registrarse
                             </button>
                         </div>
@@ -560,16 +625,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         accountViewContainer.innerHTML = `
-                    <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200">
-                        <h2 class="text-3xl font-bold text-slate-800 mb-6">Mi Cuenta</h2>
+                    <div class="glass p-6 md:p-8 rounded-3xl shadow-2xl border border-white/20">
+                        <!-- Header con información del usuario -->
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 pb-6 border-b border-white/20">
+                            <div>
+                                <h2 class="text-3xl font-bold text-white mb-2">Mi Cuenta</h2>
+                                <p class="text-white/80 flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                                    ${state.currentUser.name}
+                                </p>
+                            </div>
+                            <div class="mt-4 md:mt-0 flex items-center gap-4">
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold text-indigo-300">${state.favorites.length}</div>
+                                    <div class="text-sm text-white/70">Favoritos</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold text-purple-300">${state.searchHistory.length}</div>
+                                    <div class="text-sm text-white/70">Búsquedas</div>
+                                </div>
+                            </div>
+                        </div>
 
                         ${pitoPerezImageHTML}
 
-                        <div class="border-b border-slate-200 mb-6">
-                            <nav class="-mb-px flex space-x-6 flex-wrap" id="account-tabs">
-                                <button data-tab="favorites" class="account-tab-btn py-3 px-1 border-b-2 font-semibold border-indigo-500 text-indigo-600">❤️ Favoritos</button>
-                                <button data-tab="history" class="account-tab-btn py-3 px-1 border-b-2 font-semibold border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300">📜 Historial</button>
-                                ${isAdmin ? '<button data-tab="database" class="account-tab-btn py-3 px-1 border-b-2 font-semibold border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300">🗄️ Base de Datos</button>' : ''}
+                        <!-- Pestañas mejoradas -->
+                        <div class="mb-6">
+                            <nav class="flex space-x-2 bg-white/10 backdrop-blur-sm p-1 rounded-xl border border-white/20" id="account-tabs" role="tablist">
+                                <button data-tab="favorites" class="account-tab-btn flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 bg-white/20 text-white shadow-sm backdrop-blur-sm">
+                                    <span class="flex items-center justify-center gap-2">
+                                        <span>❤️</span>
+                                        <span>Favoritos</span>
+                                        ${state.favorites.length > 0 ? `<span class="bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full text-xs font-bold">${state.favorites.length}</span>` : ''}
+                                    </span>
+                                </button>
+                                <button data-tab="history" class="account-tab-btn flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 text-white/70 hover:text-white hover:bg-white/10">
+                                    <span class="flex items-center justify-center gap-2">
+                                        <span>📜</span>
+                                        <span>Historial</span>
+                                        ${state.searchHistory.length > 0 ? `<span class="bg-white/20 text-white px-2 py-0.5 rounded-full text-xs font-bold">${state.searchHistory.length}</span>` : ''}
+                                    </span>
+                                </button>
+                                ${isAdmin ? `<button data-tab="database" class="account-tab-btn flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 text-white/70 hover:text-white hover:bg-white/10">
+                                    <span class="flex items-center justify-center gap-2">
+                                        <span>🗄️</span>
+                                        <span>Base de Datos</span>
+                                    </span>
+                                </button>` : ''}
                             </nav>
                         </div>
                         <div id="account-content"></div>
@@ -577,14 +679,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
         
         document.getElementById('account-tabs').addEventListener('click', (e) => {
-            if (e.target.matches('.account-tab-btn')) {
-                const tab = e.target.dataset.tab;
+            const button = e.target.closest('.account-tab-btn');
+            if (button) {
+                const tab = button.dataset.tab;
                 document.querySelectorAll('.account-tab-btn').forEach(btn => {
-                    btn.classList.remove('border-indigo-500', 'text-indigo-600');
-                    btn.classList.add('border-transparent', 'text-slate-500');
+                    btn.classList.remove('bg-white/20', 'text-white', 'shadow-sm');
+                    btn.classList.add('text-white/70');
                 });
-                e.target.classList.add('border-indigo-500', 'text-indigo-600');
-                e.target.classList.remove('border-transparent', 'text-slate-500');
+                button.classList.add('bg-white/20', 'text-white', 'shadow-sm', 'backdrop-blur-sm');
+                button.classList.remove('text-white/70');
                 renderAccountContent(tab);
             }
         });
@@ -594,23 +697,157 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderAccountContent = (tab) => {
         const container = document.getElementById('account-content');
         if (tab === 'favorites') {
-            renderProductGrid(container, state.favorites);
+            if (state.favorites.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16 bg-gradient-to-br from-white/10 to-indigo-500/20 rounded-2xl border-2 border-dashed border-white/30 backdrop-blur-sm">
+                        <div class="text-7xl mb-4">❤️</div>
+                        <h3 class="text-2xl font-bold text-white mb-2">No tienes favoritos aún</h3>
+                        <p class="text-white/80 mb-6 max-w-md mx-auto">Agrega smartphones a tus favoritos haciendo clic en el corazón ❤️ en cualquier tarjeta de producto.</p>
+                        <button onclick="updateView('search')" class="bg-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors shadow-lg hover:shadow-xl transform hover:scale-105">
+                            🔍 Explorar Smartphones
+                        </button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="mb-4 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Tus Favoritos</h3>
+                            <p class="text-sm text-white/70">${state.favorites.length} ${state.favorites.length === 1 ? 'smartphone guardado' : 'smartphones guardados'}</p>
+                        </div>
+                        <button onclick="updateView('search')" class="text-sm text-indigo-300 hover:text-indigo-200 font-semibold flex items-center gap-1">
+                            <span>Agregar más</span>
+                            <span>→</span>
+                        </button>
+                    </div>
+                `;
+                const gridContainer = document.createElement('div');
+                container.appendChild(gridContainer);
+                renderProductGrid(gridContainer, state.favorites);
+            }
         } else if (tab === 'history') {
             if (state.searchHistory.length === 0) {
-                container.innerHTML = `<div class="text-center py-10"><p class="text-slate-500">No hay búsquedas recientes.</p></div>`;
+                container.innerHTML = `
+                    <div class="text-center py-16 bg-gradient-to-br from-white/10 to-purple-500/20 rounded-2xl border-2 border-dashed border-white/30 backdrop-blur-sm">
+                        <div class="text-7xl mb-4">📜</div>
+                        <h3 class="text-2xl font-bold text-white mb-2">No hay historial de búsquedas</h3>
+                        <p class="text-white/80 mb-6 max-w-md mx-auto">Tu historial de búsquedas aparecerá aquí cuando comiences a buscar smartphones.</p>
+                        <button onclick="updateView('search')" class="bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors shadow-lg hover:shadow-xl transform hover:scale-105">
+                            🔍 Comenzar a Buscar
+                        </button>
+                    </div>
+                `;
                 return;
             }
-            container.innerHTML = state.searchHistory.map(item => `
-                        <div class="bg-slate-50 p-4 rounded-xl mb-3 flex justify-between items-center">
+            
+            // Ordenar historial por fecha (más reciente primero)
+            const sortedHistory = [...state.searchHistory].sort((a, b) => {
+                const dateA = new Date(a.date || a.timestamp || 0);
+                const dateB = new Date(b.date || b.timestamp || 0);
+                return dateB - dateA;
+            });
+            
+            container.innerHTML = `
+                <div class="mb-4 flex items-center justify-between">
                             <div>
-                                <p class="text-sm text-slate-500">${item.date}</p>
-                                <div class="flex flex-wrap gap-2 mt-2">
-                                    ${Object.entries(item.filters).map(([k,v]) => `<span class="text-xs font-semibold bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full">${k}: ${v}</span>`).join('')}
+                        <h3 class="text-lg font-semibold text-white">Historial de Búsquedas</h3>
+                        <p class="text-sm text-white/70">${state.searchHistory.length} ${state.searchHistory.length === 1 ? 'búsqueda realizada' : 'búsquedas realizadas'}</p>
+                                </div>
+                    ${state.searchHistory.length > 0 ? `
+                        <button id="clear-all-history" class="text-sm text-red-300 hover:text-red-200 font-semibold flex items-center gap-1">
+                            <span>🗑️</span>
+                            <span>Limpiar todo</span>
+                        </button>
+                    ` : ''}
+                            </div>
+                <div class="space-y-3">
+                    ${sortedHistory.map(item => {
+                        const filters = item.filters || {};
+                        const hasFilters = Object.keys(filters).length > 0;
+                        const filterLabels = {
+                            brand: 'Marca',
+                            os: 'Sistema Operativo',
+                            ram: 'RAM',
+                            storage: 'Almacenamiento',
+                            minPrice: 'Precio Mín',
+                            maxPrice: 'Precio Máx',
+                            minBattery: 'Batería Mín',
+                            minCamera: 'Cámara Mín'
+                        };
+                        
+                        return `
+                        <div class="bg-gradient-to-r from-white/10 to-white/5 p-5 rounded-xl border border-white/20 hover:border-indigo-300/50 hover:shadow-md transition-all duration-200 group backdrop-blur-sm">
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center text-white font-bold">
+                                            🔍
+                        </div>
+                                        <div>
+                                            <p class="text-sm font-semibold text-white">${item.date || 'Fecha no disponible'}</p>
+                                            ${item.query ? `<p class="text-xs text-white/70">Búsqueda: "${item.query}"</p>` : ''}
+                                        </div>
+                                    </div>
+                                    ${hasFilters ? `
+                                        <div class="flex flex-wrap gap-2 mt-3">
+                                            ${Object.entries(filters).filter(([k, v]) => v && v !== '').map(([k, v]) => {
+                                                const label = filterLabels[k] || k;
+                                                const value = typeof v === 'string' && v.length > 20 ? v.substring(0, 20) + '...' : v;
+                                                return `<span class="text-xs font-semibold bg-indigo-500/30 text-indigo-200 px-3 py-1 rounded-full border border-indigo-400/30 backdrop-blur-sm">${label}: ${value}</span>`;
+                                            }).join('')}
+                                        </div>
+                                    ` : '<p class="text-xs text-white/50 italic mt-2">Sin filtros aplicados</p>'}
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="updateView('search')" class="text-xs bg-indigo-500/30 text-indigo-200 font-semibold px-4 py-2 rounded-lg hover:bg-indigo-500/50 transition-colors opacity-0 group-hover:opacity-100 backdrop-blur-sm">
+                                        🔄 Repetir
+                                    </button>
+                                    <button class="delete-history-btn text-red-300 hover:text-red-200 p-2 rounded-lg hover:bg-red-500/20 transition-colors" data-id="${item.id}" title="Eliminar esta búsqueda">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
-                            <button class="delete-history-btn bg-red-100 text-red-700 font-semibold p-2 rounded-lg text-sm hover:bg-red-200" data-id="${item.id}">Eliminar</button>
                         </div>
-                    `).join('');
+                    `;
+                    }).join('')}
+                </div>
+            `;
+            
+            // Event listener para eliminar historial individual
+            container.querySelectorAll('.delete-history-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.target.closest('.delete-history-btn').dataset.id;
+                    if (confirm('¿Eliminar esta búsqueda del historial?')) {
+                        state.searchHistory = state.searchHistory.filter(item => item.id !== parseInt(id));
+                        try {
+                            localStorage.setItem('searchHistory', JSON.stringify(state.searchHistory));
+                        } catch (e) {
+                            console.warn('Error al guardar historial:', e);
+                        }
+                        renderAccountContent('history');
+                        if (globalShowToast) globalShowToast('Búsqueda eliminada del historial', 'success');
+                    }
+                });
+            });
+            
+            // Event listener para limpiar todo el historial
+            const clearAllBtn = document.getElementById('clear-all-history');
+            if (clearAllBtn) {
+                clearAllBtn.addEventListener('click', () => {
+                    if (confirm('¿Estás seguro de que quieres eliminar todo el historial de búsquedas?')) {
+                        state.searchHistory = [];
+                        try {
+                            localStorage.setItem('searchHistory', JSON.stringify(state.searchHistory));
+                        } catch (e) {
+                            console.warn('Error al guardar historial:', e);
+                        }
+                        renderAccountContent('history');
+                        if (globalShowToast) globalShowToast('Historial limpiado', 'success');
+                    }
+                });
+            }
         } else if (tab === 'database') {
             renderDatabaseView(container);
         }
@@ -917,11 +1154,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (authInfo) {
             if (!state.currentUser) {
                 authInfo.innerHTML = `
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div class="flex items-center gap-2">
-                            <span class="text-blue-600">ℹ️</span>
-                            <p class="text-blue-800 text-sm">
-                                <strong>Debes iniciar sesión</strong> para publicar comentarios. 
+                    <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.4) 100%); border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 0.75rem; padding: 1rem; backdrop-filter: blur(10px); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <span style="color: #93c5fd; font-size: 1.5rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">ℹ️</span>
+                            <p style="color: #ffffff; font-size: 0.875rem; margin: 0; line-height: 1.5; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                                <strong style="font-weight: 700; color: #dbeafe;">Debes iniciar sesión</strong> para publicar comentarios. 
                                 Solo puedes eliminar tus propios comentarios.
                             </p>
                         </div>
@@ -929,11 +1166,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             } else {
                 authInfo.innerHTML = `
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <div class="flex items-center gap-2">
-                            <span class="text-green-600">✅</span>
-                            <p class="text-green-800 text-sm">
-                                Sesión iniciada como <strong>${state.currentUser.name}</strong>. 
+                    <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.3) 0%, rgba(22, 163, 74, 0.4) 100%); border: 2px solid rgba(34, 197, 94, 0.5); border-radius: 0.75rem; padding: 1rem; backdrop-filter: blur(10px); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <span style="color: #86efac; font-size: 1.5rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">✅</span>
+                            <p style="color: #ffffff; font-size: 0.875rem; margin: 0; line-height: 1.5; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                                Sesión iniciada como <strong style="font-weight: 700; color: #d1fae5;">${state.currentUser.name}</strong>. 
                                 Puedes publicar y eliminar tus propios comentarios.
                             </p>
                         </div>
@@ -1416,8 +1653,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const showProductModal = (phone) => {
         const imageUrl = phone.image;
+        
+        // Obtener comentarios de este teléfono
+        const phoneComments = state.comments.filter(c => c.phoneId === phone.id);
+        const averageRating = phoneComments.length > 0 
+            ? (phoneComments.reduce((sum, c) => sum + c.rating, 0) / phoneComments.length).toFixed(1)
+            : '0.0';
+        
         modalContent.innerHTML = `
-                    <div class="p-6 md:p-8">
+                    <div class="p-6 md:p-8 max-h-[90vh] overflow-y-auto">
                          <div class="flex justify-between items-start">
                              <div>
                                 <h2 class="text-2xl md:text-3xl font-bold text-slate-800">${phone.name}</h2>
@@ -1457,10 +1701,169 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </a>`).join('')}
                             </div>
                         </div>
+
+                        <!-- Sección de Comentarios y Reseñas -->
+                        <div class="mt-6 border-t border-slate-200 pt-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-slate-800 text-xl">💬 Comentarios y Reseñas</h3>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-yellow-400 text-lg">⭐</span>
+                                    <span class="font-bold text-slate-800">${averageRating}</span>
+                                    <span class="text-sm text-slate-500">(${phoneComments.length} reseñas)</span>
+                                </div>
+                            </div>
+                            
+                            ${!state.currentUser ? `
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                                    <p class="text-sm text-blue-800">
+                                        <strong>ℹ️ Inicia sesión</strong> para dejar tu comentario sobre este teléfono.
+                                    </p>
+                                </div>
+                            ` : ''}
+                            
+                            ${state.currentUser ? `
+                            <!-- Formulario para agregar comentario -->
+                            <div class="bg-slate-50 rounded-lg p-4 mb-6 border border-slate-200">
+                                <h4 class="font-semibold text-slate-800 mb-3">Escribe tu reseña</h4>
+                                <form id="phone-comment-form" class="space-y-3">
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-1">Calificación</label>
+                                        <div class="flex gap-1">
+                                            ${[5, 4, 3, 2, 1].map(rating => `
+                                                <input type="radio" id="phone-rating-${rating}" name="phone-rating" value="${rating}" class="sr-only">
+                                                <label for="phone-rating-${rating}" class="phone-rating-star text-2xl cursor-pointer hover:scale-110 transition-transform" data-rating="${rating}">⭐</label>
+                                            `).join('')}
+                                        </div>
+                                        <span id="phone-rating-text" class="text-xs text-slate-500 mt-1 block"></span>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-1">Tu comentario</label>
+                                        <textarea id="phone-comment-text" rows="3" placeholder="Comparte tu experiencia con este teléfono..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none" required minlength="10"></textarea>
+                                        <span class="text-xs text-slate-500">Mínimo 10 caracteres</span>
+                                    </div>
+                                    <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">
+                                        Publicar Reseña
+                                    </button>
+                                </form>
+                            </div>
+                            ` : ''}
+                            
+                            <!-- Lista de comentarios -->
+                            <div id="phone-comments-list" class="space-y-4">
+                                ${phoneComments.length === 0 ? `
+                                    <div class="text-center py-8 bg-slate-50 rounded-lg border border-slate-200">
+                                        <p class="text-slate-500">Aún no hay comentarios sobre este teléfono. ¡Sé el primero en compartir tu opinión!</p>
+                                    </div>
+                                ` : phoneComments.sort((a, b) => new Date(b.date) - new Date(a.date)).map(comment => {
+                                    const canDelete = state.currentUser && comment.author === state.currentUser.name;
+                                    return `
+                                    <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold text-xs">
+                                                    ${comment.author.charAt(0).toUpperCase()}
+                                                </div>
+                                                <div>
+                                                    <p class="font-semibold text-slate-800 text-sm">${escapeHtml(comment.author)}</p>
+                                                    <p class="text-xs text-slate-500">${comment.date}</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <div class="flex">
+                                                    ${[1, 2, 3, 4, 5].map(i => i <= comment.rating ? '⭐' : '☆').join('')}
+                                                </div>
+                                                ${canDelete ? `
+                                                    <button class="delete-phone-comment-btn text-red-400 hover:text-red-600 p-1" data-id="${comment.id}" title="Eliminar mi comentario">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                        </svg>
+                                                    </button>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                        <p class="text-slate-700 text-sm whitespace-pre-wrap">${escapeHtml(comment.text)}</p>
+                                    </div>
+                                `}).join('')}
+                            </div>
+                        </div>
                     </div>
                 `;
         modalBackdrop.classList.remove('hidden');
         document.getElementById('close-modal-btn').addEventListener('click', () => modalBackdrop.classList.add('hidden'));
+        
+        // Configurar eventos del formulario de comentarios
+        if (state.currentUser) {
+            const commentForm = document.getElementById('phone-comment-form');
+            if (commentForm) {
+                commentForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const rating = parseInt(document.querySelector('input[name="phone-rating"]:checked')?.value);
+                    const text = document.getElementById('phone-comment-text').value.trim();
+                    
+                    if (!rating || !text || text.length < 10) {
+                        if (globalShowToast) globalShowToast('Por favor completa todos los campos correctamente', 'error');
+                        return;
+                    }
+                    
+                    const comment = {
+                        id: Date.now(),
+                        phoneId: phone.id,
+                        rating: rating,
+                        text: sanitizeInput(text),
+                        author: state.currentUser.name,
+                        userId: state.currentUser.id,
+                        date: new Date().toLocaleDateString('es-ES', { 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })
+                    };
+                    
+                    state.comments.push(comment);
+                    saveCommentsToStorage();
+                    showProductModal(phone); // Recargar modal con nuevo comentario
+                    if (globalShowToast) globalShowToast('¡Reseña publicada exitosamente!', 'success');
+                });
+                
+                // Event listeners para estrellas de calificación
+                document.querySelectorAll('.phone-rating-star').forEach(star => {
+                    star.addEventListener('click', (e) => {
+                        const rating = parseInt(e.target.dataset.rating);
+                        document.getElementById(`phone-rating-${rating}`).checked = true;
+                        const ratingText = document.getElementById('phone-rating-text');
+                        const labels = {1: 'Muy malo', 2: 'Malo', 3: 'Regular', 4: 'Bueno', 5: 'Excelente'};
+                        ratingText.textContent = labels[rating] || '';
+                        
+                        // Actualizar visualmente
+                        document.querySelectorAll('.phone-rating-star').forEach((s, i) => {
+                            if (5 - i <= rating) {
+                                s.style.opacity = '1';
+                            } else {
+                                s.style.opacity = '0.3';
+                            }
+                        });
+                    });
+                });
+            }
+            
+            // Event listener para eliminar comentarios
+            document.querySelectorAll('.delete-phone-comment-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const commentId = parseInt(e.target.closest('.delete-phone-comment-btn').dataset.id);
+                    if (confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
+                        const comment = state.comments.find(c => c.id === commentId);
+                        if (comment && comment.author === state.currentUser.name) {
+                            state.comments = state.comments.filter(c => c.id !== commentId);
+                            saveCommentsToStorage();
+                            showProductModal(phone); // Recargar modal
+                            if (globalShowToast) globalShowToast('Comentario eliminado', 'success');
+                        }
+                    }
+                });
+            });
+        }
     };
     
     modalBackdrop.addEventListener('click', (e) => {
@@ -1486,14 +1889,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         // Renderizar vista específica si es necesario
-        if (viewId === 'comments') {
-            renderCommentsView();
-            // Asegurar que el dropdown se llene después de cambiar de vista
-            setTimeout(() => {
-                populatePhoneSelect();
-            }, 200);
-        } else if (viewId === 'comparison') {
+        if (viewId === 'comparison') {
             renderComparisonViewContent();
+        } else if (viewId === 'account') {
+            renderAccountView();
         }
     };
 
@@ -1559,9 +1958,16 @@ document.addEventListener('DOMContentLoaded', () => {
              state.searchHistory.push({
                 id: Date.now(),
                 date: new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                timestamp: Date.now(),
                 filters: Object.fromEntries(Object.entries(filters).filter(([k, v]) => v !== '' && k !== 'sort')),
+                query: filters.name || ''
             });
-            state.searchHistory = state.searchHistory.slice(-5); 
+            state.searchHistory = state.searchHistory.slice(-20); // Mantener las últimas 20 búsquedas
+            try {
+                localStorage.setItem('searchHistory', JSON.stringify(state.searchHistory));
+            } catch (e) {
+                console.warn('Error al guardar historial:', e);
+            }
         }
 
         let results = phoneDatabase.filter(phone => 
@@ -1643,7 +2049,7 @@ document.addEventListener('DOMContentLoaded', () => {
             phones: state.comparisonPhones.map(phone => ({
                 nombre: phone.name,
                 marca: phone.brand.charAt(0).toUpperCase() + phone.brand.slice(1),
-                precio: `$${phone.price.toLocaleString('es-MX')}`,
+                precio: `$${phone.price.toLocaleString('es-MX')} MXN`,
                 ram: phone.ram,
                 almacenamiento: phone.storage,
                 camara: phone.camera,
@@ -2175,76 +2581,110 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderComparisonView = () => {
         if (state.comparisonPhones.length === 0) {
             return `
-                <div class="text-center py-16">
-                    <div class="text-7xl mb-4">📊</div>
-                    <h3 class="text-xl font-bold text-slate-700 mb-2">No hay teléfonos para comparar</h3>
-                    <p class="text-slate-500">Agrega hasta 3 teléfonos para comparar sus especificaciones.</p>
+                <div style="text-align: center; padding: 4rem 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 1.5rem; border: 2px dashed rgba(255, 255, 255, 0.2);">
+                    <div style="font-size: 5rem; margin-bottom: 1.5rem; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));">📊</div>
+                    <h3 style="font-size: 1.75rem; font-weight: 700; color: #ffffff; margin-bottom: 1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">No hay teléfonos para comparar</h3>
+                    <p style="color: rgba(255, 255, 255, 0.8); font-size: 1.125rem; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                        Agrega hasta 3 teléfonos para comparar sus especificaciones lado a lado.
+                    </p>
+                    <div style="background: rgba(255, 255, 255, 0.1); border-radius: 1rem; padding: 2rem; max-width: 500px; margin: 0 auto; border: 1px solid rgba(255, 255, 255, 0.2);">
+                        <h4 style="color: #ffffff; font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <span>💡</span> ¿Cómo agregar teléfonos?
+                        </h4>
+                        <div style="text-align: left; color: rgba(255, 255, 255, 0.9); line-height: 1.8;">
+                            <p style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.25rem;">1️⃣</span>
+                                <span>Ve a la sección de <strong style="color: #a5b4fc;">Búsqueda Avanzada</strong> o <strong style="color: #a5b4fc;">Modo Fácil</strong></span>
+                            </p>
+                            <p style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.25rem;">2️⃣</span>
+                                <span>Haz clic en el botón <strong style="color: #a5b4fc;">📊 Comparar</strong> en cualquier teléfono</span>
+                            </p>
+                            <p style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.25rem;">3️⃣</span>
+                                <span>Vuelve aquí para ver la comparación detallada</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div style="margin-top: 2rem;">
+                        <button id="go-to-search-btn" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: #ffffff; font-weight: 600; padding: 0.75rem 2rem; border-radius: 0.75rem; border: none; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); font-size: 1rem; margin-right: 0.5rem;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(99, 102, 241, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.1)'">
+                            🔍 Ir a Búsqueda Avanzada
+                        </button>
+                        <button id="go-to-easy-btn" style="background: rgba(255, 255, 255, 0.2); color: #ffffff; font-weight: 600; padding: 0.75rem 2rem; border-radius: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.3); cursor: pointer; transition: all 0.3s; font-size: 1rem;" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'; this.style.transform='translateY(0)'">
+                            🎯 Ir a Modo Fácil
+                        </button>
+                    </div>
                 </div>
             `;
         }
 
         const comparisonHTML = state.comparisonPhones.map(phone => `
-            <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-200">
-                <div class="text-center mb-4">
-                    <div class="h-32 bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl flex items-center justify-center text-4xl overflow-hidden mb-4">
-                        <img src="${phone.image}" alt="${phone.name}" class="object-cover h-full w-full" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                        <div class="hidden items-center justify-center h-full w-full text-4xl bg-gradient-to-br from-indigo-100 to-purple-100">📱</div>
+            <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 15px 25px rgba(0, 0, 0, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 15px rgba(0, 0, 0, 0.1)'">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="height: 180px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%); border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-size: 3rem; overflow: hidden; margin-bottom: 1rem; border: 2px solid rgba(255, 255, 255, 0.2);">
+                        <img src="${phone.image}" alt="${phone.name}" style="object-fit: cover; height: 100%; width: 100%;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                        <div style="display: none; align-items: center; justify-content: center; height: 100%; width: 100%; font-size: 3rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);">📱</div>
                     </div>
-                    <h3 class="text-lg font-bold text-slate-800 mb-2">${phone.name}</h3>
-                    <div class="text-2xl font-bold gradient-text mb-4">$${phone.price.toLocaleString('es-MX')}</div>
-                </div>
-                
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center py-2 border-b border-slate-100">
-                        <span class="text-sm text-slate-600">Marca</span>
-                        <span class="font-semibold">${phone.brand.charAt(0).toUpperCase() + phone.brand.slice(1)}</span>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b border-slate-100">
-                        <span class="text-sm text-slate-600">RAM</span>
-                        <span class="font-semibold">${phone.ram}</span>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b border-slate-100">
-                        <span class="text-sm text-slate-600">Almacenamiento</span>
-                        <span class="font-semibold">${phone.storage}</span>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b border-slate-100">
-                        <span class="text-sm text-slate-600">Cámara</span>
-                        <span class="font-semibold">${phone.camera}</span>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b border-slate-100">
-                        <span class="text-sm text-slate-600">Batería</span>
-                        <span class="font-semibold">${phone.battery} mAh</span>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b border-slate-100">
-                        <span class="text-sm text-slate-600">Sistema</span>
-                        <span class="font-semibold">${phone.os.toUpperCase()}</span>
-                    </div>
-                    <div class="flex justify-between items-center py-2">
-                        <span class="text-sm text-slate-600">Condición</span>
-                        <span class="font-semibold">${phone.condition.charAt(0).toUpperCase() + phone.condition.slice(1)}</span>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin-bottom: 0.75rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">${phone.name}</h3>
+                    <div style="font-size: 1.75rem; font-weight: 700; background: linear-gradient(135deg, #a5b4fc 0%, #c4b5fd 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem;">
+                        $${phone.price.toLocaleString('es-MX')} <span style="font-size: 0.875rem; font-weight: 400; color: rgba(255, 255, 255, 0.7);">MXN</span>
                     </div>
                 </div>
                 
-                <button class="remove-comparison-btn w-full mt-4 bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600 transition-colors" data-id="${phone.id}">
-                    Quitar de Comparación
+                <div style="space-y: 0.75rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <span style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); display: flex; align-items: center; gap: 0.5rem;"><span>🏷️</span> Marca</span>
+                        <span style="font-weight: 600; color: #ffffff;">${phone.brand.charAt(0).toUpperCase() + phone.brand.slice(1)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <span style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); display: flex; align-items: center; gap: 0.5rem;"><span>🚀</span> RAM</span>
+                        <span style="font-weight: 600; color: #ffffff;">${phone.ram}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <span style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); display: flex; align-items: center; gap: 0.5rem;"><span>💾</span> Almacenamiento</span>
+                        <span style="font-weight: 600; color: #ffffff;">${phone.storage}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <span style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); display: flex; align-items: center; gap: 0.5rem;"><span>📷</span> Cámara</span>
+                        <span style="font-weight: 600; color: #ffffff;">${phone.camera}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <span style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); display: flex; align-items: center; gap: 0.5rem;"><span>🔋</span> Batería</span>
+                        <span style="font-weight: 600; color: #ffffff;">${phone.battery} mAh</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <span style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); display: flex; align-items: center; gap: 0.5rem;"><span>🤖</span> Sistema</span>
+                        <span style="font-weight: 600; color: #ffffff;">${phone.os.toUpperCase()}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0;">
+                        <span style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); display: flex; align-items: center; gap: 0.5rem;"><span>✨</span> Condición</span>
+                        <span style="font-weight: 600; color: #ffffff;">${phone.condition.charAt(0).toUpperCase() + phone.condition.slice(1)}</span>
+                    </div>
+                </div>
+                
+                <button class="remove-comparison-btn" data-id="${phone.id}" style="width: 100%; margin-top: 1.5rem; background: rgba(239, 68, 68, 0.8); color: #ffffff; font-weight: 600; padding: 0.75rem; border-radius: 0.75rem; border: none; cursor: pointer; transition: all 0.3s; font-size: 0.875rem;" onmouseover="this.style.background='rgba(239, 68, 68, 1)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.8)'; this.style.transform='translateY(0)'">
+                    🗑️ Quitar de Comparación
                 </button>
             </div>
         `).join('');
 
         return `
-            <div class="glass p-8 rounded-3xl shadow-2xl border border-white/20 mb-8">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-bold text-white">Comparación de Teléfonos</h2>
-                    <div class="flex gap-2">
-                        <button id="export-comparison-btn" class="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-600 transition-colors modern-btn">
+            <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 1.5rem; padding: 2rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); margin-bottom: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                    <h2 style="font-size: 2rem; font-weight: 700; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 0.5rem;">
+                        <span>📊</span> Comparación de Teléfonos
+                        <span style="font-size: 1rem; font-weight: 400; color: rgba(255, 255, 255, 0.7); margin-left: 0.5rem;">(${state.comparisonPhones.length}/3)</span>
+                    </h2>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <button id="export-comparison-btn" style="background: rgba(34, 197, 94, 0.8); color: #ffffff; font-weight: 600; padding: 0.75rem 1.5rem; border-radius: 0.75rem; border: none; cursor: pointer; transition: all 0.3s; font-size: 0.875rem;" onmouseover="this.style.background='rgba(34, 197, 94, 1)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(34, 197, 94, 0.8)'; this.style.transform='translateY(0)'">
                             📊 Exportar
                         </button>
-                        <button id="clear-comparison-btn" class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600 transition-colors modern-btn">
-                            Limpiar Todo
+                        <button id="clear-comparison-btn" style="background: rgba(239, 68, 68, 0.8); color: #ffffff; font-weight: 600; padding: 0.75rem 1.5rem; border-radius: 0.75rem; border: none; cursor: pointer; transition: all 0.3s; font-size: 0.875rem;" onmouseover="this.style.background='rgba(239, 68, 68, 1)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.8)'; this.style.transform='translateY(0)'">
+                            🗑️ Limpiar Todo
                         </button>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
                     ${comparisonHTML}
                 </div>
             </div>
@@ -2279,6 +2719,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('comparison-content');
         if (container) {
             container.innerHTML = renderComparisonView();
+            
+            // Agregar event listeners para los botones de navegación
+            const goToSearchBtn = document.getElementById('go-to-search-btn');
+            if (goToSearchBtn) {
+                goToSearchBtn.addEventListener('click', () => updateView('search'));
+            }
+            
+            const goToEasyBtn = document.getElementById('go-to-easy-btn');
+            if (goToEasyBtn) {
+                goToEasyBtn.addEventListener('click', () => updateView('easy'));
+            }
         }
     };
     
@@ -2324,23 +2775,111 @@ document.addEventListener('DOMContentLoaded', () => {
     navButtons.forEach(b => b.addEventListener('click', handleNavClick));
     mobileNavButtons.forEach(b => b.addEventListener('click', handleNavClick));
 
+    // Función para esperar a que las dependencias estén disponibles
+    const waitForDependencies = (maxAttempts = 50, delay = 100) => {
+        return new Promise((resolve, reject) => {
+            // Primero verificar si ya están disponibles
+            const hasFetch = typeof window.fetchAndInitializeApp === 'function';
+            const hasMap = typeof window.mapToPhoneSpecs === 'function';
+            
+            if (hasFetch && hasMap) {
+                resolve(true);
+                return;
+            }
+            
+            // Si no, escuchar el evento de que están listas
+            const eventHandler = () => {
+                if (typeof window.fetchAndInitializeApp === 'function' && 
+                    typeof window.mapToPhoneSpecs === 'function') {
+                    window.removeEventListener('apiFunctionsReady', eventHandler);
+                    resolve(true);
+                }
+            };
+            window.addEventListener('apiFunctionsReady', eventHandler);
+            
+            // También hacer polling como fallback
+            let attempts = 0;
+            const checkDependencies = () => {
+                attempts++;
+                const hasFetchNow = typeof window.fetchAndInitializeApp === 'function';
+                const hasMapNow = typeof window.mapToPhoneSpecs === 'function';
+                
+                if (hasFetchNow && hasMapNow) {
+                    window.removeEventListener('apiFunctionsReady', eventHandler);
+                    resolve(true);
+                } else if (attempts >= maxAttempts) {
+                    window.removeEventListener('apiFunctionsReady', eventHandler);
+                    reject(new Error('Las dependencias no se cargaron a tiempo'));
+                } else {
+                    setTimeout(checkDependencies, delay);
+                }
+            };
+            checkDependencies();
+        });
+    };
+
+    // Función para limpiar caché antiguo y asegurar modelos actualizados
+    const clearOldCache = () => {
+        try {
+            const cached = localStorage.getItem('phoneDatabase_cache');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                // Si el caché tiene menos de 30 productos, probablemente es antiguo
+                // La base de datos de respaldo tiene 35 modelos actualizados
+                if (parsed.data && Array.isArray(parsed.data) && parsed.data.length < 30) {
+                    console.log('🧹 Limpiando caché antiguo (menos de 30 productos)');
+                    localStorage.removeItem('phoneDatabase_cache');
+                }
+            }
+        } catch (e) {
+            console.warn('Error al verificar caché:', e);
+        }
+    };
+
     // Función para inicializar la aplicación con verificación de dependencias
-    const initializeApp = () => {
+    const initializeApp = async () => {
+        // Limpiar caché antiguo al inicio
+        clearOldCache();
+        
+        // Esperar a que las dependencias estén disponibles
+        try {
+            await waitForDependencies();
+        } catch (error) {
+            console.error('❌ Error esperando dependencias:', error);
+            if (loadingIndicator) {
+                loadingIndicator.innerHTML = `
+                    <div class="text-7xl mb-4">⚠️</div>
+                    <p class="mt-4 text-xl font-semibold text-red-600">Error al cargar la aplicación</p>
+                    <p class="mt-2 text-lg text-slate-600">Las dependencias no se cargaron. Por favor, recarga la página.</p>
+                    <button onclick="location.reload()" class="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                        Recargar Página
+                    </button>
+                `;
+            }
+            return;
+        }
+
         // Verificar que las funciones necesarias estén disponibles
-        if (typeof fetchAndInitializeApp !== 'function') {
+        if (typeof window.fetchAndInitializeApp !== 'function') {
             console.error('❌ fetchAndInitializeApp no está disponible');
             if (loadingIndicator) {
                 loadingIndicator.innerHTML = `
                     <div class="text-7xl mb-4">⚠️</div>
                     <p class="mt-4 text-xl font-semibold text-red-600">Error al cargar la aplicación</p>
                     <p class="mt-2 text-lg text-slate-600">Por favor, recarga la página.</p>
+                    <button onclick="location.reload()" class="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                        Recargar Página
+                    </button>
                 `;
             }
             return;
         }
 
-        const apiUrl = typeof FAKE_STORE_API_URL !== 'undefined' ? FAKE_STORE_API_URL : 'https://fakestoreapi.com/products?limit=20';
-        const mapFunction = typeof mapToPhoneSpecs !== 'undefined' ? mapToPhoneSpecs : null;
+        // Usar la nueva API principal (DummyJSON) o fallback
+        const apiUrl = typeof window.PRIMARY_API_URL !== 'undefined' ? window.PRIMARY_API_URL : 
+                      (typeof window.FAKE_STORE_API_URL !== 'undefined' ? window.FAKE_STORE_API_URL : 
+                      'https://dummyjson.com/products/category/smartphones');
+        const mapFunction = typeof window.mapToPhoneSpecs !== 'undefined' ? window.mapToPhoneSpecs : null;
 
         if (!mapFunction) {
             console.error('❌ mapToPhoneSpecs no está disponible');
@@ -2349,12 +2888,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="text-7xl mb-4">⚠️</div>
                     <p class="mt-4 text-xl font-semibold text-red-600">Error al cargar la aplicación</p>
                     <p class="mt-2 text-lg text-slate-600">Por favor, recarga la página.</p>
+                    <button onclick="location.reload()" class="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                        Recargar Página
+                    </button>
                 `;
             }
             return;
         }
 
-        fetchAndInitializeApp(loadingIndicator, renderAuthSection, renderCharts, renderSearchView, renderEasyModeView, renderAccountView, updateView, apiUrl, mapFunction)
+        window.fetchAndInitializeApp(loadingIndicator, renderAuthSection, renderCharts, renderSearchView, renderEasyModeView, renderAccountView, updateView, apiUrl, mapFunction)
         .then(newPhoneDatabase => {
             // Asegurar que siempre tenemos datos válidos
             if (!newPhoneDatabase || !Array.isArray(newPhoneDatabase) || newPhoneDatabase.length === 0) {
@@ -2377,9 +2919,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // Hacer renderAccountView disponible globalmente
             window.renderAccountView = renderAccountView;
             
-            // Detectar si se está usando base de datos de respaldo
-            const isUsingFallback = newPhoneDatabase.some && newPhoneDatabase.some(phone => phone.source === 'fallback-database');
-            if (isUsingFallback) {
+            // Solo mostrar indicador offline si realmente no hay conexión
+            // No mostrar solo porque se use la base de datos de respaldo
+            // (puede usarse incluso con conexión si la API falla)
+            if (!navigator.onLine) {
                 showOfflineIndicator();
             }
             
@@ -2396,11 +2939,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Configurar listeners de conexión
             window.addEventListener('online', () => {
-                showToast('Conexión restaurada', 'success');
-                const offlineIndicator = document.getElementById('offline-indicator');
-                if (offlineIndicator) {
-                    offlineIndicator.remove();
+                if (typeof showToast === 'function') {
+                    showToast('Conexión restaurada', 'success');
                 }
+                hideOfflineIndicator();
             });
             
             window.addEventListener('offline', () => {
@@ -2417,53 +2959,56 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => {
             console.error('❌ Error en la inicialización:', error);
-            // Ocultar loading indicator en caso de error
-            if (loadingIndicator) {
-                loadingIndicator.classList.add('hidden');
-            }
-            // Mostrar mensaje de error al usuario
-            showToast('Error al cargar la aplicación. Por favor, recarga la página.', 'error');
             // Intentar cargar datos de respaldo directamente
             try {
                 if (window.getFallbackPhoneData && typeof window.getFallbackPhoneData === 'function') {
                     const fallbackData = window.getFallbackPhoneData();
                     if (fallbackData && Array.isArray(fallbackData) && fallbackData.length > 0) {
+                        console.log('✅ Usando base de datos de respaldo con modelos actualizados:', fallbackData.length, 'teléfonos');
                         phoneDatabase = fallbackData;
+                        renderAuthSection();
+                        renderCharts();
+                        renderSearchView();
+                        renderEasyModeView();
+                        renderAccountView();
                         updateView('dashboard');
+                        initializeTheme();
+                        
+                        // Ocultar loading indicator
+                        if (loadingIndicator) {
+                            loadingIndicator.classList.add('hidden');
+                        }
+                        
+                        showToast('Catálogo cargado desde base de datos local con modelos actualizados', 'success');
+                        return;
                     }
                 }
             } catch (e) {
                 console.error('Error al cargar datos de respaldo:', e);
             }
+            
+            // Si llegamos aquí, no se pudieron cargar datos
+            if (loadingIndicator) {
+                loadingIndicator.classList.add('hidden');
+            }
+            showToast('Error al cargar la aplicación. Por favor, recarga la página.', 'error');
         });
     };
 
-    // Intentar inicializar inmediatamente, o esperar un poco si las funciones no están disponibles
-    if (typeof fetchAndInitializeApp === 'function' && typeof mapToPhoneSpecs === 'function') {
-        initializeApp();
-    } else {
-        // Esperar un poco para que los módulos se carguen
-        let attempts = 0;
-        const maxAttempts = 10;
-        const checkInterval = setInterval(() => {
-            attempts++;
-            if ((typeof fetchAndInitializeApp === 'function' && typeof mapToPhoneSpecs === 'function') || attempts >= maxAttempts) {
-                clearInterval(checkInterval);
-                if (typeof fetchAndInitializeApp === 'function' && typeof mapToPhoneSpecs === 'function') {
-                    initializeApp();
-                } else {
-                    console.error('❌ No se pudieron cargar las funciones necesarias después de varios intentos');
-                    if (loadingIndicator) {
-                        loadingIndicator.innerHTML = `
-                            <div class="text-7xl mb-4">⚠️</div>
-                            <p class="mt-4 text-xl font-semibold text-red-600">Error al cargar la aplicación</p>
-                            <p class="mt-2 text-lg text-slate-600">Por favor, recarga la página.</p>
-                        `;
-                    }
-                }
-            }
-        }, 100);
-    }
+    // Inicializar la aplicación (ahora usa async/await internamente)
+    initializeApp().catch(error => {
+        console.error('❌ Error al inicializar la aplicación:', error);
+        if (loadingIndicator) {
+            loadingIndicator.innerHTML = `
+                <div class="text-7xl mb-4">⚠️</div>
+                <p class="mt-4 text-xl font-semibold text-red-600">Error al cargar la aplicación</p>
+                <p class="mt-2 text-lg text-slate-600">${error.message || 'Error desconocido'}</p>
+                <button onclick="location.reload()" class="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                    Recargar Página
+                </button>
+            `;
+        }
+    });
 });
 
 // Debounce function for real-time search
@@ -2921,14 +3466,40 @@ function findUserByUsername(username) {
 }
 
 // Modal de autenticación
-function showAuthModal(type = 'login') {
+// Función para validar contraseña
+function validatePassword(password) {
+    const validations = {
+        minLength: password.length >= 8,
+        hasUpperCase: /[A-Z]/.test(password),
+        hasLowerCase: /[a-z]/.test(password),
+        hasNumber: /[0-9]/.test(password),
+        hasSpecialChar: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+    };
+    
+    const isValid = Object.values(validations).every(v => v === true);
+    
+    return {
+        isValid,
+        validations,
+        errors: [
+            !validations.minLength && 'Mínimo 8 caracteres',
+            !validations.hasUpperCase && 'Al menos una mayúscula',
+            !validations.hasLowerCase && 'Al menos una minúscula',
+            !validations.hasNumber && 'Al menos un número',
+            !validations.hasSpecialChar && 'Al menos un carácter especial'
+        ].filter(Boolean)
+    };
+}
+
+// Función para mostrar términos y condiciones
+function showTermsModal() {
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
     modal.innerHTML = `
-        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6">
-            <div class="flex justify-between items-center mb-6">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+            <div class="flex justify-between items-center mb-6 sticky top-0 bg-white dark:bg-slate-800 pb-4 border-b border-slate-200 dark:border-slate-700">
                 <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">
-                    ${type === 'login' ? 'Iniciar Sesión' : 'Registrarse'}
+                    Términos y Condiciones
                 </h2>
                 <button onclick="this.closest('.fixed').remove()" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2936,23 +3507,123 @@ function showAuthModal(type = 'login') {
                     </svg>
                 </button>
             </div>
+            
+            <div class="space-y-4 text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
+                <section>
+                    <h3 class="font-bold text-lg mb-2 text-slate-800 dark:text-slate-100">1. Aceptación de los Términos</h3>
+                    <p>Al registrarte y utilizar el sistema Pito Pérez, aceptas cumplir con estos términos y condiciones. Si no estás de acuerdo con alguna parte de estos términos, no debes utilizar el servicio.</p>
+                </section>
+                
+                <section>
+                    <h3 class="font-bold text-lg mb-2 text-slate-800 dark:text-slate-100">2. Uso del Servicio</h3>
+                    <p>El sistema Pito Pérez es una herramienta de apoyo a la decisión para la comparación y selección de smartphones. Te comprometes a:</p>
+                    <ul class="list-disc list-inside ml-4 mt-2 space-y-1">
+                        <li>Proporcionar información veraz y actualizada</li>
+                        <li>No utilizar el servicio para fines ilegales o no autorizados</li>
+                        <li>No intentar acceder a áreas restringidas del sistema</li>
+                        <li>Respetar los derechos de propiedad intelectual</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h3 class="font-bold text-lg mb-2 text-slate-800 dark:text-slate-100">3. Cuenta de Usuario</h3>
+                    <p>Eres responsable de mantener la confidencialidad de tu contraseña y de todas las actividades que ocurran bajo tu cuenta. Debes notificarnos inmediatamente de cualquier uso no autorizado.</p>
+                </section>
+                
+                <section>
+                    <h3 class="font-bold text-lg mb-2 text-slate-800 dark:text-slate-100">4. Privacidad</h3>
+                    <p>Respetamos tu privacidad. Los datos personales que proporcionas se utilizan únicamente para mejorar tu experiencia en el sistema. No compartimos tu información con terceros sin tu consentimiento.</p>
+                </section>
+                
+                <section>
+                    <h3 class="font-bold text-lg mb-2 text-slate-800 dark:text-slate-100">5. Contenido del Usuario</h3>
+                    <p>Al publicar comentarios, reseñas u otro contenido, otorgas al sistema una licencia no exclusiva para usar, modificar y mostrar dicho contenido. Eres responsable del contenido que publiques.</p>
+                </section>
+                
+                <section>
+                    <h3 class="font-bold text-lg mb-2 text-slate-800 dark:text-slate-100">6. Limitación de Responsabilidad</h3>
+                    <p>El sistema se proporciona "tal cual" sin garantías de ningún tipo. No garantizamos la exactitud, completitud o utilidad de la información proporcionada. El uso del sistema es bajo tu propio riesgo.</p>
+                </section>
+                
+                <section>
+                    <h3 class="font-bold text-lg mb-2 text-slate-800 dark:text-slate-100">7. Modificaciones</h3>
+                    <p>Nos reservamos el derecho de modificar estos términos en cualquier momento. Los cambios entrarán en vigor al publicarlos en el sistema. Es tu responsabilidad revisar periódicamente estos términos.</p>
+                </section>
+                
+                <section>
+                    <h3 class="font-bold text-lg mb-2 text-slate-800 dark:text-slate-100">8. Contacto</h3>
+                    <p>Si tienes preguntas sobre estos términos, puedes contactarnos a través del sistema de ayuda integrado.</p>
+                </section>
+            </div>
+            
+            <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+                <button onclick="this.closest('.fixed').remove()" class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">
+                    Entendido
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+function showAuthModal(type = 'login') {
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">
+                    Cuenta de Usuario
+                </h2>
+                <button onclick="this.closest('.fixed').remove()" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Tabs para Login y Registro -->
+            <div class="flex gap-2 mb-6 border-b border-slate-200 dark:border-slate-700">
+                <button id="tab-login" class="flex-1 py-2 px-4 text-center font-semibold transition-colors ${type === 'login' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}">
+                    Iniciar Sesión
+                </button>
+                <button id="tab-register" class="flex-1 py-2 px-4 text-center font-semibold transition-colors ${type === 'register' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}">
+                    Registrarse
+                </button>
+            </div>
+            
             <form id="auth-form" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Nombre</label>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Nombre de Usuario</label>
                     <input type="text" id="auth-name" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-slate-100" required>
                     <div id="username-feedback" class="mt-1 text-xs hidden"></div>
+                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">${type === 'register' ? 'El nombre de usuario debe ser único' : 'Ingresa tu nombre de usuario'}</p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email</label>
                     <input type="email" id="auth-email" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-slate-100" required>
-                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">El correo puede repetirse</p>
+                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">${type === 'register' ? 'El correo puede repetirse' : 'Ingresa tu correo electrónico'}</p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Contraseña</label>
                     <input type="password" id="auth-password" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-slate-100" required>
-                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">La contraseña puede repetirse</p>
+                    <div id="password-feedback" class="mt-2 space-y-1"></div>
+                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">${type === 'register' ? 'La contraseña debe cumplir todos los requisitos' : 'Ingresa tu contraseña'}</p>
                 </div>
-                <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors">
+                <div id="terms-container" class="${type === 'register' ? '' : 'hidden'}">
+                    <div class="flex items-start">
+                        <input type="checkbox" id="auth-terms" class="mt-1 mr-2 w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500" required>
+                        <label for="auth-terms" class="text-sm text-slate-700 dark:text-slate-300">
+                            Acepto los 
+                            <button type="button" onclick="window.showTermsModal()" class="text-indigo-600 hover:text-indigo-700 underline font-medium">
+                                términos y condiciones
+                            </button>
+                        </label>
+                    </div>
+                    <div id="terms-error" class="mt-1 text-xs text-red-600 dark:text-red-400 hidden"></div>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" id="auth-submit-btn">
                     ${type === 'login' ? 'Iniciar Sesión' : 'Registrarse'}
                 </button>
             </form>
@@ -2960,6 +3631,129 @@ function showAuthModal(type = 'login') {
     `;
     
     document.body.appendChild(modal);
+    
+    // Funcionalidad de tabs
+    let currentType = type;
+    const tabLogin = document.getElementById('tab-login');
+    const tabRegister = document.getElementById('tab-register');
+    const authForm = document.getElementById('auth-form');
+    const usernameFeedback = document.getElementById('username-feedback');
+    const usernameInput = document.getElementById('auth-name');
+    const emailInput = document.getElementById('auth-email');
+    const passwordInput = document.getElementById('auth-password');
+    const passwordFeedback = document.getElementById('password-feedback');
+    const termsContainer = document.getElementById('terms-container');
+    const termsCheckbox = document.getElementById('auth-terms');
+    const termsError = document.getElementById('terms-error');
+    const submitBtn = document.getElementById('auth-submit-btn');
+    const usernameHelp = usernameInput.nextElementSibling.nextElementSibling;
+    const emailHelp = emailInput.nextElementSibling;
+    const passwordHelp = passwordInput.nextElementSibling.nextElementSibling;
+    
+    // Función para actualizar feedback de contraseña
+    const updatePasswordFeedback = (password) => {
+        if (currentType !== 'register') {
+            passwordFeedback.innerHTML = '';
+            return;
+        }
+        
+        if (!password || password.length === 0) {
+            passwordFeedback.innerHTML = '';
+            passwordInput.classList.remove('border-red-500', 'border-green-500');
+            return;
+        }
+        
+        const validation = validatePassword(password);
+        
+        passwordFeedback.innerHTML = `
+            <div class="text-xs space-y-1">
+                <div class="flex items-center ${validation.validations.minLength ? 'text-green-600 dark:text-green-400' : 'text-slate-500'}">
+                    ${validation.validations.minLength ? '✓' : '○'} Mínimo 8 caracteres
+                </div>
+                <div class="flex items-center ${validation.validations.hasUpperCase ? 'text-green-600 dark:text-green-400' : 'text-slate-500'}">
+                    ${validation.validations.hasUpperCase ? '✓' : '○'} Al menos una mayúscula (A-Z)
+                </div>
+                <div class="flex items-center ${validation.validations.hasLowerCase ? 'text-green-600 dark:text-green-400' : 'text-slate-500'}">
+                    ${validation.validations.hasLowerCase ? '✓' : '○'} Al menos una minúscula (a-z)
+                </div>
+                <div class="flex items-center ${validation.validations.hasNumber ? 'text-green-600 dark:text-green-400' : 'text-slate-500'}">
+                    ${validation.validations.hasNumber ? '✓' : '○'} Al menos un número (0-9)
+                </div>
+                <div class="flex items-center ${validation.validations.hasSpecialChar ? 'text-green-600 dark:text-green-400' : 'text-slate-500'}">
+                    ${validation.validations.hasSpecialChar ? '✓' : '○'} Al menos un carácter especial (!@#$%^&*...)
+                </div>
+            </div>
+        `;
+        
+        if (validation.isValid) {
+            passwordInput.classList.add('border-green-500');
+            passwordInput.classList.remove('border-red-500');
+        } else {
+            passwordInput.classList.add('border-red-500');
+            passwordInput.classList.remove('border-green-500');
+        }
+    };
+    
+    // Validación en tiempo real de contraseña
+    passwordInput.addEventListener('input', (e) => {
+        updatePasswordFeedback(e.target.value);
+    });
+    
+    const switchTab = (newType) => {
+        currentType = newType;
+        
+        // Actualizar tabs
+        if (newType === 'login') {
+            tabLogin.classList.add('text-indigo-600', 'border-b-2', 'border-indigo-600');
+            tabLogin.classList.remove('text-slate-500');
+            tabRegister.classList.remove('text-indigo-600', 'border-b-2', 'border-indigo-600');
+            tabRegister.classList.add('text-slate-500');
+        } else {
+            tabRegister.classList.add('text-indigo-600', 'border-b-2', 'border-indigo-600');
+            tabRegister.classList.remove('text-slate-500');
+            tabLogin.classList.remove('text-indigo-600', 'border-b-2', 'border-indigo-600');
+            tabLogin.classList.add('text-slate-500');
+        }
+        
+        // Mostrar/ocultar términos y condiciones
+        if (newType === 'register') {
+            termsContainer.classList.remove('hidden');
+            termsCheckbox.required = true;
+        } else {
+            termsContainer.classList.add('hidden');
+            termsCheckbox.required = false;
+            termsCheckbox.checked = false;
+            termsError.classList.add('hidden');
+        }
+        
+        // Actualizar texto del botón
+        submitBtn.textContent = newType === 'login' ? 'Iniciar Sesión' : 'Registrarse';
+        
+        // Actualizar textos de ayuda
+        usernameHelp.textContent = newType === 'register' ? 'El nombre de usuario debe ser único' : 'Ingresa tu nombre de usuario';
+        emailHelp.textContent = newType === 'register' ? 'El correo puede repetirse' : 'Ingresa tu correo electrónico';
+        passwordHelp.textContent = newType === 'register' ? 'La contraseña debe cumplir todos los requisitos' : 'Ingresa tu contraseña';
+        
+        // Limpiar validación
+        usernameInput.classList.remove('border-red-500', 'border-green-500');
+        usernameFeedback.classList.add('hidden');
+        passwordInput.classList.remove('border-red-500', 'border-green-500');
+        updatePasswordFeedback(passwordInput.value);
+    };
+    
+    tabLogin.addEventListener('click', () => switchTab('login'));
+    tabRegister.addEventListener('click', () => switchTab('register'));
+    
+    // Inicializar estado si se abre en modo registro
+    if (type === 'register') {
+        // Asegurar que el contenedor de términos esté visible
+        termsContainer.classList.remove('hidden');
+        termsCheckbox.required = true;
+        // Si hay contraseña ya ingresada, validarla
+        if (passwordInput.value) {
+            updatePasswordFeedback(passwordInput.value);
+        }
+    }
     
     // Validación en tiempo real del nombre de usuario (solo para registro)
     if (type === 'register') {
@@ -2999,19 +3793,70 @@ function showAuthModal(type = 'login') {
     // Event listener para el formulario
     document.getElementById('auth-form').addEventListener('submit', (e) => {
         e.preventDefault();
-        const name = document.getElementById('auth-name').value;
-        const email = document.getElementById('auth-email').value;
+        const name = document.getElementById('auth-name').value.trim();
+        const email = document.getElementById('auth-email').value.trim();
         const password = document.getElementById('auth-password').value;
+        const termsAccepted = termsCheckbox.checked;
         
-        if (type === 'login') {
+        // Usar el tipo actual del tab
+        const formType = currentType;
+        
+        if (formType === 'login') {
             handleLogin(name, email, password);
             modal.remove();
         } else {
+            // Validar nombre antes de registrar
+            if (!name || name.length === 0) {
+                if (globalShowToast) globalShowToast('El nombre de usuario es requerido', 'error');
+                usernameInput.classList.add('border-red-500');
+                usernameInput.focus();
+                return;
+            }
+            
+            // Validar que el nombre no esté repetido antes de registrar
+            if (window.isUsernameTaken && window.isUsernameTaken(name)) {
+                if (globalShowToast) globalShowToast('Este nombre de usuario ya está en uso. Por favor elige otro.', 'error');
+                usernameInput.classList.add('border-red-500');
+                usernameInput.classList.remove('border-green-500');
+                usernameFeedback.textContent = '❌ Este nombre de usuario ya está en uso';
+                usernameFeedback.className = 'mt-1 text-xs text-red-600 dark:text-red-400';
+                usernameFeedback.classList.remove('hidden');
+                usernameInput.focus();
+                return;
+            }
+            
+            // Validar contraseña
+            const passwordValidation = validatePassword(password);
+            if (!passwordValidation.isValid) {
+                if (globalShowToast) globalShowToast('La contraseña no cumple con los requisitos de seguridad', 'error');
+                passwordInput.classList.add('border-red-500');
+                passwordInput.focus();
+                return;
+            }
+            
+            // Validar términos y condiciones
+            if (!termsAccepted) {
+                if (globalShowToast) globalShowToast('Debes aceptar los términos y condiciones para registrarte', 'error');
+                termsError.textContent = 'Debes aceptar los términos y condiciones';
+                termsError.classList.remove('hidden');
+                termsCheckbox.focus();
+                return;
+            }
+            
+            termsError.classList.add('hidden');
+            
             // Para registro, no cerrar el modal si hay error
             const wasSuccessful = handleRegister(name, email, password);
             if (wasSuccessful) {
-        modal.remove();
+                modal.remove();
             }
+        }
+    });
+    
+    // Limpiar error de términos cuando se marca el checkbox
+    termsCheckbox.addEventListener('change', () => {
+        if (termsCheckbox.checked) {
+            termsError.classList.add('hidden');
         }
     });
 }
@@ -3021,6 +3866,28 @@ function handleLogin(name, email, password) {
     if (!globalState) return;
     // Simulación de login
     globalState.currentUser = { id: 1, name, email };
+    
+    // Cargar datos del usuario desde localStorage
+    try {
+        const savedFavorites = localStorage.getItem(`favorites_${name}`);
+        if (savedFavorites) {
+            globalState.favorites = JSON.parse(savedFavorites);
+        }
+        
+        const savedHistory = localStorage.getItem(`searchHistory_${name}`);
+        if (savedHistory) {
+            globalState.searchHistory = JSON.parse(savedHistory);
+        } else {
+            // Intentar cargar historial general si no hay uno específico del usuario
+            const generalHistory = localStorage.getItem('searchHistory');
+            if (generalHistory) {
+                globalState.searchHistory = JSON.parse(generalHistory);
+            }
+        }
+    } catch (e) {
+        console.warn('Error al cargar datos del usuario:', e);
+    }
+    
     if (globalRenderAuthSection) globalRenderAuthSection();
     if (globalShowToast) globalShowToast('¡Bienvenido!', 'success');
     
@@ -3048,7 +3915,12 @@ function handleRegister(name, email, password) {
         return false;
     }
     
-    // El correo y contraseña pueden repetirse, solo validamos el nombre
+    // Validar contraseña
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+        if (globalShowToast) globalShowToast('La contraseña no cumple con los requisitos de seguridad', 'error');
+        return false;
+    }
     
     // Crear objeto de usuario
     const newUser = {
@@ -3096,47 +3968,474 @@ function handleLogout() {
 
 // Función para mostrar indicador offline
 function showOfflineIndicator() {
-    // Crear indicador offline
-    const offlineIndicator = document.createElement('div');
-    offlineIndicator.id = 'offline-indicator';
-    offlineIndicator.className = 'fixed top-20 right-4 z-50 bg-orange-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 animate-pulse';
-    offlineIndicator.innerHTML = `
-        <span class="text-lg">📱</span>
-        <div>
-            <div class="font-semibold text-sm">Modo Offline</div>
-            <div class="text-xs opacity-90">Usando datos locales</div>
-        </div>
-        <button onclick="this.parentElement.remove()" class="ml-2 text-white hover:text-orange-200">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-        </button>
-    `;
+    // Usar el indicador que ya existe en el HTML
+    const offlineIndicator = document.getElementById('offline-indicator');
+    if (!offlineIndicator) return;
     
-    document.body.appendChild(offlineIndicator);
+    // Mostrar el indicador
+    offlineIndicator.classList.remove('hidden');
     
-    // Auto-ocultar después de 10 segundos
+    // Configurar el botón de cerrar
+    const closeBtn = document.getElementById('close-offline-indicator');
+    if (closeBtn) {
+        closeBtn.onclick = () => {
+            offlineIndicator.classList.add('hidden');
+        };
+    }
+    
+    // Auto-ocultar después de 15 segundos (más tiempo para que el usuario lo vea)
     setTimeout(() => {
-        if (offlineIndicator.parentElement) {
-            offlineIndicator.remove();
+        if (offlineIndicator && !offlineIndicator.classList.contains('hidden')) {
+            offlineIndicator.classList.add('hidden');
         }
-    }, 10000);
+    }, 15000);
+}
+
+// Función para ocultar indicador offline
+function hideOfflineIndicator() {
+    const offlineIndicator = document.getElementById('offline-indicator');
+    if (offlineIndicator) {
+        offlineIndicator.classList.add('hidden');
+    }
 }
 
 // Función para verificar estado de conexión
 function checkConnectionStatus() {
     if (!navigator.onLine) {
         showOfflineIndicator();
-        showToast('Sin conexión a internet. Usando datos locales.', 'warning', 5000);
+        if (typeof showToast === 'function') {
+            showToast('Sin conexión a internet. Usando datos locales.', 'warning', 5000);
+        }
+    } else {
+        hideOfflineIndicator();
     }
 }
 
 // Hacer funciones disponibles globalmente
 window.showAuthModal = showAuthModal;
+window.showTermsModal = showTermsModal;
 window.handleLogin = handleLogin;
 window.handleRegister = handleRegister;
 window.handleLogout = handleLogout;
 window.showOfflineIndicator = showOfflineIndicator;
+window.hideOfflineIndicator = hideOfflineIndicator;
 window.isUsernameTaken = isUsernameTaken;
 window.getRegisteredUsers = getRegisteredUsers;
 window.saveRegisteredUser = saveRegisteredUser;
+window.validatePassword = validatePassword;
+
+// ============================================
+// CHATBOT - Asistente Virtual
+// ============================================
+(function() {
+    // Base de conocimiento del chatbot
+    const chatbotKnowledge = {
+        // Preguntas sobre teléfonos
+        'mejor telefono': {
+            response: `Los mejores teléfonos dependen de tu presupuesto y necesidades:
+
+📱 **Premium (Más de $25,000 MXN):**
+• iPhone 16 Pro Max - Excelente cámara y rendimiento
+• Galaxy S24 Ultra - Pantalla increíble y S Pen
+• Pixel 9 Pro - IA avanzada y fotografía
+
+💰 **Gama Media-Alta ($15,000 - $25,000 MXN):**
+• iPhone 15 - Equilibrio perfecto
+• Galaxy S24+ - Gran pantalla y batería
+• Pixel 9 - Excelente relación precio-calidad
+
+💵 **Económico (Menos de $15,000 MXN):**
+• Galaxy A55 - Buenas especificaciones
+• Pixel 8a - Cámara destacada
+• Redmi Note 13 Pro - Excelente batería
+
+💡 **Tip:** Usa el "Modo Fácil" para recomendaciones personalizadas según tus necesidades.`
+        },
+        'iphone': {
+            response: `📱 **Información sobre iPhone:**
+
+**Ventajas:**
+• Sistema iOS muy fluido y seguro
+• Excelente calidad de construcción
+• Cámaras de alta calidad
+• Actualizaciones por muchos años
+• Ecosistema Apple integrado
+
+**Modelos disponibles:**
+• iPhone 16 Pro Max - El más potente
+• iPhone 16 Pro - Pro con tamaño más manejable
+• iPhone 16 - Equilibrio perfecto
+• iPhone 15 - Opción más accesible
+
+**Precios:** Desde $22,000 hasta $37,000 MXN aproximadamente.
+
+💡 Puedes usar la búsqueda avanzada para filtrar por marca "apple" y ver todos los modelos disponibles.`
+        },
+        'samsung': {
+            response: `📱 **Información sobre Samsung Galaxy:**
+
+**Ventajas:**
+• Pantallas AMOLED de alta calidad
+• Gran variedad de modelos
+• Baterías de larga duración
+• S Pen en modelos Ultra
+• Android personalizado
+
+**Series principales:**
+• **Galaxy S** - Gama alta (S24 Ultra, S24+, S24)
+• **Galaxy A** - Gama media (A55, A54, A34)
+
+**Precios:** Desde $9,500 hasta $32,000 MXN aproximadamente.
+
+💡 Usa los filtros de búsqueda para encontrar el modelo perfecto según tu presupuesto.`
+        },
+        'bateria': {
+            response: `🔋 **Teléfonos con mejor batería:**
+
+Los teléfonos con mayor capacidad de batería incluyen:
+
+1. **OnePlus 12R** - 5500 mAh
+2. **Realme GT 6** - 5500 mAh
+3. **Galaxy S24 Ultra** - 5000 mAh
+4. **Galaxy A55** - 5000 mAh
+5. **Redmi Note 13 Pro** - 5100 mAh
+
+💡 **Consejo:** En la búsqueda avanzada, puedes filtrar por "Batería Mínima" para encontrar teléfonos con la capacidad que necesitas.`
+        },
+        'camara': {
+            response: `📷 **Teléfonos con mejor cámara:**
+
+**Cámaras destacadas:**
+• **Galaxy S24 Ultra** - 200MP con zoom 10x
+• **Redmi Note 13 Pro+** - 200MP
+• **iPhone 16 Pro Max** - 48MP con zoom 5x
+• **Pixel 9 Pro** - 50MP con IA avanzada
+• **Xiaomi 14 Ultra** - 50MP Leica
+
+💡 **Tip:** Los Pixel de Google tienen procesamiento de IA excepcional para fotos. Los iPhone destacan en video. Los Galaxy S24 Ultra tienen el mejor zoom.
+
+Puedes filtrar por "Cámara Mínima" en la búsqueda avanzada.`
+        },
+        'precio': {
+            response: `💰 **Rangos de precios:**
+
+**Económico (< $10,000 MXN):**
+• Galaxy A34 - $9,499
+• Redmi 12 - $6,499
+
+**Gama Media ($10,000 - $20,000 MXN):**
+• Galaxy A55 - $13,999
+• Pixel 8a - $14,999
+• Galaxy S24 - $20,999
+
+**Gama Alta ($20,000 - $30,000 MXN):**
+• iPhone 16 - $22,999
+• Pixel 9 Pro - $26,999
+• Galaxy S24+ - $24,999
+
+**Premium (> $30,000 MXN):**
+• iPhone 16 Pro Max - $36,999
+• Galaxy S24 Ultra - $31,999
+
+💡 Usa el filtro de precio en la búsqueda avanzada para encontrar teléfonos en tu rango.`
+        },
+        // Preguntas sobre funcionalidades
+        'buscar': {
+            response: `🔍 **Cómo usar la búsqueda:**
+
+**Búsqueda Avanzada:**
+1. Haz clic en "🔍 Búsqueda Avanzada" en el menú
+2. Usa los filtros para refinar tu búsqueda:
+   • Marca, Sistema Operativo, Condición
+   • Almacenamiento, RAM, Tamaño de pantalla
+   • Cámara mínima, Batería mínima
+   • Rango de precio
+3. Escribe en "Buscar por nombre" para buscar modelos específicos
+4. Selecciona cómo ordenar los resultados
+5. Haz clic en "Aplicar Filtros"
+
+**Modo Fácil:**
+1. Ve a "🎯 Modo Fácil"
+2. Responde las preguntas sobre tus necesidades
+3. Recibirás recomendaciones personalizadas
+
+💡 Puedes dejar campos vacíos - solo se aplicarán los filtros que completes.`
+        },
+        'comparar': {
+            response: `📊 **Cómo comparar teléfonos:**
+
+1. **Agregar teléfonos:**
+   • Ve a "Búsqueda Avanzada" o "Modo Fácil"
+   • Haz clic en el botón "📊 Comparar" en cualquier teléfono
+   • Puedes agregar hasta 3 teléfonos
+
+2. **Ver la comparación:**
+   • Haz clic en "📊 Comparar" en el menú
+   • O usa el botón flotante en la esquina inferior derecha
+
+3. **En la comparación verás:**
+   • Imagen, nombre y precio
+   • Marca, RAM, Almacenamiento
+   • Cámara, Batería, Sistema Operativo
+   • Condición
+
+4. **Acciones disponibles:**
+   • Quitar teléfonos individuales
+   • Exportar la comparación
+   • Limpiar toda la comparación
+
+💡 La comparación te ayuda a ver las diferencias lado a lado.`
+        },
+        'modo facil': {
+            response: `🎯 **Modo Fácil - Recomendaciones personalizadas:**
+
+El Modo Fácil te hace preguntas simples para recomendarte el teléfono perfecto:
+
+**Preguntas que te hará:**
+1. ¿Para qué usarás principalmente tu teléfono?
+   (Básico, Redes Sociales, Juegos, Trabajo, etc.)
+
+2. ¿Cuál es tu presupuesto aproximado?
+   (Económico, Accesible, Intermedio, Alto, Premium)
+
+3. ¿Qué característica es más importante?
+   (Batería, Cámara, Almacenamiento, Marca, etc.)
+
+4. ¿Tienes preferencia de sistema operativo?
+   (iOS, Android, Cualquiera)
+
+5. ¿Qué tamaño de pantalla prefieres?
+   (Pequeña, Mediana, Grande)
+
+**Cómo usarlo:**
+1. Ve a "🎯 Modo Fácil" en el menú
+2. Responde las preguntas seleccionando las opciones
+3. Al final verás recomendaciones personalizadas
+
+💡 No necesitas ser experto - solo elige lo que más te guste.`
+        },
+        'comentarios': {
+            response: `💬 **Sistema de Comentarios:**
+
+**Para ver comentarios:**
+1. Ve a "💬 Comentarios" en el menú
+2. Verás todos los comentarios de usuarios
+3. Puedes filtrar por teléfono o buscar
+
+**Para agregar comentarios:**
+1. Debes iniciar sesión primero
+2. Selecciona el teléfono
+3. Elige una calificación (1-5 estrellas)
+4. Escribe tu opinión
+5. Publica tu comentario
+
+**Características:**
+• Calificaciones con estrellas
+• Búsqueda de comentarios
+• Filtros por teléfono
+• Ordenamiento (recientes, mejor valorados, etc.)
+
+💡 Los comentarios ayudan a otros usuarios a tomar decisiones informadas.`
+        },
+        'cuenta': {
+            response: `👤 **Mi Cuenta:**
+
+**Funcionalidades disponibles:**
+• Ver tu información de usuario
+• Ver tus teléfonos favoritos
+• Ver tu historial de búsqueda
+• Gestionar tu cuenta
+
+**Para usar favoritos:**
+1. Inicia sesión
+2. Haz clic en el corazón ❤️ en cualquier teléfono
+3. Ve a "Mi Cuenta" para ver tus favoritos
+
+**Historial de búsqueda:**
+• Se guardan automáticamente tus búsquedas
+• Puedes verlas en "Mi Cuenta"
+• Puedes eliminar búsquedas individuales
+
+💡 Inicia sesión para acceder a todas las funciones personalizadas.`
+        },
+        'offline': {
+            response: `📱 **Modo Offline:**
+
+Esta página funciona **con o sin internet**:
+
+**Con internet:**
+• Carga datos actualizados de la API
+• Todos los gráficos funcionan
+• Experiencia completa
+
+**Sin internet:**
+• Usa datos guardados localmente
+• Base de datos con 35+ teléfonos
+• Funcionalidades básicas disponibles
+• Los gráficos no se muestran (requieren Chart.js)
+
+**Indicador offline:**
+• Aparece automáticamente cuando no hay conexión
+• Muestra que estás usando datos locales
+
+💡 La página se guarda automáticamente para funcionar offline.`
+        },
+        'default': {
+            response: `🤖 No estoy seguro de entender tu pregunta. 
+
+Puedo ayudarte con:
+• 📱 Información sobre teléfonos específicos
+• 🔍 Cómo usar la búsqueda avanzada
+• 📊 Cómo comparar teléfonos
+• 🎯 Cómo usar el modo fácil
+• 💬 Sistema de comentarios
+• 👤 Funcionalidades de cuenta
+• 📱 Modo offline
+
+Intenta preguntar de otra manera o usa las opciones rápidas. 😊`
+        }
+    };
+
+    // Función para procesar preguntas
+    function processQuestion(question) {
+        const lowerQuestion = question.toLowerCase().trim();
+        
+        // Buscar coincidencias en el conocimiento
+        for (const [key, data] of Object.entries(chatbotKnowledge)) {
+            if (key !== 'default' && lowerQuestion.includes(key)) {
+                return data.response;
+            }
+        }
+        
+        // Búsqueda por palabras clave
+        if (lowerQuestion.includes('mejor') || lowerQuestion.includes('recomend')) {
+            return chatbotKnowledge['mejor telefono'].response;
+        }
+        if (lowerQuestion.includes('buscar') || lowerQuestion.includes('busqueda') || lowerQuestion.includes('filtro')) {
+            return chatbotKnowledge['buscar'].response;
+        }
+        if (lowerQuestion.includes('comparar') || lowerQuestion.includes('comparacion')) {
+            return chatbotKnowledge['comparar'].response;
+        }
+        if (lowerQuestion.includes('fácil') || lowerQuestion.includes('facil') || lowerQuestion.includes('recomendacion')) {
+            return chatbotKnowledge['modo facil'].response;
+        }
+        if (lowerQuestion.includes('comentario') || lowerQuestion.includes('opinion')) {
+            return chatbotKnowledge['comentarios'].response;
+        }
+        if (lowerQuestion.includes('cuenta') || lowerQuestion.includes('usuario') || lowerQuestion.includes('favorito')) {
+            return chatbotKnowledge['cuenta'].response;
+        }
+        if (lowerQuestion.includes('offline') || lowerQuestion.includes('internet') || lowerQuestion.includes('conexion')) {
+            return chatbotKnowledge['offline'].response;
+        }
+        
+        return chatbotKnowledge['default'].response;
+    }
+
+    // Función para formatear texto (markdown básico)
+    function formatText(text) {
+        // Convertir **texto** a <strong>
+        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // Convertir saltos de línea a <br>
+        text = text.replace(/\n/g, '<br>');
+        return text;
+    }
+
+    // Función para agregar mensaje al chat
+    function addMessage(text, isUser = false) {
+        const messagesContainer = document.getElementById('chatbot-messages');
+        if (!messagesContainer) return;
+
+        const messageDiv = document.createElement('div');
+        messageDiv.style.display = 'flex';
+        messageDiv.style.gap = '0.5rem';
+        messageDiv.style.flexDirection = isUser ? 'row-reverse' : 'row';
+        messageDiv.style.alignItems = 'flex-start';
+
+        if (!isUser) {
+            messageDiv.innerHTML = `
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">🤖</div>
+                <div style="background: white; padding: 0.75rem 1rem; border-radius: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 80%;">
+                    <div style="font-size: 0.875rem; color: #1e293b; line-height: 1.6;">${formatText(text)}</div>
+                </div>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 0.75rem 1rem; border-radius: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 80%;">
+                    <div style="font-size: 0.875rem; color: white; line-height: 1.6;">${text}</div>
+                </div>
+            `;
+        }
+
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // Función para enviar mensaje
+    window.sendChatbotMessage = function() {
+        const input = document.getElementById('chatbot-input');
+        if (!input || !input.value.trim()) return;
+
+        const question = input.value.trim();
+        addMessage(question, true);
+        input.value = '';
+
+        // Simular delay de respuesta
+        setTimeout(() => {
+            const response = processQuestion(question);
+            addMessage(response, false);
+        }, 500);
+    };
+
+    // Inicializar chatbot cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('chatbot-toggle');
+        const closeBtn = document.getElementById('chatbot-close');
+        const chatWindow = document.getElementById('chatbot-window');
+        const sendBtn = document.getElementById('chatbot-send');
+        const input = document.getElementById('chatbot-input');
+        const quickOptions = document.querySelectorAll('.quick-option-btn');
+
+        if (!toggleBtn || !closeBtn || !chatWindow) return;
+
+        // Toggle del chat
+        toggleBtn.addEventListener('click', () => {
+            const isVisible = chatWindow.style.display !== 'none';
+            chatWindow.style.display = isVisible ? 'none' : 'flex';
+            if (!isVisible && input) {
+                setTimeout(() => input.focus(), 100);
+            }
+        });
+
+        // Cerrar chat
+        closeBtn.addEventListener('click', () => {
+            chatWindow.style.display = 'none';
+        });
+
+        // Enviar con botón
+        if (sendBtn) {
+            sendBtn.addEventListener('click', window.sendChatbotMessage);
+        }
+
+        // Enviar con Enter
+        if (input) {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    window.sendChatbotMessage();
+                }
+            });
+        }
+
+        // Opciones rápidas
+        quickOptions.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const text = btn.textContent.trim();
+                if (input) {
+                    input.value = text;
+                    window.sendChatbotMessage();
+                }
+            });
+        });
+    });
+})();

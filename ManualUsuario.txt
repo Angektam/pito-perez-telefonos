@@ -1,0 +1,649 @@
+Manual de Usuario del Sistema Pito Pérez
+
+Versión: 1.0
+Fecha: Noviembre 2025
+Destinatario: Usuarios Finales
+
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Introducción al Sistema
+
+Bienvenido al sistema Pito Pérez. Esta herramienta es su punto central para 
+explorar, comparar y elegir el smartphone ideal que se adapte a sus necesidades 
+y presupuesto. Pito Pérez es una guía interactiva de smartphones diseñada para 
+ayudarte a tomar decisiones informadas mediante gráficos dinámicos, filtros 
+avanzados, comparaciones detalladas y un modo fácil de uso.
+
+El sistema funciona como una aplicación web progresiva (PWA), lo que significa 
+que puedes acceder a todas las funcionalidades desde cualquier navegador moderno, 
+y una vez cargada la primera vez, podrás seguir utilizándola incluso sin conexión 
+a Internet.
+
+[CAPTURA DE PANTALLA 1: Pantalla principal del sistema mostrando el menú de navegación 
+y el panel general con gráficos interactivos]
+
+1.1 Confianza y Disponibilidad
+
+Nuestro sistema ha sido diseñado para ser altamente confiable y accesible:
+
+• Disponibilidad Continua: El sistema está alojado en una infraestructura que 
+  minimiza las interrupciones, asegurando que siempre puedas acceder a tu trabajo. 
+  Además, gracias a la tecnología de Service Worker y Progressive Web App (PWA), 
+  el sistema puede funcionar completamente offline después de la primera carga, 
+  permitiéndote consultar información de smartphones incluso cuando no tengas 
+  conexión a Internet.
+
+• Seguridad de Datos: La información que ingreses (como favoritos, comentarios y 
+  preferencias) está protegida mediante almacenamiento local seguro y respaldos 
+  automáticos. Tus datos personales nunca se comparten con terceros sin tu 
+  consentimiento explícito.
+
+• Rendimiento Optimizado: El sistema utiliza técnicas de caché inteligente para 
+  cargar rápidamente, incluso con conexiones lentas. Los datos se sincronizan 
+  automáticamente cuando detecta una conexión estable.
+
+• Recuperación Automática: Si experimentas una demora inusual o la página se 
+  queda en blanco, simplemente intenta recargar la página (F5 o Ctrl+R). El 
+  sistema está diseñado para recuperarse automáticamente de errores temporales.
+
+• Actualizaciones Transparentes: El sistema se actualiza automáticamente en 
+  segundo plano, asegurando que siempre tengas acceso a las últimas características 
+  y correcciones sin interrupciones en tu experiencia.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+2. Acceso y Configuración Inicial
+
+2.1 Requisitos Mínimos
+
+Para garantizar una experiencia óptima con Pito Pérez, asegúrate de cumplir con 
+los siguientes requisitos:
+
+• Navegador web compatible: 
+  - Google Chrome (versión 90 o superior) - Recomendado
+  - Mozilla Firefox (versión 88 o superior)
+  - Microsoft Edge (versión 90 o superior)
+  - Safari (versión 14 o superior) - Para usuarios de Mac e iOS
+  - También funciona en navegadores móviles modernos (Chrome Mobile, Safari Mobile)
+
+• Conexión a Internet estable: 
+  - Se requiere conexión para la primera carga de datos y para sincronizar 
+    información actualizada.
+  - Velocidad mínima recomendada: 1 Mbps para una experiencia fluida.
+  - Después de la primera carga, el sistema funciona completamente offline.
+
+• Resolución de pantalla mínima: 
+  - Desktop: 1024x768 píxeles o superior
+  - Tablet: 768x1024 píxeles o superior
+  - Móvil: 360x640 píxeles o superior (diseño responsive)
+
+• JavaScript habilitado: 
+  - El sistema requiere JavaScript para funcionar. Asegúrate de que esté habilitado 
+    en tu navegador (generalmente está activado por defecto).
+
+• Almacenamiento local: 
+  - El navegador debe permitir el almacenamiento local (cookies y localStorage) 
+    para guardar tus preferencias y datos offline.
+
+2.2 Inicio de Sesión
+
+Para acceder a todas las funcionalidades del sistema, incluyendo guardar favoritos, 
+dejar comentarios y personalizar tu experiencia, necesitas crear una cuenta e 
+iniciar sesión.
+
+URL de Acceso: https://pito-perez.github.io/ 
+(Nota: Esta es la URL principal. Si tu organización tiene una URL personalizada, 
+consulta con tu administrador).
+
+Proceso de Registro (Primera vez):
+
+1. Abre tu navegador y navega a la URL de acceso mencionada arriba.
+
+2. Localiza el botón "👤 Iniciar Sesión / Registrarse" en la esquina superior 
+   derecha del menú principal y haz clic en él.
+
+[CAPTURA DE PANTALLA 2: Vista del header mostrando el botón de autenticación 
+"👤 Iniciar Sesión / Registrarse" en la esquina superior derecha]
+
+3. Se abrirá un modal con dos pestañas: "Iniciar Sesión" y "Registrarse". 
+   Haz clic en la pestaña "Registrarse".
+
+[CAPTURA DE PANTALLA 3: Modal de autenticación mostrando las pestañas de 
+"Iniciar Sesión" y "Registrarse", con la pestaña "Registrarse" activa]
+
+4. Completa el formulario de registro con la siguiente información:
+   - Nombre de Usuario: Elige un nombre único que te identifique (obligatorio). 
+     Este nombre será visible en tus comentarios y favoritos.
+   - Correo Electrónico: Ingresa una dirección de correo válida (obligatorio). 
+     Se utilizará para recuperar tu cuenta si olvidas tu contraseña.
+   - Contraseña: Crea una contraseña segura con al menos 8 caracteres, que incluya 
+     letras y números (obligatorio).
+
+[CAPTURA DE PANTALLA 4: Formulario de registro completo con los campos de 
+Nombre de Usuario, Email y Contraseña, mostrando validación en tiempo real 
+del nombre de usuario]
+
+5. Revisa y acepta los términos y condiciones de uso si es necesario.
+
+6. Haz clic en el botón "Registrarse".
+
+7. Si el registro es exitoso, serás redirigido automáticamente a la página principal 
+   y verás tu nombre de usuario en el encabezado, indicando que has iniciado sesión.
+
+[CAPTURA DE PANTALLA 5: Header después de iniciar sesión mostrando el nombre 
+del usuario y el botón "Salir"]
+
+Proceso de Inicio de Sesión (Usuarios existentes):
+
+1. Navega a la URL de acceso del sistema.
+
+2. Haz clic en el botón "👤 Iniciar Sesión / Registrarse" ubicado en la esquina 
+   superior derecha.
+
+3. Se abrirá un modal con dos pestañas. Haz clic en la pestaña "Iniciar Sesión".
+
+[CAPTURA DE PANTALLA 6: Modal de autenticación con la pestaña "Iniciar Sesión" 
+activa, mostrando los campos de nombre de usuario, email y contraseña]
+
+4. Introduce tu Nombre de Usuario en el primer campo.
+
+5. Introduce tu Correo Electrónico en el segundo campo.
+
+6. Introduce tu Contraseña en el tercer campo.
+
+7. Haz clic en el botón "Iniciar Sesión".
+
+8. Una vez autenticado correctamente, serás redirigido a la página principal y 
+   verás tu estado de sesión activa en el encabezado con tu nombre de usuario.
+
+Nota de Seguridad: Por tu seguridad, cierra sesión cuando termines de usar el 
+sistema, especialmente si estás en una computadora compartida. Puedes cerrar 
+sesión haciendo clic en "👤 Mi Cuenta" y seleccionando "Cerrar Sesión".
+
+═══════════════════════════════════════════════════════════════════════════════
+
+3. Navegación y Funcionalidades Clave
+
+3.1 El Menú Principal
+
+El menú de navegación, ubicado en la parte superior de la página (o en un menú 
+hamburguesa en dispositivos móviles), contiene las secciones fundamentales del 
+sistema. Cada sección está diseñada para ayudarte en diferentes aspectos de tu 
+búsqueda del smartphone ideal:
+
+[CAPTURA DE PANTALLA 7: Vista completa del menú principal de navegación mostrando 
+todos los botones: Panel General, Búsqueda Avanzada, Modo Fácil, Comparar, Mi Cuenta]
+
+• 📊 Panel General: Esta sección te muestra una visión general del mercado de 
+  smartphones mediante gráficos dinámicos e interactivos. Aquí puedes visualizar:
+  - Precio promedio del mercado por rango
+  - Distribución de capacidad de batería
+  - Popularidad de sistemas operativos (Android, iOS, etc.)
+  - Estadísticas de cámaras (megapíxeles promedio)
+  - Tendencias de RAM y almacenamiento
+  Estos gráficos se actualizan automáticamente con los datos más recientes y te 
+  ayudan a entender el panorama general antes de hacer una búsqueda específica.
+
+[CAPTURA DE PANTALLA 8: Vista del Panel General mostrando los 4 gráficos interactivos 
+(Precio por marca, Batería, Sistema Operativo, Cámara) en una cuadrícula de 2x2]
+
+• 🔍 Búsqueda Avanzada: Esta es la herramienta principal para encontrar 
+  smartphones que cumplan con tus criterios específicos. Incluye filtros 
+  múltiples que te permiten refinar tu búsqueda por:
+  - Marca (Samsung, Apple, Xiaomi, etc.)
+  - Sistema Operativo (Android, iOS)
+  - RAM (desde 2GB hasta 16GB o más)
+  - Almacenamiento interno (desde 32GB hasta 1TB)
+  - Resolución de cámara (megapíxeles)
+  - Capacidad de batería (mAh)
+  - Rango de precio (desde económico hasta premium)
+  - Búsqueda por nombre del modelo
+  Además, puedes ordenar los resultados por precio, nombre, batería, cámara, etc., 
+  en orden ascendente o descendente.
+
+[CAPTURA DE PANTALLA 9: Vista de la sección de Búsqueda Avanzada mostrando todos 
+los filtros disponibles (marca, sistema operativo, RAM, almacenamiento, cámara, 
+batería, precio) y la barra de búsqueda por nombre]
+
+[CAPTURA DE PANTALLA 10: Resultados de búsqueda mostrando tarjetas de smartphones 
+con imágenes, especificaciones, precios y botones de acción (Ver Detalles, 
+Favoritos, Comparar)]
+
+• 🎯 Modo Fácil: Si no estás seguro de qué características necesitas o te 
+  sientes abrumado por las opciones técnicas, el Modo Fácil es tu mejor aliado. 
+  Es un asistente interactivo que te hace preguntas simples sobre:
+  - Tu presupuesto aproximado
+  - Uso principal del teléfono (fotografía, juegos, trabajo, etc.)
+  - Preferencias de tamaño de pantalla
+  - Importancia de la duración de batería
+  - Necesidad de almacenamiento
+  Basándose en tus respuestas, el sistema genera recomendaciones personalizadas 
+  que se ajustan a tus necesidades específicas.
+
+[CAPTURA DE PANTALLA 11: Vista del Modo Fácil mostrando la primera pregunta 
+sobre presupuesto con las opciones disponibles (Muy bajo, Bajo, Medio, Alto, Premium)]
+
+[CAPTURA DE PANTALLA 12: Vista del Modo Fácil mostrando una pregunta sobre 
+tipo de uso con las opciones (Básico, Redes Sociales, Gaming, Profesional, etc.)]
+
+[CAPTURA DE PANTALLA 13: Resultados del Modo Fácil mostrando los smartphones 
+recomendados con sus puntuaciones de coincidencia y badges explicativos]
+
+• 📊 Comparar: Esta funcionalidad te permite comparar hasta 3 smartphones lado 
+  a lado en una tabla detallada. Puedes comparar características como:
+  - Marca y modelo
+  - RAM y almacenamiento
+  - Resolución de cámara (frontal y trasera)
+  - Capacidad de batería
+  - Precio
+  - Sistema operativo
+  - Dimensiones y peso
+  Para agregar un teléfono a la comparación, simplemente haz clic en el botón 
+  "📊 Comparar" en cualquier tarjeta de smartphone. Esta herramienta es 
+  especialmente útil cuando estás decidiendo entre varias opciones finales.
+
+[CAPTURA DE PANTALLA 14: Vista de la sección Comparar mostrando una tabla 
+comparativa lado a lado de 3 smartphones con todas sus especificaciones 
+organizadas en columnas]
+
+[CAPTURA DE PANTALLA 15: Botón flotante de comparación en la esquina inferior 
+derecha mostrando el contador de smartphones agregados]
+
+• 👤 Mi Cuenta: Desde aquí puedes gestionar tu perfil y acceder a funciones 
+  personalizadas:
+  - Ver y editar tu información de perfil
+  - Acceder a tu lista de favoritos (smartphones que has marcado como interesantes)
+  - Revisar tu historial de búsquedas recientes
+  - Gestionar tus comentarios y calificaciones
+  - Configurar preferencias de visualización
+  - Cerrar sesión
+
+[CAPTURA DE PANTALLA 16: Vista de la sección Mi Cuenta mostrando el header con 
+estadísticas (favoritos y búsquedas) y las pestañas de Favoritos e Historial]
+
+[CAPTURA DE PANTALLA 17: Pestaña de Favoritos mostrando la lista de smartphones 
+guardados en formato de grid con tarjetas]
+
+[CAPTURA DE PANTALLA 18: Pestaña de Historial mostrando las búsquedas recientes 
+con filtros aplicados y botones para repetir o eliminar búsquedas]
+
+Nota: Los comentarios ahora se encuentran integrados en el modal de detalles de 
+cada smartphone. Para dejar una reseña, abre los detalles de un teléfono y 
+desplázate hasta la sección de comentarios.
+
+3.2 Búsqueda y Filtrado de Smartphones
+
+El sistema cuenta con un motor de búsqueda potente que te permite encontrar 
+exactamente lo que buscas:
+
+Búsqueda Básica:
+1. Ve a la sección "🔍 Búsqueda Avanzada" desde el menú principal.
+2. En la barra de búsqueda, escribe el nombre del modelo que buscas (ej: "iPhone 15", 
+   "Galaxy S23").
+3. Los resultados se mostrarán automáticamente mientras escribes.
+
+[CAPTURA DE PANTALLA 19: Barra de búsqueda con texto "iPhone 15" y resultados 
+apareciendo en tiempo real debajo]
+
+Búsqueda con Filtros:
+1. En la página de búsqueda avanzada, verás múltiples filtros desplegables.
+2. Selecciona los criterios que te interesan:
+   - Elige una o varias marcas del filtro "Marca"
+   - Establece un rango de precio usando los controles deslizantes
+   - Selecciona la cantidad mínima de RAM que necesitas
+   - Especifica el almacenamiento mínimo requerido
+   - Define el rango de capacidad de batería
+   - Establece la resolución mínima de cámara
+3. Los resultados se actualizarán automáticamente conforme seleccionas filtros.
+4. Puedes combinar múltiples filtros para refinar aún más tu búsqueda.
+5. Usa el menú desplegable "Ordenar por" para organizar los resultados según tu 
+   preferencia (precio, nombre, batería, etc.).
+
+[CAPTURA DE PANTALLA 20: Vista de los filtros aplicados mostrando selecciones 
+en marca (Samsung), precio ($10,000 - $20,000), RAM (8GB), y los resultados 
+filtrados actualizándose en tiempo real]
+
+Guardar Búsquedas:
+- Las búsquedas recientes se guardan automáticamente en tu historial (si has 
+  iniciado sesión).
+- Puedes acceder a tu historial desde "👤 Mi Cuenta" > "Historial de Búsquedas".
+
+3.3 Creación y Edición de Registros
+
+El flujo general para crear o modificar cualquier elemento en el sistema sigue 
+estos pasos:
+
+Agregar a Favoritos:
+1. Navega hasta cualquier smartphone en los resultados de búsqueda o en el panel 
+   general.
+2. Haz clic en el icono de corazón "❤️" en la esquina superior derecha de la 
+   tarjeta del smartphone.
+3. El smartphone se agregará automáticamente a tu lista de favoritos (el corazón 
+   cambiará de color para indicar que está guardado).
+4. Puedes ver todos tus favoritos desde "👤 Mi Cuenta" > "Favoritos".
+
+[CAPTURA DE PANTALLA 21: Tarjeta de smartphone mostrando el botón de favoritos 
+(❤️) en la esquina superior derecha, antes y después de hacer clic]
+
+Agregar a Comparación:
+1. En cualquier tarjeta de smartphone, localiza el botón "📊 Comparar" junto al 
+   botón de favoritos.
+2. Haz clic en "📊 Comparar" para agregar el smartphone a la lista de comparación 
+   (el botón cambiará de color para indicar que está seleccionado).
+3. Puedes agregar hasta 3 smartphones a la vez.
+4. Una vez que tengas los smartphones seleccionados, aparecerá un botón flotante 
+   en la esquina inferior derecha. Haz clic en él para ver la tabla detallada 
+   lado a lado.
+5. Para quitar un smartphone de la comparación, haz clic en el icono "X" junto 
+   a su nombre en la tabla de comparación.
+
+[CAPTURA DE PANTALLA 22: Tarjeta de smartphone mostrando el botón de comparar 
+(📊) activo y el botón flotante de comparación en la esquina inferior derecha 
+con el contador "2"]
+
+Crear un Comentario:
+1. Ve al detalle de cualquier smartphone haciendo clic en el botón "Ver Detalles" 
+   en su tarjeta.
+2. Se abrirá un modal con toda la información del smartphone. Desplázate hasta 
+   la sección "💬 Comentarios y Reseñas" al final del modal.
+3. Si no has iniciado sesión, verás un mensaje indicando que debes iniciar sesión 
+   para dejar comentarios.
+4. Si estás autenticado, verás un formulario para escribir tu reseña:
+   - Calificación: Selecciona de 1 a 5 estrellas haciendo clic en las estrellas 
+     (obligatorio)
+   - Comentario: Escribe tu reseña detallada (mínimo 10 caracteres, obligatorio)
+5. Haz clic en "Publicar Reseña".
+6. Tu comentario aparecerá inmediatamente en la lista de comentarios del smartphone 
+   con tu nombre de usuario y la fecha.
+
+[CAPTURA DE PANTALLA 23: Modal de detalles de smartphone mostrando la sección 
+de comentarios con el formulario para escribir una reseña (calificación con 
+estrellas y campo de texto)]
+
+[CAPTURA DE PANTALLA 24: Sección de comentarios mostrando comentarios existentes 
+con calificaciones, nombres de usuarios y fechas]
+
+Editar un Comentario:
+1. Ve a la sección de comentarios del smartphone donde dejaste tu comentario.
+2. Localiza tu comentario (aparecerá con tu nombre de usuario).
+3. Haz clic en el icono "Editar" (generalmente un lápiz ✏️) junto a tu comentario.
+4. Modifica el contenido que desees cambiar.
+5. Haz clic en "Guardar Cambios" o "Actualizar".
+
+Eliminar un Comentario:
+1. Localiza tu comentario en la sección correspondiente.
+2. Haz clic en el icono "Eliminar" (generalmente una papelera 🗑️) junto a tu comentario.
+3. Confirma la eliminación cuando se te solicite.
+4. El comentario se eliminará permanentemente.
+
+Quitar de Favoritos:
+1. Ve a "👤 Mi Cuenta" > "Mis Favoritos".
+2. Localiza el smartphone que deseas quitar.
+3. Haz clic en el icono de corazón "❤️" nuevamente (que ahora estará lleno/activo) 
+   o en el botón "Quitar de Favoritos".
+4. El smartphone se eliminará de tu lista de favoritos.
+
+Nota sobre Campos Obligatorios: Los campos marcados con un asterisco (*) o 
+indicados como "obligatorio" deben completarse para poder guardar el registro. 
+Si intentas guardar sin completar estos campos, verás un mensaje de error en 
+rojo indicándote qué campos faltan.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+4. Soporte y Solución de Problemas
+
+Si encuentras dificultades al usar el sistema, por favor revisa esta sección 
+antes de contactar a soporte. La mayoría de los problemas comunes tienen 
+soluciones rápidas que puedes aplicar tú mismo.
+
+4.1 Solución Rápida a Problemas Comunes
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Síntoma                          │ Solución Sugerida                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ La página se queda en blanco o   │ 1. Intenta recargar la página (F5 o     │
+│ es muy lenta.                    │    Ctrl+R).                              │
+│                                  │ 2. Si el problema persiste, limpia la     │
+│                                  │    caché de tu navegador:                 │
+│                                  │    - Chrome/Edge: Ctrl+Shift+Delete,     │
+│                                  │      selecciona "Caché" y "Eliminar"     │
+│                                  │    - Firefox: Ctrl+Shift+Delete,         │
+│                                  │      marca "Caché" y "Limpiar ahora"     │
+│                                  │ 3. Cierra y vuelve a abrir el navegador. │
+│                                  │ 4. Verifica tu conexión a Internet.      │
+│                                  │ 5. Si estás en modo offline, espera a     │
+│                                  │    que se restablezca la conexión.       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ No puedo guardar un nuevo        │ 1. Asegúrate de haber llenado todos los  │
+│ registro (favorito, comentario). │    campos obligatorios (marcados con *). │
+│                                  │ 2. Revisa si aparece un mensaje de error │
+│                                  │    rojo en la parte superior del         │
+│                                  │    formulario.                           │
+│                                  │ 3. Verifica que hayas iniciado sesión    │
+│                                  │    (algunas funciones requieren          │
+│                                  │    autenticación).                       │
+│                                  │ 4. Si intentas registrar un nombre de    │
+│                                  │    usuario que ya existe, elige otro.    │
+│                                  │ 5. Asegúrate de que tu contraseña cumpla │
+│                                  │    con los requisitos mínimos (8+        │
+│                                  │    caracteres).                          │
+│                                  │ 6. Intenta recargar la página y volver   │
+│                                  │    a intentar.                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Recibo un mensaje de "Acceso     │ 1. Verifica que has iniciado sesión     │
+│ Denegado" o "No autorizado".     │    correctamente. Busca tu nombre de     │
+│                                  │    usuario en el encabezado.             │
+│                                  │ 2. Si no has iniciado sesión, hazlo      │
+│                                  │    desde "👤 Mi Cuenta" > "Iniciar       │
+│                                  │    Sesión".                              │
+│                                  │ 3. Cierra sesión y vuelve a iniciar      │
+│                                  │    sesión para refrescar tus permisos.   │
+│                                  │ 4. Si el problema persiste, puede que    │
+│                                  │    no tengas los permisos necesarios     │
+│                                  │    para esa sección; contacta a tu       │
+│                                  │    administrador o al equipo de soporte. │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Los gráficos no se muestran o    │ 1. Verifica que JavaScript esté         │
+│ están vacíos.                    │    habilitado en tu navegador.           │
+│                                  │ 2. Espera unos segundos, los gráficos    │
+│                                  │    pueden tardar en cargar si hay muchos │
+│                                  │    datos.                                │
+│                                  │ 3. Recarga la página (F5).              │
+│                                  │ 4. Limpia la caché del navegador.        │
+│                                  │ 5. Prueba en otro navegador para         │
+│                                  │    descartar problemas de compatibilidad.│
+├─────────────────────────────────────────────────────────────────────────────┤
+│ No puedo agregar más de 3        │ Esto es una limitación intencional del   │
+│ smartphones a la comparación.    │ sistema para mantener la comparación    │
+│                                  │ clara y legible. Quita uno de los        │
+│                                  │ smartphones actuales antes de agregar    │
+│                                  │ uno nuevo.                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ El modo offline no funciona.     │ 1. Asegúrate de haber visitado el sitio  │
+│                                  │    al menos una vez con conexión a       │
+│                                  │    Internet para que se descarguen los   │
+│                                  │    datos necesarios.                     │
+│                                  │ 2. Verifica que tu navegador soporte     │
+│                                  │    Service Workers (navegadores          │
+│                                  │    modernos lo hacen).                   │
+│                                  │ 3. Revisa que el almacenamiento local    │
+│                                  │    no esté bloqueado en tu navegador.    │
+│                                  │ 4. Intenta recargar la página con        │
+│                                  │    conexión y luego desconecta.          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Los filtros no funcionan         │ 1. Asegúrate de haber seleccionado al    │
+│ correctamente.                   │    menos un criterio de búsqueda.       │
+│                                  │ 2. Verifica que los rangos de precio,    │
+│                                  │    RAM, etc., sean lógicos (el mínimo    │
+│                                  │    debe ser menor que el máximo).        │
+│                                  │ 3. Haz clic en "Limpiar Filtros" para    │
+│                                  │    restablecer y empezar de nuevo.       │
+│                                  │ 4. Recarga la página si los filtros se   │
+│                                  │    quedan "pegados".                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+4.2 Chatbot Integrado
+
+El sistema incluye un chatbot inteligente que puede ayudarte con preguntas 
+frecuentes y guiarte en el uso del sistema:
+
+Acceso al Chatbot:
+- Localiza el botón con el icono "💬" en la esquina inferior izquierda de la 
+  pantalla.
+- Haz clic en el botón para abrir la ventana del chatbot.
+
+[CAPTURA DE PANTALLA 25: Botón flotante del chatbot en la esquina inferior 
+izquierda de la pantalla]
+
+Funcionalidades del Chatbot:
+- Puedes hacer preguntas sobre cómo usar el sistema, por ejemplo:
+  * "¿Cómo busco un smartphone por precio?"
+  * "¿Cómo comparo dos teléfonos?"
+  * "¿Cuáles son los mejores smartphones para fotografía?"
+  * "¿Cómo funciona el modo offline?"
+- El chatbot ofrece respuestas guiadas y puede dirigirte a las secciones 
+  relevantes del sistema.
+- Puedes escribir preguntas en lenguaje natural (no necesitas usar comandos 
+  específicos).
+
+[CAPTURA DE PANTALLA 26: Ventana del chatbot abierta mostrando el mensaje de 
+bienvenida, opciones rápidas y el campo de entrada de texto]
+
+Recomendación: Consulta el chatbot antes de contactar al equipo de soporte, ya 
+que puede resolver muchas de tus dudas de forma inmediata.
+
+4.3 Contacto con el Equipo de Soporte
+
+Si el problema no se resuelve con las soluciones anteriores, o si encuentras un 
+error que no está documentado aquí, por favor contacta a nuestro equipo de 
+soporte proporcionando la siguiente información:
+
+Información de Contacto:
+• Correo de Soporte: soporte@pito-perez.app
+• Teléfono de Ayuda: +52 (55) 1234 5678
+• Horario de Atención: Lunes a Viernes, 9:00 AM - 6:00 PM (Hora del Centro de México)
+• Portal de Soporte: [URL del portal de soporte si está disponible]
+
+Información Requerida al Contactar:
+Para ayudarte de la manera más eficiente, por favor incluye la siguiente 
+información en tu solicitud de soporte:
+
+1. Tu nombre de usuario en el sistema
+2. La hora exacta en que ocurrió el error (incluye fecha y zona horaria)
+3. Una descripción detallada del problema:
+   - ¿Qué estabas intentando hacer cuando ocurrió el error?
+   - ¿Qué pasos seguiste antes de que apareciera el problema?
+   - ¿El error es reproducible? (¿ocurre cada vez que intentas la misma acción?)
+4. Una captura de pantalla del problema:
+   - En Windows: Usa la herramienta "Recortes" (Snipping Tool) o presiona 
+     Windows + Shift + S
+   - En Mac: Presiona Cmd + Shift + 4
+   - En móvil: Usa la función de captura de pantalla de tu dispositivo
+5. Información de tu navegador:
+   - Tipo de navegador y versión (ej: Chrome 120, Firefox 121)
+   - Sistema operativo (Windows 11, macOS Sonoma, Android 13, etc.)
+   - Resolución de pantalla
+6. Cualquier mensaje de error específico que hayas visto (copia el texto exacto)
+
+Tiempo de Respuesta:
+- Nuestro equipo se compromete a responder a todas las solicitudes de soporte 
+  en un plazo máximo de 24 horas hábiles.
+- Para problemas críticos que impiden el uso del sistema, haremos nuestro mejor 
+  esfuerzo para responder en menos de 4 horas.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+5. Recomendaciones Finales y Consejos de Uso
+
+Para aprovechar al máximo el sistema Pito Pérez, te recomendamos seguir estos 
+consejos:
+
+• Usa el "Modo Fácil" si no estás seguro de qué teléfono elegir: Este asistente 
+  te guiará paso a paso y te ayudará a identificar tus necesidades reales antes 
+  de sumergirte en las especificaciones técnicas.
+
+• Activa la función "📊 Comparar" desde cualquier tarjeta: Cuando encuentres 
+  varios smartphones que te interesan, no dudes en compararlos lado a lado. 
+  Esta es la mejor manera de ver las diferencias reales entre modelos.
+
+• Aprovecha el modo offline: Después de tu primera visita con conexión a Internet, 
+  la aplicación funciona completamente offline. Esto es especialmente útil si 
+  viajas o tienes conexión limitada.
+
+• Consulta el chatbot para dudas rápidas: Antes de contactar soporte, intenta 
+  hacer tu pregunta al chatbot integrado. Muchas veces obtendrás una respuesta 
+  inmediata.
+
+• Revisa los comentarios de otros usuarios: Las opiniones y calificaciones de 
+  la comunidad pueden darte insights valiosos que no encontrarás en las 
+  especificaciones técnicas.
+
+• Guarda tus favoritos: No pierdas de vista los smartphones que te interesan. 
+  Agrégalos a favoritos para consultarlos más tarde.
+
+• Explora el Panel General regularmente: Los gráficos de mercado te ayudan a 
+  entender las tendencias y te dan contexto sobre precios y características 
+  promedio del mercado.
+
+• Usa múltiples filtros en combinación: La búsqueda avanzada es más poderosa 
+  cuando combinas varios criterios. Experimenta con diferentes combinaciones 
+  para encontrar exactamente lo que buscas.
+
+• Mantén tu sesión activa: Algunas funcionalidades como favoritos y comentarios 
+  requieren que hayas iniciado sesión. Mantén tu sesión activa para una 
+  experiencia completa.
+
+• Actualiza tu navegador regularmente: Para garantizar la mejor experiencia y 
+  seguridad, mantén tu navegador actualizado a la última versión disponible.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+¡Gracias por usar Pito Pérez!
+
+Esperamos que esta guía te haya sido útil. Si tienes sugerencias para mejorar 
+el sistema o el manual, no dudes en contactarnos a través de los canales de 
+soporte mencionados anteriormente.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+6. Índice de Capturas de Pantalla
+
+Para facilitar la referencia, aquí está el índice completo de todas las 
+capturas de pantalla mencionadas en este manual:
+
+CAPTURA 1: Pantalla principal del sistema con menú de navegación y panel general
+CAPTURA 2: Botón de autenticación en el header
+CAPTURA 3: Modal de autenticación con pestañas
+CAPTURA 4: Formulario de registro completo
+CAPTURA 5: Header después de iniciar sesión
+CAPTURA 6: Modal de inicio de sesión
+CAPTURA 7: Menú principal completo de navegación
+CAPTURA 8: Panel General con gráficos interactivos
+CAPTURA 9: Sección de Búsqueda Avanzada con filtros
+CAPTURA 10: Resultados de búsqueda con tarjetas de smartphones
+CAPTURA 11: Modo Fácil - Primera pregunta (presupuesto)
+CAPTURA 12: Modo Fácil - Pregunta sobre tipo de uso
+CAPTURA 13: Resultados del Modo Fácil con recomendaciones
+CAPTURA 14: Tabla comparativa de smartphones
+CAPTURA 15: Botón flotante de comparación
+CAPTURA 16: Sección Mi Cuenta con pestañas
+CAPTURA 17: Pestaña de Favoritos
+CAPTURA 18: Pestaña de Historial de búsquedas
+CAPTURA 19: Barra de búsqueda con resultados en tiempo real
+CAPTURA 20: Filtros aplicados y resultados filtrados
+CAPTURA 21: Botón de favoritos en tarjeta de smartphone
+CAPTURA 22: Botón de comparar y botón flotante
+CAPTURA 23: Modal de detalles con formulario de comentarios
+CAPTURA 24: Sección de comentarios con reseñas existentes
+CAPTURA 25: Botón flotante del chatbot
+CAPTURA 26: Ventana del chatbot abierta
+
+Nota: Todas las capturas de pantalla deben ser actualizadas cuando se realicen 
+cambios significativos en la interfaz del sistema. Se recomienda tomar capturas 
+en diferentes resoluciones (desktop, tablet, móvil) para cubrir todos los casos 
+de uso.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Versión del Manual: 1.1
+Última actualización: Noviembre 2025
