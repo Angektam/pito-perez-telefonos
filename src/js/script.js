@@ -3613,7 +3613,7 @@ function showAuthModal(type = 'login') {
                 </div>
                 <div id="terms-container" class="${type === 'register' ? '' : 'hidden'}">
                     <div class="flex items-start">
-                        <input type="checkbox" id="auth-terms" class="mt-1 mr-2 w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500" required>
+                        <input type="checkbox" id="auth-terms" class="mt-1 mr-2 w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500" ${type === 'register' ? 'required' : ''}>
                         <label for="auth-terms" class="text-sm text-slate-700 dark:text-slate-300">
                             Acepto los 
                             <button type="button" onclick="window.showTermsModal()" class="text-indigo-600 hover:text-indigo-700 underline font-medium">
@@ -3744,7 +3744,7 @@ function showAuthModal(type = 'login') {
     tabLogin.addEventListener('click', () => switchTab('login'));
     tabRegister.addEventListener('click', () => switchTab('register'));
     
-    // Inicializar estado si se abre en modo registro
+    // Inicializar estado según el tipo
     if (type === 'register') {
         // Asegurar que el contenedor de términos esté visible
         termsContainer.classList.remove('hidden');
@@ -3753,6 +3753,11 @@ function showAuthModal(type = 'login') {
         if (passwordInput.value) {
             updatePasswordFeedback(passwordInput.value);
         }
+    } else {
+        // Si es login, asegurar que el checkbox no sea required
+        termsContainer.classList.add('hidden');
+        termsCheckbox.required = false;
+        termsCheckbox.checked = false;
     }
     
     // Validación en tiempo real del nombre de usuario (solo para registro)
