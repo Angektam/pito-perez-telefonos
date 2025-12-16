@@ -3457,13 +3457,13 @@ function enhanceTouchExperience() {
 
 // Inicializar botón de ayuda
 function initializeHelpButton() {
-    const helpBtn = document.getElementById('help-btn');
+    const logoContainer = document.getElementById('logo-container');
     const helpModal = document.getElementById('help-modal');
     const closeHelpModal = document.getElementById('close-help-modal');
     
-    if (helpBtn && helpModal) {
-        // Abrir modal al hacer clic en el botón de ayuda
-        helpBtn.addEventListener('click', () => {
+    if (logoContainer && helpModal) {
+        // Abrir modal al hacer clic en el logo
+        logoContainer.addEventListener('click', () => {
             helpModal.classList.remove('hidden');
             // Forzar reflow para que la animación funcione
             helpModal.offsetHeight;

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Limpiar Caché y Recargar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #4338ca;
+        }
+        .info {
+            background: #e0f2fe;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Limpiar Caché de la Aplicación</h1>
+        <div class="info">
+            <p>Este script limpiará el caché del navegador y localStorage para que las nuevas imágenes se carguen correctamente.</p>
+        </div>
+        
+        <button onclick="limpiarTodo()">Limpiar Todo y Recargar</button>
+        <button onclick="soloLimpiarCache()">Solo Limpiar Caché</button>
+        <button onclick="verificarImagenes()">Verificar Imágenes</button>
+        
+        <div id="resultado"></div>
+    </div>
+
+    <script>
+        function limpiarTodo() {
+            // Limpiar localStorage
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Limpiar caché del navegador (si es posible)
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        caches.delete(name);
+                    });
+                });
+            }
+            
+            document.getElementById('resultado').innerHTML = 
+                '<div class="success">✅ Caché limpiado! Ahora recarga index.html con Ctrl+F5</div>';
+        }
+        
+        function soloLimpiarCache() {
+            // Solo limpiar el caché de teléfonos
+            localStorage.removeItem('phoneDatabase_cache');
+            document.getElementById('resultado').innerHTML = 
+                '<div class="success">✅ Caché de teléfonos limpiado! Recarga index.html</div>';
+        }
+        
+        function verificarImagenes() {
+            const imagenes = [
+                'src/images/phones/iphone-15-pro.jpg',
+                'src/images/phones/iphone-15.jpg',
+                'src/images/phones/iphone-14-pro.jpg',
+                'src/images/phones/iphone-14.jpg',
+                'src/images/phones/galaxy-s24.jpg',
+                'src/images/phones/galaxy-s23.jpg',
+                'src/images/phones/galaxy-a54.jpg',
+                'src/images/phones/galaxy-a34.jpg'
+            ];
+            
+            let html = '<h3>Verificando imágenes:</h3><ul>';
+            let todasOk = true;
+            
+            imagenes.forEach(img => {
+                const imgEl = new Image();
+                imgEl.onload = function() {
+                    html += `<li style="color: green;">✓ ${img}</li>`;
+                    if (imagenes.indexOf(img) === imagenes.length - 1) {
+                        document.getElementById('resultado').innerHTML = html + '</ul>';
+                    }
+                };
+                imgEl.onerror = function() {
+                    html += `<li style="color: red;">✗ ${img} (NO ENCONTRADA)</li>`;
+                    todasOk = false;
+                    if (imagenes.indexOf(img) === imagenes.length - 1) {
+                        document.getElementById('resultado').innerHTML = html + '</ul>';
+                    }
+                };
+                imgEl.src = img;
+            });
+        }
+    </script>
+</body>
+</html>
+

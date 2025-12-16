@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Verificar Imágenes</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .imagen { margin: 20px 0; padding: 10px; border: 1px solid #ccc; }
+        .imagen img { max-width: 200px; height: auto; }
+        .error { color: red; }
+        .ok { color: green; }
+        button { padding: 10px 20px; margin: 10px 0; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Verificador de Imágenes</h1>
+    <button onclick="limpiarCache()">Limpiar Caché y Recargar</button>
+    <button onclick="verificarImagenes()">Verificar Imágenes</button>
+    <div id="resultados"></div>
+
+    <script>
+        function limpiarCache() {
+            localStorage.removeItem('phoneDatabase_cache');
+            localStorage.removeItem('favorites');
+            localStorage.removeItem('searchHistory');
+            sessionStorage.clear();
+            alert('Caché limpiado! Recarga la página principal (index.html) con Ctrl+F5');
+        }
+
+        function verificarImagenes() {
+            const imagenes = [
+                'src/images/phones/iphone-15-pro.jpg',
+                'src/images/phones/iphone-15.jpg',
+                'src/images/phones/iphone-14-pro.jpg',
+                'src/images/phones/iphone-14.jpg',
+                'src/images/phones/galaxy-s24.jpg',
+                'src/images/phones/galaxy-s23.jpg',
+                'src/images/phones/galaxy-a54.jpg',
+                'src/images/phones/galaxy-a34.jpg'
+            ];
+
+            const resultados = document.getElementById('resultados');
+            resultados.innerHTML = '<h2>Verificando imágenes...</h2>';
+
+            imagenes.forEach(img => {
+                const div = document.createElement('div');
+                div.className = 'imagen';
+                div.innerHTML = `<p>${img}</p>`;
+                
+                const imgElement = document.createElement('img');
+                imgElement.src = img;
+                imgElement.onload = function() {
+                    div.innerHTML += `<p class="ok">✓ Imagen cargada correctamente</p>`;
+                };
+                imgElement.onerror = function() {
+                    div.innerHTML += `<p class="error">✗ Error al cargar la imagen</p>`;
+                };
+                
+                div.appendChild(imgElement);
+                resultados.appendChild(div);
+            });
+        }
+
+        // Verificar automáticamente al cargar
+        window.onload = verificarImagenes;
+    </script>
+</body>
+</html>
+

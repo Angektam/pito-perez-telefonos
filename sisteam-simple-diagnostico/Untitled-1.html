@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teorema de Bayes - Diagnóstico de Gripe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #555;
+            margin-top: 20px;
+        }
+        pre {
+            background-color: #eee;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .formula {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .resultado {
+            font-size: 1.5em;
+            color: #28a745;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🤧 Teorema de Bayes: Sistema Simple de Diagnóstico</h1>
+        
+        <p>El objetivo es calcular la probabilidad de tener **Gripe dado que se tiene Fiebre** ($P(\text{Gripe} | \text{Fiebre})$).</p>
+
+        <h2>Datos Iniciales</h2>
+        <ul>
+            <li>$P(\text{Gripe}) = 0.2$</li>
+            <li>$P(\text{Fiebre} | \text{Gripe}) = 0.85$</li>
+            <li>$P(\text{Fiebre} | \text{No gripe}) = 0.1$</li>
+        </ul>
+
+        <h2>Fórmula de Bayes</h2>
+        <p class="formula">
+            $$P(\text{Gripe} | \text{Fiebre}) = \frac{P(\text{Fiebre} | \text{Gripe}) \cdot P(\text{Gripe})}{P(\text{Fiebre})}$$
+        </p>
+
+        <h2>Pasos del Cálculo</h2>
+        
+        <h3>1. Probabilidad de No Gripe ($P(\text{No gripe})$)</h3>
+        <pre>
+P(No gripe) = 1 - P(Gripe) = 1 - 0.2 = 0.8
+        </pre>
+
+        <h3>2. Probabilidad Total de Fiebre ($P(\text{Fiebre})$)</h3>
+        <p>Se utiliza la Ley de Probabilidad Total:</p>
+        <pre>
+P(Fiebre) = P(Fiebre | Gripe) * P(Gripe) + P(Fiebre | No gripe) * P(No gripe)
+P(Fiebre) = (0.85 * 0.2) + (0.1 * 0.8)
+P(Fiebre) = 0.17 + 0.08
+P(Fiebre) = 0.25
+        </pre>
+
+        <h3>3. Cálculo Final con Bayes</h3>
+        <pre>
+P(Gripe | Fiebre) = (0.85 * 0.2) / 0.25
+P(Gripe | Fiebre) = 0.17 / 0.25
+P(Gripe | Fiebre) = 0.68
+        </pre>
+
+        <h2>Resultado Final</h2>
+        <p class="resultado">
+            La probabilidad de tener gripe dado que se tiene fiebre es: <strong>0.68 (68%)</strong>
+        </p>
+    </div>
+
+</body>
+</html>

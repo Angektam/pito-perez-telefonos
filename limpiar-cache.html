@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Limpiar Caché</title>
+</head>
+<body>
+    <h1>Limpiar Caché de la Aplicación</h1>
+    <button onclick="limpiarCache()">Limpiar Caché y Recargar</button>
+    <script>
+        function limpiarCache() {
+            // Limpiar localStorage
+            localStorage.removeItem('phoneDatabase_cache');
+            localStorage.removeItem('favorites');
+            localStorage.removeItem('searchHistory');
+            localStorage.removeItem('comparisonPhones');
+            
+            // Limpiar sessionStorage
+            sessionStorage.clear();
+            
+            // Forzar recarga sin caché
+            window.location.reload(true);
+        }
+        
+        // Mostrar información del caché
+        window.onload = function() {
+            const cache = localStorage.getItem('phoneDatabase_cache');
+            if (cache) {
+                const data = JSON.parse(cache);
+                console.log('Caché encontrado:', data);
+                document.body.innerHTML += '<p>Caché encontrado. Haz clic en el botón para limpiarlo.</p>';
+            } else {
+                document.body.innerHTML += '<p>No hay caché en localStorage.</p>';
+            }
+        };
+    </script>
+</body>
+</html>
+

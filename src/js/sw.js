@@ -1,5 +1,9 @@
 // Service Worker para PWA - Pito Pérez
-const CACHE_NAME = 'pito-perez-v1.1';
+const CACHE_NAME = 'pito-perez-v2.0';
+const STATIC_CACHE = 'pito-perez-static-v2.0';
+const DYNAMIC_CACHE = 'pito-perez-dynamic-v2.0';
+
+// Recursos críticos que deben estar siempre en caché
 const urlsToCache = [
     './',
     './index.html',
@@ -8,21 +12,32 @@ const urlsToCache = [
     './src/js/script.js',
     './src/js/api.js',
     './src/js/security.js',
-    './src/js/fallback-db.js'
+    './src/js/fallback-db.js',
+    // Imágenes locales
+    './src/images/b4ad327a-a040-42bf-862e-fd1e192ba284.webp',
+    './src/images/phones/iphone-14-pro.jpg',
+    './src/images/phones/iphone-14.jpg',
+    './src/images/phones/iphone-15-pro.jpg',
+    './src/images/phones/iphone-15.jpg',
+    './src/images/phones/galaxy-s23.jpg',
+    './src/images/phones/galaxy-s24.jpg',
+    './src/images/phones/galaxy-a34.jpg',
+    './src/images/phones/galaxy-a54.jpg'
 ];
 
 // Instalación del Service Worker con manejo de errores
 self.addEventListener('install', (event) => {
     console.log('🔧 Service Worker instalando...');
     event.waitUntil(
-        caches.open(CACHE_NAME)
+        caches.open(STATIC_CACHE)
             .then((cache) => {
-                console.log('✅ Cache abierto:', CACHE_NAME);
+                console.log('✅ Cache estático abierto:', STATIC_CACHE);
                 // Intentar agregar archivos individualmente para mejor manejo de errores
-                return Promise.all(
+                return Promise.allSettled(
                     urlsToCache.map(url => {
                         return cache.add(url).catch(err => {
                             console.warn(`⚠️ No se pudo cachear ${url}:`, err.message);
+                            return null; // Continuar aunque falle uno
                         });
                     })
                 );
@@ -44,7 +59,8 @@ self.addEventListener('activate', (event) => {
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME) {
+                    // Mantener solo las cachés actuales
+                    if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE && cacheName !== CACHE_NAME) {
                         console.log('🗑️ Eliminando cache antigua:', cacheName);
                         return caches.delete(cacheName);
                     }
@@ -61,46 +77,88 @@ self.addEventListener('activate', (event) => {
 // Interceptar requests
 self.addEventListener('fetch', (event) => {
     const { request } = event;
+    const url = new URL(request.url);
     
     // Ignorar requests que no son GET
     if (request.method !== 'GET') {
         return;
     }
     
+    // Estrategia: Cache First para recursos estáticos, Network First para datos dinámicos
     event.respondWith(
         caches.match(request)
             .then((cachedResponse) => {
-                // Si está en cache, devolverla
+                // Si está en cache, devolverla (Cache First)
                 if (cachedResponse) {
                     return cachedResponse;
                 }
                 
-                // Si no está en cache, hacer fetch
+                // Si no está en cache, intentar fetch (Network First)
                 return fetch(request)
                     .then((response) => {
                         // Verificar si la respuesta es válida
                         if (!response || response.status !== 200 || response.type === 'error') {
+                            // Si falla y es un recurso local, intentar devolver una respuesta básica
+                            if (url.origin === self.location.origin) {
+                                // Para HTML, devolver index.html
+                                if (request.headers.get('accept')?.includes('text/html')) {
+                                    return caches.match('./index.html');
+                                }
+                            }
                             return response;
                         }
                         
                         // Clonar la respuesta antes de cachear
                         const responseToCache = response.clone();
                         
-                        // Solo cachear archivos locales
-                        const url = new URL(request.url);
-                        if (url.origin === self.location.origin) {
-                            caches.open(CACHE_NAME)
+                        // Cachear recursos locales y algunos externos importantes
+                        const shouldCache = 
+                            url.origin === self.location.origin || // Recursos locales
+                            url.hostname === 'fonts.googleapis.com' || // Fuentes de Google
+                            url.hostname === 'fonts.gstatic.com' || // Fuentes estáticas de Google
+                            url.hostname === 'cdn.tailwindcss.com' || // Tailwind CDN
+                            url.hostname === 'cdn.jsdelivr.net'; // Chart.js CDN
+                        
+                        if (shouldCache) {
+                            const cacheToUse = url.origin === self.location.origin ? STATIC_CACHE : DYNAMIC_CACHE;
+                            caches.open(cacheToUse)
                                 .then((cache) => {
                                     cache.put(request, responseToCache);
+                                })
+                                .catch(err => {
+                                    console.warn('Error al cachear:', err);
                                 });
                         }
                         
                         return response;
                     })
                     .catch((error) => {
-                        console.error('❌ Error en fetch:', error);
-                        // Devolver una respuesta de error básica
-                        return new Response('Sin conexión', { status: 503 });
+                        console.warn('⚠️ Error en fetch, intentando fallbacks:', error.message);
+                        
+                        // Fallbacks para recursos externos importantes
+                        if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
+                            // Para fuentes, devolver una respuesta vacía (el navegador usará fallback)
+                            return new Response('', {
+                                headers: { 'Content-Type': 'text/css' }
+                            });
+                        }
+                        
+                        // Para recursos locales, intentar devolver index.html si es HTML
+                        if (url.origin === self.location.origin) {
+                            if (request.headers.get('accept')?.includes('text/html')) {
+                                return caches.match('./index.html') || 
+                                       new Response('Sin conexión. Por favor, verifica tu internet.', { 
+                                           status: 503,
+                                           headers: { 'Content-Type': 'text/html; charset=utf-8' }
+                                       });
+                            }
+                        }
+                        
+                        // Para otros recursos, devolver error
+                        return new Response('Sin conexión', { 
+                            status: 503,
+                            headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+                        });
                     });
             })
     );
